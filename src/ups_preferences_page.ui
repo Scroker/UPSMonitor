@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="UpsPreferencesPage" parent="AdwPreferencesPage">
+    <child>
+      <object class="AdwPreferencesGroup" id="bettery_group">
+        <property name="title">Battery</property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="device_group">
+        <property name="title">Device</property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="driver_group">
+        <property name="title">Driver</property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="input_group">
+        <property name="title">Input</property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="output_group">
+        <property name="title">Output</property>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup" id="ups_group">
+        <property name="title">UPS</property>
+      </object>
+    </child>
+  </template>
+</interface>

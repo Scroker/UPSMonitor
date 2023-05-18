@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="AddNewServerBox" parent="GtkBox">
+    <property name="orientation">vertical</property>
+    <child>
+      <object class="AdwHeaderBar">
+        <property name="title-widget">
+          <object class="AdwWindowTitle">
+            <property name="title" translatable="yes">Add new server</property>
+          </object>
+        </property>
+        <child>
+          <object class="GtkButton" id="connect_button">
+            <property name="child">
+              <object class="AdwButtonContent">
+                <property name="icon-name">network-server-symbolic</property>
+                <property name="label" translatable="yes">_Connect</property>
+                <property name="use-underline">True</property>
+              </object>
+            </property>
+            <style>
+              <class name="suggested-action"/>
+            </style>
+          </object>
+        </child>
+        <child type="end">
+          <object class="GtkButton" id="cancel_button">
+            <property name="label" translatable="yes">_Cancel</property>
+            <property name="use-underline">True</property>
+            <style>
+              <class name="destructive-action"/>
+            </style>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkProgressBar" id="progress">
+        <property name="visible">False</property>
+        <style>
+          <class name="osd"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="error_label">
+        <property name="margin-start">20</property>
+        <property name="margin-end">20</property>
+        <property name="margin-top">20</property>
+        <property name="visible">False</property>
+        <property name="label">Ops! Something goes wrong..</property>
+        <style>
+          <class name="title-3"/>
+          <class name="error"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="connected_label">
+        <property name="margin-start">20</property>
+        <property name="margin-end">20</property>
+        <property name="margin-top">20</property>
+        <property name="visible">False</property>
+        <property name="label">Connected!</property>
+        <style>
+          <class name="title-3"/>
+          <class name="success"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="on_connection_label">
+        <property name="margin-start">20</property>
+        <property name="margin-end">20</property>
+        <property name="margin-top">20</property>
+        <property name="visible">False</property>
+        <property name="label">Connecting..</property>
+        <style>
+          <class name="title-3"/>
+          <class name="warning"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="margin-top">20</property>
+        <property name="label">Server</property>
+        <style>
+          <class name="title-4"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="AdwClamp">
+        <child>
+          <object class="GtkListBox">
+            <property name="margin-top">20</property>
+            <property name="margin-bottom">20</property>
+            <property name="margin-start">20</property>
+            <property name="margin-end">20</property>
+            <style>
+              <class name="boxed-list"/>
+            </style>
+            <child>
+              <object class="AdwEntryRow" id="ip_address">
+                <property name="title">IP Address</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwEntryRow" id="port">
+                <property name="title">Port</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="label">Authentication</property>
+        <style>
+          <class name="title-4"/>
+        </style>
+      </object>
+    </child>
+    <child>
+      <object class="AdwClamp">
+        <child>
+          <object class="GtkListBox">
+            <property name="margin-top">20</property>
+            <property name="margin-bottom">20</property>
+            <property name="margin-start">20</property>
+            <property name="margin-end">20</property>
+            <style>
+              <class name="boxed-list"/>
+            </style>
+            <child>
+              <object class="AdwEntryRow" id="username">
+                <property name="title">User</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPasswordEntryRow" id="password">
+                <property name="title">Password</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

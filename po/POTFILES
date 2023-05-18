@@ -1,0 +1,6 @@
+data/org.ponderorg.UPSMonitor.desktop.in
+data/org.ponderorg.UPSMonitor.appdata.xml.in
+data/org.ponderorg.UPSMonitor.gschema.xml
+src/main.py
+src/window.py
+src/window.ui

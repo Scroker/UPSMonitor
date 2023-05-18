@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="UpsmonitorWindow" parent="AdwApplicationWindow">
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+    <style>
+      <class name="devel"/>
+    </style>
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="AddNewServerBox" id="add_new_server">
+          </object>
+        </child>
+        <child>
+          <object class="AdwLeaflet" id="leaflet">
+            <property name="can-navigate-back">True</property>
+            <property name="vexpand">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="width-request">300</property>
+                <child>
+                  <object class="AdwHeaderBar">
+                    <binding name="show-end-title-buttons">
+                      <lookup name="folded">leaflet</lookup>
+                    </binding>
+                    <property name="title-widget">
+                      <object class="AdwWindowTitle">
+                        <property name="title" translatable="yes">UPSMonitor</property>
+                        <property name="subtitle" translatable="yes">A simple GUI for Network UPS Tools</property>
+                      </object>
+                    </property>
+                    <child type="start">
+                      <object class="GtkButton" id="add_server_button">
+                        <property name="icon-name">list-add-symbolic</property>
+                      </object>
+                    </child>
+                    <child type="start">
+                      <object class="GtkButton" id="update_button">
+                        <property name="icon-name">update-symbolic</property>
+                      </object>
+                    </child>
+                    <child type="end">
+                      <object class="GtkMenuButton">
+                        <property name="icon-name">open-menu-symbolic</property>
+                        <property name="menu-model">primary_menu</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBox" id="ups_list_box">
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwLeafletPage">
+                <property name="navigatable">False</property>
+                <property name="child">
+                  <object class="GtkSeparator"/>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="ups_page_leaflet">
+                <property name="orientation">vertical</property>
+                <property name="hexpand">True</property>
+                <property name="width-request">300</property>
+                <child>
+                  <object class="AdwHeaderBar">
+                    <binding name="show-start-title-buttons">
+                      <lookup name="folded">leaflet</lookup>
+                    </binding>
+                    <child>
+                      <object class="GtkButton" id="back_button">
+                        <binding name="visible">
+                          <lookup name="folded">leaflet</lookup>
+                        </binding>
+                        <property name="icon-name">go-previous-symbolic</property>
+                      </object>
+                    </child>
+                    <property name="title-widget">
+                      <object class="AdwWindowTitle" id="content_window_title">
+                      </object>
+                    </property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+  <menu id="primary_menu">
+    <section>
+      <!--
+      <item>
+        <attribute name="label" translatable="yes">_Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
+      </item>
+      -->
+      <item>
+        <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
+        <attribute name="action">win.show-help-overlay</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_About UPSMonitor</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>
+

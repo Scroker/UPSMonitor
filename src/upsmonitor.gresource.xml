@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/ponderorg/UPSMonitor">
+    <file preprocess="xml-stripblanks">window.ui</file>
+    <file preprocess="xml-stripblanks">ups_action_row.ui</file>
+    <file preprocess="xml-stripblanks">ups_preferences_page.ui</file>
+    <file preprocess="xml-stripblanks">monitor_preferences_window.ui</file>
+    <file preprocess="xml-stripblanks">add_new_server_box.ui</file>
+    <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
+  </gresource>
+  <gresource prefix="/org/ponderorg/UPSMonitor/icons/scalable/actions/">
+    <file preprocess="xml-stripblanks">update-symbolic.svg</file>
+  </gresource>
+</gresources>
