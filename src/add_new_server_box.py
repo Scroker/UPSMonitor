@@ -5,6 +5,9 @@ from pynut3 import nut3
 
 from gi.repository import Adw, Gtk, GLib, GObject
 
+from .data_model import Host
+from .host_services import HostServices
+
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/add_new_server_box.ui')
 class AddNewServerBox(Gtk.Box):
     __gtype_name__ = 'AddNewServerBox'
@@ -37,6 +40,9 @@ class AddNewServerBox(Gtk.Box):
         self.port.set_text('3493')
 
     def cancel(self, widget):
+        self.on_connection_label.set_visible(False)
+        self.connected_label.set_visible(False)
+        self.error_label.set_visible(False)
         self.emit("cancel_connection")
 
     def do_connect(self, widget):
@@ -44,14 +50,14 @@ class AddNewServerBox(Gtk.Box):
         self.on_connection_label.set_visible(True)
         self.connected_label.set_visible(False)
         self.error_label.set_visible(False)
-        thread = threading.Thread(target=self.example_target)
+        thread = threading.Thread(target=self.load_function)
         thread.daemon = True
         thread.start()
         thread = threading.Thread(target=self._do_connect)
         thread.daemon = True
         thread.start()
 
-    def example_target(self):
+    def load_function(self):
         for i in range(50):
             GLib.idle_add(self.update_progess, i)
             time.sleep(0.2)
@@ -74,8 +80,15 @@ class AddNewServerBox(Gtk.Box):
             if username != "" and password != "":
                 client = nut3.PyNUT3Client(host=host, login=username, password=password, port=port)
             else:
-                client = nut3.PyNUT3Client(host=host)
+                client = nut3.PyNUT3Client(host=host, port=port)
             if client != None:
+                host_services = HostServices()
+                if username != "" and password != "":
+                    host = Host(host, port, username, password)
+                    host_services.add_host(host)
+                else:
+                    host = Host(host, port, None, None)
+                    host_services.add_host(host)
                 self.connected_label.set_visible(True)
                 self.emit("conncetion_ok", client)
             self.emit("cancel_connection")
