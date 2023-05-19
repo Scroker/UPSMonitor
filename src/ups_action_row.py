@@ -10,6 +10,6 @@ class UpsActionRow(Adw.ActionRow):
         if ups_data != None:
             kwargs.pop("ups_data")
         super().__init__(**kwargs)
-        for k1, v1 in ups_data.items():
-            self.set_title(v1)
-            self.set_subtitle(k1)
+        self.ups_data = ups_data
+        self.set_title(self.ups_data.name)
+        self.set_subtitle(self.ups_data.key)

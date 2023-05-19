@@ -1,3 +1,3 @@
-# upsmonitor
+# UPSonitor
 
-A description of this project.
+UPSMonitor is a simple GTK

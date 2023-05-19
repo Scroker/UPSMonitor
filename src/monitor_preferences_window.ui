@@ -4,29 +4,14 @@
   <requires lib="Adw" version="1.0"/>
   <template class="MonitorPreferencesWindow" parent="AdwPreferencesWindow">
     <property name="default-width">600</property>
-    <property name="default-height">300</property>
+    <property name="default-height">600</property>
     <child>
       <object class="AdwPreferencesPage">
         <property name="title">Connections</property>
         <property name="icon-name">network-server-symbolic</property>
         <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title">Registered servers</property>
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">Server 1</property>
-              </object>
-            </child>
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">Server 2</property>
-              </object>
-            </child>
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">Server 3</property>
-              </object>
-            </child>
+          <object class="AdwPreferencesGroup" id="saved_profiles_group">
+            <property name="title">Saved Profiles</property>
           </object>
         </child>
       </object>

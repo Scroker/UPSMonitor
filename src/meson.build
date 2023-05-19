@@ -33,7 +33,7 @@ upsmonitor_sources = [
   'ups_action_row.py',
   'ups_preferences_page.py',
   'monitor_preferences_window.py',
-  'host_services.py',
+  'service_model.py',
   'data_model.py',
   'add_new_server_box.py',
 ]

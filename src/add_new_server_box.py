@@ -6,7 +6,7 @@ from pynut3 import nut3
 from gi.repository import Adw, Gtk, GLib, GObject
 
 from .data_model import Host
-from .host_services import HostServices
+from .service_model import HostServices, UPServices
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/add_new_server_box.ui')
 class AddNewServerBox(Gtk.Box):
@@ -14,19 +14,19 @@ class AddNewServerBox(Gtk.Box):
 
     ip_address = Gtk.Template.Child()
     progress = Gtk.Template.Child()
-    on_connection_label = Gtk.Template.Child()
-    connected_label = Gtk.Template.Child()
-    error_label = Gtk.Template.Child()
     username = Gtk.Template.Child()
     password = Gtk.Template.Child()
-    port = Gtk.Template.Child()
     connect_button = Gtk.Template.Child()
     cancel_button = Gtk.Template.Child()
+    port = Gtk.Template.Child()
+    banner = Gtk.Template.Child()
 
-    @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
-                    arg_types=(object,),
-                    accumulator=GObject.signal_accumulator_true_handled)
-    def conncetion_ok(self, *client):
+    #@GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
+    #                arg_types=(object,),
+    #                accumulator=GObject.signal_accumulator_true_handled)
+
+    @GObject.Signal
+    def conncetion_ok(self):
         print("signal : connceted")
 
     @GObject.Signal
@@ -40,22 +40,20 @@ class AddNewServerBox(Gtk.Box):
         self.port.set_text('3493')
 
     def cancel(self, widget):
-        self.on_connection_label.set_visible(False)
-        self.connected_label.set_visible(False)
-        self.error_label.set_visible(False)
         self.emit("cancel_connection")
 
     def do_connect(self, widget):
         self.progress.set_visible(True)
-        self.on_connection_label.set_visible(True)
-        self.connected_label.set_visible(False)
-        self.error_label.set_visible(False)
         thread = threading.Thread(target=self.load_function)
         thread.daemon = True
         thread.start()
         thread = threading.Thread(target=self._do_connect)
         thread.daemon = True
         thread.start()
+
+    def close_banner(self):
+        time.sleep(5)
+        self.banner.set_revealed(False)
 
     def load_function(self):
         for i in range(50):
@@ -69,30 +67,23 @@ class AddNewServerBox(Gtk.Box):
 
     def _do_connect(self):
         try:
-            host = self.ip_address.get_text()
+            ip_address = self.ip_address.get_text()
             username = self.username.get_text()
             password = self.password.get_text()
-            try:
-                port = int(self.port.get_text())
-            except ValueError:
-                print("TODO: Port value not valid")
-            client = None
+            port = int(self.port.get_text())
             if username != "" and password != "":
-                client = nut3.PyNUT3Client(host=host, login=username, password=password, port=port)
+                host = Host(ip_address=ip_address, port=port, username=username, password=password)
             else:
-                client = nut3.PyNUT3Client(host=host, port=port)
-            if client != None:
-                host_services = HostServices()
-                if username != "" and password != "":
-                    host = Host(host, port, username, password)
-                    host_services.add_host(host)
-                else:
-                    host = Host(host, port, None, None)
-                    host_services.add_host(host)
-                self.connected_label.set_visible(True)
-                self.emit("conncetion_ok", client)
-            self.emit("cancel_connection")
-        except nut3.PyNUT3Error:
-            self.error_label.set_visible(True)
-        self.on_connection_label.set_visible(False)
+                host = Host(ip_address=ip_address, port=port)
+            upservices = UPServices(host)
+            host_services = HostServices()
+            host_services.save_host(host)
+            self.emit("conncetion_ok")
+        except nut3.PyNUT3Error as inst:
+            self.banner.set_title("Ops! Connection error, please retry..")
+            self.banner.set_revealed(True)
+            thread = threading.Thread(target=self.close_banner, daemon = True)
+            thread.start()
+        except ValueError:
+                print("TODO: Port value not valid")
         self.progress.set_visible(False)
