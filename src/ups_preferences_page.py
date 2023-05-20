@@ -19,7 +19,6 @@ class UpsPreferencesPage(Adw.PreferencesPage):
         super().__init__(**kwargs)
         if ups_data != None:
             self.set_title(ups_data.name)
-            print(ups_data.battery)
             for k2 in ups_data.battery:
                 v2 = ups_data.battery[k2]
                 action_row = Adw.ActionRow()

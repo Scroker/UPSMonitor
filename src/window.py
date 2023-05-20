@@ -46,34 +46,33 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        host_services = HostServices()
         self.back_button.connect("clicked", self.on_back_button_clicked)
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
         self.update_button.connect("clicked", self.on_update_button_clicked)
         self.add_new_server.connect("cancel_connection", self.close_connection_window)
         self.add_new_server.connect("conncetion_ok", self.on_connection)
         self.add_new_server.set_visible(False)
+        self.hosts = host_services.get_all_hosts()
         thread = threading.Thread(target=self.refresh_data, daemon=True)
         thread.start()
 
 
-    def on_connection(self, widget):
+    def on_connection(self, widget, host):
         self.add_new_server.set_visible(False)
         self.leaflet.set_visible(True)
         self.set_deletable(True)
         self.close_connection_window()
+        self.hosts.append(host)
         thread = threading.Thread(target=self.refresh_data, daemon = True)
         thread.start()
 
     def refresh_data(self):
-        host_services = HostServices()
-        ups_list = []
-        for host in host_services.get_all_hosts():
-            try:
-                upservices = UPServices(host)
-                ups_list.extend(upservices.get_all_ups())
-            except PyNUT3Error as inst:
-                print(type(inst))    # the exception type
-        self.update_row(ups_list)
+        self.ups_list = []
+        for host in self.hosts:
+            upservices = UPServices(host)
+            self.ups_list.extend(upservices.get_all_ups())
+        self.update_row()
 
     def close_connection_window(self, widget=None):
         self.add_new_server.set_visible(False)
@@ -89,13 +88,12 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         thread = threading.Thread(target=self.refresh_data, daemon = True)
         thread.start()
 
-    def update_row(self, ups_list:[]):
+    def update_row(self):
         while self.ups_list_box.get_last_child() != None:
             self.ups_list_box.remove(self.ups_list_box.get_last_child())
         for element in self.ups_list_box:
             self.ups_list_box.remove(element)
-        print(ups_list)
-        for ups in ups_list:
+        for ups in self.ups_list:
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_row_selected)
             self.ups_list_box.insert(ups_action_row, -1)

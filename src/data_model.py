@@ -16,14 +16,22 @@ class UPS(GObject.Object):
         self.output = {}
         self.ups = {}
 
-
 class Host(GObject.Object):
     __gtype_name__ = 'Host'
 
-    def __init__(self, ip_address:str, port:int, host_id:int=None, username:str=None, password:str=None):
+    def __init__(self, profile_name:str, ip_address:str, port:int, host_id:int=None, username:str=None, password:str=None):
         super().__init__()
         self.host_id = host_id
+        self.profile_name = profile_name
         self.ip_address = ip_address
         self.port = port
         self.username = username
         self.password = password
+
+class HostAlreadyExist(Exception):
+
+    def __init__(self):
+        super().__init__()
+
+
+    

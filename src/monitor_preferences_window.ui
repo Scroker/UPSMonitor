@@ -10,8 +10,15 @@
         <property name="title">Connections</property>
         <property name="icon-name">network-server-symbolic</property>
         <child>
-          <object class="AdwPreferencesGroup" id="saved_profiles_group">
+          <object class="AdwPreferencesGroup">
             <property name="title">Saved Profiles</property>
+            <child>
+              <object class="GtkListBox" id="saved_profiles_list">
+                <style>
+                  <class name="boxed-list"/>
+                </style>
+              </object>
+            </child>
           </object>
         </child>
       </object>
@@ -20,16 +27,6 @@
       <object class="AdwPreferencesPage">
         <property name="title">Appearance</property>
         <property name="icon-name">preferences-desktop-appearance-symbolic</property>
-        <child>
-          <object class="AdwPreferencesGroup">
-            <property name="title">Registered servers</property>
-            <child>
-              <object class="AdwActionRow">
-                <property name="title">Appearence service</property>
-              </object>
-            </child>
-          </object>
-        </child>
       </object>
     </child>
   </template>

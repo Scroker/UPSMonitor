@@ -3,7 +3,7 @@ import sqlite3
 from pynut3 import nut3
 
 from gi.repository import GObject
-from .data_model import UPS, Host
+from .data_model import UPS, Host, HostAlreadyExist
 
 class UPServices(GObject.Object):
     ___gtype_name__ = 'UPServices'
@@ -49,32 +49,48 @@ class HostServices(GObject.Object):
         #self.conn.execute('''DROP TABLE IF EXISTS hosts''')
         self.conn.execute('''CREATE TABLE IF NOT EXISTS hosts
                              (id             INTEGER     PRIMARY KEY    AUTOINCREMENT,
+                             profile_name    CHAR(50),
                              ip_address      TEXT         NOT NULL,
                              port            INTEGER     NOT NULL,
                              username        CHAR(50),
-                             password        REAL);''')
+                             password        CHAR(50));''')
 
     def get_all_hosts(self) -> []:
-        query = "SELECT id, ip_address, port, username, password FROM HOSTS"
+        query = "SELECT id, profile_name, ip_address, port, username, password FROM HOSTS"
         cursor = self.conn.execute(query)
         host_list = []
         for row in cursor:
-           host_list.append(Host(row[1], row[2], row[0], row[3], row[4]))
+            print(row)
+            host_list.append(Host(row[1], row[2], row[3], row[0], row[3], row[4]))
         return host_list
 
     def get_host(self, host_id:int) -> []:
-        query = "SELECT id, ip_address, port, username, password FROM hosts WHERE id=" + str(host_id)
+        query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE id=" + str(host_id)
         cursor = self.conn.execute(query)
         for row in cursor:
-           return Host(row[1], row[2], row[0], row[3], row[4])
+           return Host(row[1], row[2], row[3], row[0], row[3], row[4])
         return host_list
 
     def save_host(self, host:Host):
+        query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name='" + host.profile_name + "'"
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        if cursor.fetchone() is not None:
+            raise Exception
         if host.username != None or host.username != None:
-            query = "INSERT INTO hosts (ip_address,port,username, password) VALUES ('" + host.ip_address + "'," + str(host.port) + "," + host.username + "," + host.password + ")"
+            query = "INSERT INTO hosts (profile_name, ip_address,port,username, password) VALUES ('"\
+                    + host.profile_name + "','"\
+                    + host.ip_address + "',"\
+                    + str(host.port) + ",'"\
+                    + host.username + "','"\
+                    + host.password + "')"
+            cursor.execute(query)
         else:
-            query = "INSERT INTO hosts (ip_address,port) VALUES ('" + host.ip_address + "'," + str(host.port) + ")"
-        self.conn.execute(query)
+            query = "INSERT INTO hosts (profile_name, ip_address, port) VALUES ('"\
+                    + host.profile_name + "','"\
+                    + host.ip_address + "',"\
+                    + str(host.port) + ")"
+            cursor.execute(query)
         self.conn.commit()
 
     def update_host(self, host:Host):
@@ -86,3 +102,4 @@ class HostServices(GObject.Object):
         query = "DELETE FROM hosts WHERE id=" + str(host_id)
         self.conn.execute(query)
         self.conn.commit()
+
