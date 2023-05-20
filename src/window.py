@@ -31,7 +31,7 @@ from .ups_action_row import UpsActionRow
 from .ups_preferences_page import UpsPreferencesPage
 from .add_new_server_box import AddNewServerBox
 
-@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/window.ui')
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/window.ui')
 class UpsmonitorWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'UpsmonitorWindow'
 

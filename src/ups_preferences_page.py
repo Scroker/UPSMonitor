@@ -1,7 +1,7 @@
 from gi.repository import Adw
 from gi.repository import Gtk
 
-@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ups_preferences_page.ui')
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_preferences_page.ui')
 class UpsPreferencesPage(Adw.PreferencesPage):
     __gtype_name__ = 'UpsPreferencesPage'
 

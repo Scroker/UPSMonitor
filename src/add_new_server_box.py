@@ -8,7 +8,7 @@ from gi.repository import Adw, Gtk, GLib, GObject
 from .data_model import Host
 from .service_model import HostServices, UPServices
 
-@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/add_new_server_box.ui')
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/add_new_server_box.ui')
 class AddNewServerBox(Gtk.Box):
     __gtype_name__ = 'AddNewServerBox'
 

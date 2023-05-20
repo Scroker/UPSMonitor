@@ -4,7 +4,7 @@ from gi.repository import Gtk
 from .data_model import Host
 from .service_model import HostServices
 
-@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/monitor_preferences_window.ui')
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/monitor_preferences_window.ui')
 class MonitorPreferencesWindow(Adw.PreferencesWindow):
     __gtype_name__ = 'MonitorPreferencesWindow'
 
