@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 from pynut3 import nut3
 
@@ -10,6 +11,7 @@ class UPServices(GObject.Object):
 
     def __init__(self, host:Host):
         super().__init__()
+        self.host = host
         if host.username != None and host.password != None:
             self.client = nut3.PyNUT3Client(host=host.ip_address, login=host.username, password=host.password, port=host.port)
         else:
@@ -19,7 +21,7 @@ class UPServices(GObject.Object):
         ups_dict = self.client.get_dict_ups()
         ups_list = []
         for k1, v1 in ups_dict.items():
-            ups = UPS(k1 , v1)
+            ups = UPS(k1 , v1, self.host)
             vars_dict = self.client.get_dict_vars(k1)
             for k2, v2 in vars_dict.items():
                 if "battery." in k2:
@@ -45,8 +47,9 @@ class HostServices(GObject.Object):
 
     def __init__(self):
         super().__init__()
-        self.conn = sqlite3.connect('ups_monitor.db')
-        #self.conn.execute('''DROP TABLE IF EXISTS hosts''')
+        if not os.path.exists("./.ups_monitor"):
+            os.mkdir("./.ups_monitor")
+        self.conn = sqlite3.connect('./.ups_monitor/ups_monitor.db')
         self.conn.execute('''CREATE TABLE IF NOT EXISTS hosts
                              (id             INTEGER     PRIMARY KEY    AUTOINCREMENT,
                              profile_name    CHAR(50),
@@ -70,6 +73,13 @@ class HostServices(GObject.Object):
         for row in cursor:
            return Host(row[1], row[2], row[3], row[0], row[3], row[4])
         return host_list
+
+    def get_host_by_name(self, host_name:str) -> []:
+            query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name='" + host_name + "'"
+            cursor = self.conn.execute(query)
+            for row in cursor:
+               return Host(row[1], row[2], row[3], row[0], row[3], row[4])
+            return host_list
 
     def save_host(self, host:Host):
         query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name='" + host.profile_name + "'"

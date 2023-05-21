@@ -3,8 +3,10 @@
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
   <template class="UpsmonitorWindow" parent="AdwApplicationWindow">
-    <property name="default-width">800</property>
-    <property name="default-height">600</property>
+    <property name="default-width">1200</property>
+    <property name="default-height">800</property>
+    <property name="width-request">300</property>
+    <property name="height-request">600</property>
     <style>
       <class name="devel"/>
     </style>
@@ -12,7 +14,7 @@
       <object class="GtkBox">
         <property name="orientation">vertical</property>
         <child>
-          <object class="AddNewServerBox" id="add_new_server">
+          <object class="AddNewServerBox" id="add_server_box">
           </object>
         </child>
         <child>
@@ -31,12 +33,12 @@
                     <property name="title-widget">
                       <object class="AdwWindowTitle">
                         <property name="title" translatable="yes">UPSMonitor</property>
-                        <property name="subtitle" translatable="yes">A simple GUI for Network UPS Tools</property>
+                        <property name="subtitle" translatable="yes">A simple client for Network UPS Tools</property>
                       </object>
                     </property>
                     <child type="start">
                       <object class="GtkButton" id="add_server_button">
-                        <property name="icon-name">network-server-symbolic</property>
+                        <property name="icon-name">plus-symbolic</property>
                       </object>
                     </child>
                     <child type="start">
@@ -48,6 +50,11 @@
                       <object class="GtkMenuButton">
                         <property name="icon-name">open-menu-symbolic</property>
                         <property name="menu-model">primary_menu</property>
+                      </object>
+                    </child>
+                    <child type="end">
+                      <object class="GtkToggleButton" id="show_servers_button">
+                        <property name="icon-name">network-server-symbolic</property>
                       </object>
                     </child>
                   </object>
@@ -81,12 +88,42 @@
                     <binding name="show-start-title-buttons">
                       <lookup name="folded">leaflet</lookup>
                     </binding>
-                    <child>
+                    <child type="start">
                       <object class="GtkButton" id="back_button">
                         <binding name="visible">
                           <lookup name="folded">leaflet</lookup>
                         </binding>
                         <property name="icon-name">go-previous-symbolic</property>
+                      </object>
+                    </child>
+                    <child type="start">
+                      <object class="GtkButton" id="save_button">
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">document-save-symbolic</property>
+                            <property name="label" translatable="yes">_Save</property>
+                            <property name="use-underline">True</property>
+                          </object>
+                        </child>
+                        <property name="visible">False</property>
+                        <style>
+                          <class name="suggested-action"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child type="end">
+                      <object class="GtkButton" id="delete_button">
+                        <child>
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">user-trash-symbolic</property>
+                            <property name="label" translatable="yes">_Delete</property>
+                            <property name="use-underline">True</property>
+                          </object>
+                        </child>
+                        <property name="visible">False</property>
+                        <style>
+                          <class name="destructive-action"/>
+                        </style>
                       </object>
                     </child>
                     <property name="title-widget">
@@ -104,11 +141,11 @@
   </template>
   <menu id="primary_menu">
     <section>
+      <!--
       <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
-      <!--
       <item>
         <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
         <attribute name="action">win.show-help-overlay</attribute>
@@ -121,4 +158,5 @@
     </section>
   </menu>
 </interface>
+
 

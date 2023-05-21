@@ -12,4 +12,7 @@ class UpsActionRow(Adw.ActionRow):
         super().__init__(**kwargs)
         self.ups_data = ups_data
         self.set_title(self.ups_data.name)
-        self.set_subtitle(self.ups_data.key)
+        if self.ups_data.host.profile_name != None:
+            self.set_subtitle(self.ups_data.host.profile_name)
+        else:
+            self.set_subtitle(self.ups_data.host.ip_address)    

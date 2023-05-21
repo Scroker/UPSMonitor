@@ -94,14 +94,14 @@ class AddNewServerBox(Gtk.Box):
             thread = threading.Thread(target=self.close_banner, daemon = True)
             thread.start()
             return
-        if username != "" and password != "":
+        if self.use_authentication.get_active() and username != "" and password != "":
             host = Host(None, ip_address=ip_address, port=port, username=username, password=password)
         else:
             host = Host(None, ip_address=ip_address, port=port)
         try:
             upservices = UPServices(host)
         except nut3.PyNUT3Error:
-            self.banner.set_title("Ops! Connection error, please retry..")
+            self.banner.set_title(_("Ops! Connection error, please retry.."))
             self.banner.set_revealed(True)
             self.progress.set_visible(False)
             thread = threading.Thread(target=self.close_banner, daemon = True)
@@ -117,8 +117,9 @@ class AddNewServerBox(Gtk.Box):
                     host.profile_name = name
                 host_services = HostServices()
                 host_services.save_host(host)
+                host = host_services.get_host_by_name(host.profile_name)
             except Exception:
-                self.banner.set_title("Profile name already exist")
+                self.banner.set_title(_("Profile name already exist"))
                 self.banner.set_revealed(True)
                 self.progress.set_visible(False)
                 thread = threading.Thread(target=self.close_banner, daemon = True)

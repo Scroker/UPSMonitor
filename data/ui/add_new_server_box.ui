@@ -66,12 +66,12 @@
             </style>
             <child>
               <object class="AdwEntryRow" id="ip_address">
-                <property name="title">IP Address</property>
+                <property name="title" translatable="yes">IP Address</property>
               </object>
             </child>
             <child>
               <object class="AdwEntryRow" id="port">
-                <property name="title">Port</property>
+                <property name="title" translatable="yes">Port</property>
               </object>
             </child>
           </object>
@@ -83,18 +83,12 @@
         <property name="halign">center</property>
         <child>
           <object class="GtkCheckButton" id="save_profile">
-            <style>
-              <class name="selection-mode"/>
-            </style>
           </object>
         </child>
         <child>
           <object class="GtkLabel">
             <property name="margin-start">10</property>
-            <property name="label">Salva il profilo</property>
-            <style>
-              <class name="title-4"/>
-            </style>
+            <property name="label" translatable="yes">Save profile</property>
           </object>
         </child>
       </object>
@@ -113,7 +107,7 @@
             </style>
             <child>
               <object class="AdwEntryRow" id="profile_name">
-                <property name="title">Profile name</property>
+                <property name="title" translatable="yes">Profile name</property>
               </object>
             </child>
           </object>
@@ -124,21 +118,14 @@
       <object class="GtkBox">
         <property name="margin-top">10</property>
         <property name="halign">center</property>
-        <property name="visible">False</property>
         <child>
           <object class="GtkCheckButton" id="use_authentication">
-            <style>
-              <class name="selection-mode"/>
-            </style>
           </object>
         </child>
         <child>
           <object class="GtkLabel">
             <property name="margin-start">10</property>
-            <property name="label">Autenticazione</property>
-            <style>
-              <class name="title-4"/>
-            </style>
+            <property name="label">Use authentication</property>
           </object>
         </child>
       </object>
@@ -157,12 +144,12 @@
             </style>
             <child>
               <object class="AdwEntryRow" id="username">
-                <property name="title">User</property>
+                <property name="title" translatable="yes">Username</property>
               </object>
             </child>
             <child>
               <object class="AdwPasswordEntryRow" id="password">
-                <property name="title">Password</property>
+                <property name="title" translatable="yes">Password</property>
               </object>
             </child>
           </object>

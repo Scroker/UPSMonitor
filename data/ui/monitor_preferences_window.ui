@@ -7,11 +7,11 @@
     <property name="default-height">600</property>
     <child>
       <object class="AdwPreferencesPage">
-        <property name="title">Connections</property>
+        <property name="title" translatable="yes">Connections</property>
         <property name="icon-name">network-server-symbolic</property>
         <child>
           <object class="AdwPreferencesGroup">
-            <property name="title">Saved Profiles</property>
+            <property name="title" translatable="yes">Saved Profiles</property>
             <child>
               <object class="GtkListBox" id="saved_profiles_list">
                 <style>
@@ -23,11 +23,6 @@
         </child>
       </object>
     </child>
-    <child>
-      <object class="AdwPreferencesPage">
-        <property name="title">Appearance</property>
-        <property name="icon-name">preferences-desktop-appearance-symbolic</property>
-      </object>
-    </child>
   </template>
 </interface>
+

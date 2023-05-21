@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=upsmonitor
+Name=UPSMonitor
 Exec=upsmonitor
 Icon=org.ponderorg.UPSMonitor
 Terminal=false

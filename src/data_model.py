@@ -1,20 +1,4 @@
-import sqlite3
-
 from gi.repository import GObject
-
-class UPS(GObject.Object):
-    __gtype_name__ = 'UPS'
-
-    def __init__(self, key:str, name:str):
-        super().__init__()
-        self.key = key
-        self.name = name
-        self.battery = {}
-        self.device = {}
-        self.driver = {}
-        self.input = {}
-        self.output = {}
-        self.ups = {}
 
 class Host(GObject.Object):
     __gtype_name__ = 'Host'
@@ -33,5 +17,17 @@ class HostAlreadyExist(Exception):
     def __init__(self):
         super().__init__()
 
+class UPS(GObject.Object):
+    __gtype_name__ = 'UPS'
 
-    
+    def __init__(self, key:str, name:str, host:Host):
+        super().__init__()
+        self.key = key
+        self.name = name
+        self.battery = {}
+        self.device = {}
+        self.driver = {}
+        self.input = {}
+        self.output = {}
+        self.ups = {}
+        self.host = host

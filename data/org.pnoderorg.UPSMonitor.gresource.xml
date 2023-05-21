@@ -3,12 +3,15 @@
   <gresource prefix="/org/ponderorg/UPSMonitor">
     <file preprocess="xml-stripblanks">ui/window.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_action_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_preferences_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/host_preferences_page.ui</file>
     <file preprocess="xml-stripblanks">ui/monitor_preferences_window.ui</file>
     <file preprocess="xml-stripblanks">ui/add_new_server_box.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/help-overlay.ui</file>
   </gresource>
   <gresource prefix="/org/ponderorg/UPSMonitor/icons/scalable/actions/">
-    <file preprocess="xml-stripblanks" alias="update-symbolic.svg">ui/update-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">icons/hicolor/scalable/actions/plus-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="update-symbolic.svg">icons/hicolor/scalable/actions/update-symbolic.svg</file>
   </gresource>
 </gresources>

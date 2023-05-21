@@ -1,0 +1,80 @@
+msgid "charge"
+msgstr "Charge"
+
+msgid "voltage"
+msgstr "Voltage"
+
+msgid "voltage.high"
+msgstr "High voltage"
+
+msgid "voltage.low"
+msgstr "Low voltage"
+
+msgid "voltage.nominal"
+msgstr "Nominal voltage"
+
+msgid "model"
+msgstr "Model"
+
+msgid "type"
+msgstr "Type"
+
+msgid "name"
+msgstr "Name"
+
+msgid "parameter.pollinterval"
+msgstr "Polling interval"
+
+msgid "parameter.port"
+msgstr "Port"
+
+msgid "parameter.synchronous"
+msgstr "Synchronous"
+
+msgid "version"
+msgstr "Version"
+
+msgid "version.internal"
+msgstr "Internal version"
+
+msgid "version.usb"
+msgstr "USB version"
+
+msgid "current.nominal"
+msgstr "Nominal current"
+
+msgid "voltage.fault"
+msgstr "Voltage fault"
+
+msgid "frequency.nominal"
+msgstr "Nominal frequency"
+
+msgid "frequency"
+msgstr "Frequency"
+
+msgid "beeper.status"
+msgstr "Beeper status"
+
+msgid "delay.shutdown"
+msgstr "Delay shutdown"
+
+msgid "delay.start"
+msgstr "Delay start"
+
+msgid "firmware"
+msgstr "Firmware"
+
+msgid "load"
+msgstr "Load"
+
+msgid "mfr"
+msgstr "MFR"
+
+msgid "status"
+msgstr "Status"
+
+msgid "vendorid"
+msgstr "Vendor ID"
+
+msgid "productid"
+msgstr "Product ID"

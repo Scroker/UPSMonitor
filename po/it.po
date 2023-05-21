@@ -1,0 +1,66 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
+"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+msgid "charge"
+msgstr "Carica"
+
+msgid "_Cancel"
+msgstr "_Cancella"
+
+msgid "_Connect"
+msgstr "_Connetti"
+
+msgid "Add new server"
+msgstr "Aggiungi un nuovo server"
+
+msgid "Save profile"
+msgstr "Salva il profilo"
+
+msgid "IP Address"
+msgstr "Indirizzo IP"
+
+msgid "Port"
+msgstr "Porta"
+
+msgid "Username"
+msgstr "Nome utente"
+
+msgid "Profile name"
+msgstr "Nome profilo"
+
+msgid  "_About UPSMonitor"
+msgstr  "_Informazioni su UPSMonitor"
+
+msgid "_Preferences"
+msgstr "_Preferenze"
+
+msgid "A simple client for Network UPS Tools"
+msgstr "Un semplice client per Network UPS Tools"
+
+msgid "Connections"
+msgstr "Connessioni"
+
+msgid "Saved Profiles"
+msgstr "Profili Salvati"
+
+msgid "Appearance"
+msgstr "Aspetto"
+
+msgid "Ops! Connection error, please retry.."
+msgstr "Ops! Errore di connessione, riprova prego.."
+
+msgid "Profile name already exist"
+msgstr "Il nome profilo già in uso"

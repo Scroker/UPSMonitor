@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="HostPreferencesPage" parent="AdwPreferencesPage">
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title">Profile</property>
+        <child>
+          <object class="AdwEntryRow" id="server_name_row">
+            <property name="title">Server name</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title">Authentication</property>
+        <child>
+          <object class="AdwEntryRow" id="username_row">
+            <property name="title">Username</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPasswordEntryRow" id="password_row">
+            <property name="title">Password</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title">Address</property>
+        <child>
+          <object class="AdwEntryRow" id="ip_address_row">
+            <property name="title">IP Address</property>
+          </object>
+        </child>
+        <child>
+          <object class="AdwEntryRow" id="port_row">
+            <property name="title">Port</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
