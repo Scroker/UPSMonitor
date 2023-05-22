@@ -56,6 +56,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
         self.update_button.connect("clicked", self.on_update_button_clicked)
         self.delete_button.connect("clicked", self.on_delete_host)
+        self.save_button.connect("clicked", self.on_save_host)
         self.add_server_box.connect("cancel_connection", self.close_connection_window)
         self.add_server_box.connect("conncetion_ok", self.on_connection)
         self.show_servers_button.connect("toggled", self.on_show_servers_toggled)
@@ -77,6 +78,19 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
             thread.start()
 
+    def on_save_host(self, widget):
+        child = self.ups_page_leaflet.get_last_child()
+        if isinstance(child, Adw.PreferencesPage):
+            host_services = HostServices()
+            host = child.host_data
+            host.profile_name = child.server_name_row.get_text()
+            host.ip_address = child.ip_address_row.get_text()
+            host.port = child.port_row.get_text()
+            host.username = child.username_row.get_text()
+            host.password = child.password_row.get_text()
+            host_services.update_host(host)
+            if self.show_servers_button.get_active():
+                self.update_host_row()
 
     def update_host_row(self):
         for element in self.ups_list_box:
@@ -105,6 +119,8 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                 host_services = HostServices()
                 host_services.delete_host(child.host_data.host_id)
                 self.hosts.remove(child.host_data)
+                self.save_button.set_visible(False)
+                self.delete_button.set_visible(False)
                 self.ups_page_leaflet.remove(child)
                 if self.show_servers_button.get_active():
                     self.update_host_row()
@@ -113,6 +129,9 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                         self.ups_list_box.remove(element)
                     thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
                     thread.start()
+                self.content_window_title.set_title("")
+                self.content_window_title.set_subtitle("")
+                self.leaflet.navigate(Adw.NavigationDirection.BACK)
         elif response == Gtk.ResponseType.CANCEL:
             pass
         widget.destroy()

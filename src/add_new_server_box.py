@@ -20,11 +20,9 @@ class AddNewServerBox(Gtk.Box):
     cancel_button = Gtk.Template.Child()
     port = Gtk.Template.Child()
     banner = Gtk.Template.Child()
-    use_authentication = Gtk.Template.Child()
-    save_profile = Gtk.Template.Child()
     profile_name = Gtk.Template.Child()
-    profile_clamp = Gtk.Template.Child()
-    auth_clamp = Gtk.Template.Child()
+    profile_row  = Gtk.Template.Child()
+    authentication_row = Gtk.Template.Child()
 
     @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
                     arg_types=(object,),
@@ -40,24 +38,10 @@ class AddNewServerBox(Gtk.Box):
         super().__init__(**kwargs)
         self.connect_button.connect("clicked", self.do_connect)
         self.cancel_button.connect("clicked",self.cancel)
-        self.save_profile.connect("toggled",self.enable_profile)
-        self.use_authentication.connect("toggled",self.enable_auth)
         self.port.set_text('3493')
 
     def cancel(self, widget):
         self.emit("cancel_connection")
-
-    def enable_profile(self, widget):
-        if self.save_profile.get_active():
-            self.profile_clamp.set_visible(True)
-        else:
-            self.profile_clamp.set_visible(False)
-
-    def enable_auth(self, widget):
-        if self.use_authentication.get_active():
-            self.auth_clamp.set_visible(True)
-        else:
-            self.auth_clamp.set_visible(False)
 
     def do_connect(self, widget):
         self.progress.set_visible(True)
@@ -94,10 +78,10 @@ class AddNewServerBox(Gtk.Box):
             thread = threading.Thread(target=self.close_banner, daemon = True)
             thread.start()
             return
-        if self.use_authentication.get_active() and username != "" and password != "":
-            host = Host(None, ip_address=ip_address, port=port, username=username, password=password)
+        if self.authentication_row.get_enable_expansion() and username != "" and password != "":
+            host = Host(host_id=None, ip_address=ip_address, port=port, username=username, password=password)
         else:
-            host = Host(None, ip_address=ip_address, port=port)
+            host = Host(host_id=None, ip_address=ip_address, port=port)
         try:
             upservices = UPServices(host)
         except nut3.PyNUT3Error:
@@ -107,9 +91,7 @@ class AddNewServerBox(Gtk.Box):
             thread = threading.Thread(target=self.close_banner, daemon = True)
             thread.start()
             return
-        if self.save_profile.get_active():
-            print(self.save_profile.get_active())
-            print(name)
+        if self.profile_row.get_enable_expansion():
             try:
                 if name == "" or name == None:
                     host.profile_name = host.ip_address

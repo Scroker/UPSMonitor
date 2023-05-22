@@ -74,82 +74,33 @@
                 <property name="title" translatable="yes">Port</property>
               </object>
             </child>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkBox">
-        <property name="halign">center</property>
-        <child>
-          <object class="GtkCheckButton" id="save_profile">
-          </object>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="margin-start">10</property>
-            <property name="label" translatable="yes">Save profile</property>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="AdwClamp" id="profile_clamp">
-        <property name="visible">false</property>
-        <child>
-          <object class="GtkListBox">
-            <property name="margin-top">20</property>
-            <property name="margin-bottom">20</property>
-            <property name="margin-start">20</property>
-            <property name="margin-end">20</property>
-            <style>
-              <class name="boxed-list"/>
-            </style>
             <child>
-              <object class="AdwEntryRow" id="profile_name">
-                <property name="title" translatable="yes">Profile name</property>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkBox">
-        <property name="margin-top">10</property>
-        <property name="halign">center</property>
-        <child>
-          <object class="GtkCheckButton" id="use_authentication">
-          </object>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="margin-start">10</property>
-            <property name="label">Use authentication</property>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="AdwClamp" id="auth_clamp">
-        <property name="visible">false</property>
-        <child>
-          <object class="GtkListBox">
-            <property name="margin-top">20</property>
-            <property name="margin-bottom">20</property>
-            <property name="margin-start">20</property>
-            <property name="margin-end">20</property>
-            <style>
-              <class name="boxed-list"/>
-            </style>
-            <child>
-              <object class="AdwEntryRow" id="username">
-                <property name="title" translatable="yes">Username</property>
+              <object class="AdwExpanderRow" id="profile_row">
+                <property name="title">Save profile</property>
+                <property name="enable-expansion">False</property>
+                <property name="show-enable-switch">True</property>
+                <child>
+                  <object class="AdwEntryRow" id="profile_name">
+                    <property name="title" translatable="yes">Profile name</property>
+                  </object>
+                </child>
               </object>
             </child>
             <child>
-              <object class="AdwPasswordEntryRow" id="password">
-                <property name="title" translatable="yes">Password</property>
+              <object class="AdwExpanderRow" id="authentication_row">
+                <property name="title">Use authentication</property>
+                <property name="enable-expansion">False</property>
+                <property name="show-enable-switch">True</property>
+                <child>
+                  <object class="AdwEntryRow" id="username">
+                    <property name="title" translatable="yes">Username</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwPasswordEntryRow" id="password">
+                    <property name="title" translatable="yes">Password</property>
+                  </object>
+                </child>
               </object>
             </child>
           </object>

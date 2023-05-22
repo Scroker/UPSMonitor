@@ -3,7 +3,7 @@ from gi.repository import GObject
 class Host(GObject.Object):
     __gtype_name__ = 'Host'
 
-    def __init__(self, profile_name:str, ip_address:str, port:int, host_id:int=None, username:str=None, password:str=None):
+    def __init__(self, ip_address:str, port:int, profile_name:str=None, host_id:int=None, username:str=None, password:str=None):
         super().__init__()
         self.host_id = host_id
         self.profile_name = profile_name

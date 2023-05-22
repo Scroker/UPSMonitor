@@ -50,66 +50,56 @@ class HostServices(GObject.Object):
         if not os.path.exists("./.ups_monitor"):
             os.mkdir("./.ups_monitor")
         self.conn = sqlite3.connect('./.ups_monitor/ups_monitor.db')
-        self.conn.execute('''CREATE TABLE IF NOT EXISTS hosts
+        cursor = self.conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS hosts
                              (id             INTEGER     PRIMARY KEY    AUTOINCREMENT,
                              profile_name    CHAR(50),
                              ip_address      TEXT         NOT NULL,
                              port            INTEGER     NOT NULL,
                              username        CHAR(50),
                              password        CHAR(50));''')
+        self.conn.commit()
 
     def get_all_hosts(self) -> []:
-        query = "SELECT id, profile_name, ip_address, port, username, password FROM HOSTS"
-        cursor = self.conn.execute(query)
+        cursor = self.conn.cursor()
+        result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM HOSTS")
         host_list = []
-        for row in cursor:
-            print(row)
-            host_list.append(Host(row[1], row[2], row[3], row[0], row[3], row[4]))
+        for row in result:
+            host = Host(row[2], row[3], row[1], row[0], row[4], row[5])
+            host_list.append(host)
         return host_list
 
     def get_host(self, host_id:int) -> []:
-        query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE id=" + str(host_id)
-        cursor = self.conn.execute(query)
-        for row in cursor:
-           return Host(row[1], row[2], row[3], row[0], row[3], row[4])
+        cursor = self.conn.cursor()
+        result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE id=?", (host_id,))
+        for row in result:
+           return Host(row[2], row[3], row[1], row[0], row[3], row[4])
         return host_list
 
     def get_host_by_name(self, host_name:str) -> []:
-            query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name='" + host_name + "'"
-            cursor = self.conn.execute(query)
-            for row in cursor:
-               return Host(row[1], row[2], row[3], row[0], row[3], row[4])
-            return host_list
+        cursor = self.conn.cursor()
+        result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name=?", (host_name,))
+        for row in result:
+           return Host(row[2], row[3], row[1], row[0], row[4], row[5])
+        return host_list
 
     def save_host(self, host:Host):
-        query = "SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name='" + host.profile_name + "'"
         cursor = self.conn.cursor()
-        cursor.execute(query)
+        cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name=?", (host.profile_name,))
         if cursor.fetchone() is not None:
             raise Exception
         if host.username != None or host.username != None:
-            query = "INSERT INTO hosts (profile_name, ip_address,port,username, password) VALUES ('"\
-                    + host.profile_name + "','"\
-                    + host.ip_address + "',"\
-                    + str(host.port) + ",'"\
-                    + host.username + "','"\
-                    + host.password + "')"
-            cursor.execute(query)
+            cursor.execute("INSERT INTO hosts (profile_name, ip_address, port,username, password) VALUES (?,?,?,?,?)", (host.profile_name, host.ip_address, host.port, host.username, host.password))
         else:
-            query = "INSERT INTO hosts (profile_name, ip_address, port) VALUES ('"\
-                    + host.profile_name + "','"\
-                    + host.ip_address + "',"\
-                    + str(host.port) + ")"
-            cursor.execute(query)
+            cursor.execute("INSERT INTO hosts (profile_name, ip_address, port) VALUES (?,?,?)", (host.profile_name, host.ip_address, host.port))
         self.conn.commit()
 
     def update_host(self, host:Host):
-        query = "UPDATE hosts SET ip_address='" + host.ip_address + "', port=" + ste(host.port )+ ", username='" + host.username + "', password='" + host.password + "' WHERE ID=" + str(host.host_id) + ")"
-        self.conn.execute(query)
+        cursor = self.conn.cursor()
+        cursor.execute("UPDATE hosts SET ip_address=?, port=?, profile_name=?, username=?, password=? WHERE id=?", (host.ip_address, host.port, host.profile_name, host.username, host.password, host.host_id))
         self.conn.commit()
 
     def delete_host(self, host_id:int):
-        query = "DELETE FROM hosts WHERE id=" + str(host_id)
-        self.conn.execute(query)
+        self.conn.execute("DELETE FROM hosts WHERE id=?", (host_id,))
         self.conn.commit()
 
