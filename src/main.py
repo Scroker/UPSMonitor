@@ -16,9 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 import sys
 import gi
+import time
+from threading import Thread, Timer
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -81,8 +82,18 @@ class UpsmonitorApplication(Adw.Application):
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
 
-
-def main(version):
+def start_gui():
     """The application's entry point."""
     app = UpsmonitorApplication()
     return app.run(sys.argv)
+
+def start_backend():
+    t = Timer(60.0, start_backend)
+    t.start()
+    print("Hello, World!")
+
+def main(version):
+    t = Thread(target=start_gui)
+    start_backend()
+    t.run()
+
