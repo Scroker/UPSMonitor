@@ -91,7 +91,7 @@ class Client():
         self._quit = service.get_dbus_method('quit', 'org.gdramis.UPSMonitorService.Quit')
 
     def run(self):
-        print ("Mesage from service:", self._message())
+        print ("Hosts:", self._message())
         self._quit()
 
 def start_gui():
@@ -100,7 +100,7 @@ def start_gui():
     return app.run(sys.argv)
 
 def start_backend():
-    UPSMonitorService("This is the service").run()
+    UPSMonitorService().run()
 
 def main(version):
     t_backend = Thread(target=start_backend)
