@@ -93,8 +93,8 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                 self.update_host_row()
 
     def update_host_row(self):
-        for element in self.ups_list_box:
-            self.ups_list_box.remove(element)
+        while self.ups_list_box.get_last_child() != None:
+            self.ups_list_box.remove(self.ups_list_box.get_last_child())
         for host in self.hosts:
             if host.profile_name != None:
                 host_action_row = HostActionRow(host_data = host)
@@ -171,8 +171,8 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         thread.start()
 
     def update_ups_row(self):
-        for element in self.ups_list_box:
-            self.ups_list_box.remove(element)
+        while self.ups_list_box.get_last_child() != None:
+            self.ups_list_box.remove(self.ups_list_box.get_last_child())
         for ups in self.ups_list:
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_ups_row_selected)
