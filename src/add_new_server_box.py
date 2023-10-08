@@ -12,17 +12,18 @@ from .service_model import HostServices, UPServices
 class AddNewServerBox(Gtk.Box):
     __gtype_name__ = 'AddNewServerBox'
 
-    ip_address = Gtk.Template.Child()
+    port = Gtk.Template.Child()
+    banner = Gtk.Template.Child()
     progress = Gtk.Template.Child()
     username = Gtk.Template.Child()
     password = Gtk.Template.Child()
-    connect_button = Gtk.Template.Child()
-    cancel_button = Gtk.Template.Child()
-    port = Gtk.Template.Child()
-    banner = Gtk.Template.Child()
+    ip_address = Gtk.Template.Child()
     profile_name = Gtk.Template.Child()
-    profile_row  = Gtk.Template.Child()
-    authentication_row = Gtk.Template.Child()
+    cancel_button = Gtk.Template.Child()
+    connect_button = Gtk.Template.Child()
+    save_profile_switch = Gtk.Template.Child()
+    authentication_switch = Gtk.Template.Child()
+
 
     @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
                     arg_types=(object,),
@@ -38,7 +39,6 @@ class AddNewServerBox(Gtk.Box):
         super().__init__(**kwargs)
         self.connect_button.connect("clicked", self.do_connect)
         self.cancel_button.connect("clicked",self.cancel)
-        self.port.set_text('3493')
 
     def cancel(self, widget):
         self.emit("cancel_connection")
@@ -78,7 +78,7 @@ class AddNewServerBox(Gtk.Box):
             thread = threading.Thread(target=self.close_banner, daemon = True)
             thread.start()
             return
-        if self.authentication_row.get_enable_expansion() and username != "" and password != "":
+        if self.authentication_switch.get_active() and username != "" and password != "":
             host = Host(host_id=None, ip_address=ip_address, port=port, username=username, password=password)
         else:
             host = Host(host_id=None, ip_address=ip_address, port=port)
@@ -91,7 +91,7 @@ class AddNewServerBox(Gtk.Box):
             thread = threading.Thread(target=self.close_banner, daemon = True)
             thread.start()
             return
-        if self.profile_row.get_enable_expansion():
+        if self.save_profile_switch.get_active():
             try:
                 if name == "" or name == None:
                     host.profile_name = host.ip_address

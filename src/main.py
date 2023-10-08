@@ -19,6 +19,7 @@
 import sys
 import gi
 import time
+import dbus
 from threading import Thread, Timer
 
 gi.require_version('Gtk', '4.0')
@@ -26,6 +27,7 @@ gi.require_version('Adw', '1')
 
 from gi.repository import Gtk, Gio, Adw
 from .window import UpsmonitorWindow
+from .ups_monitor_service import UPSMonitorService
 from .monitor_preferences_window import MonitorPreferencesWindow
 
 
@@ -81,19 +83,27 @@ class UpsmonitorApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
+class Client():
+    def __init__(self):
+        bus = dbus.SessionBus()
+        service = bus.get_object('org.gdramis.UPSMonitorService', "/org/gdramis/UPSMonitorService")
+        self._message = service.get_dbus_method('get_message', 'org.gdramis.UPSMonitorService.Message')
+        self._quit = service.get_dbus_method('quit', 'org.gdramis.UPSMonitorService.Quit')
+
+    def run(self):
+        print ("Mesage from service:", self._message())
+        self._quit()
 
 def start_gui():
-    """The application's entry point."""
+    Client().run()
     app = UpsmonitorApplication()
     return app.run(sys.argv)
 
 def start_backend():
-    t = Timer(60.0, start_backend)
-    t.start()
-    print("Hello, World!")
+    UPSMonitorService("This is the service").run()
 
 def main(version):
-    t = Thread(target=start_gui)
-    start_backend()
-    t.run()
+    t_backend = Thread(target=start_backend)
+    t_backend.start()
+    start_gui()
 
