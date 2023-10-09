@@ -40,6 +40,18 @@ class UPServices(GObject.Object):
                 elif "ups." in k2:
                     ups.ups[k2.replace('ups.','')]=v2
             ups_list.append(ups)
+        self.get_all_hosts_ups()
+        return ups_list
+
+    def get_all_hosts_ups(self):
+        ups_list = []
+        ups_dict = self.client.get_dict_ups()
+        for k1, v1 in ups_dict.items():
+           vars_dict = self.client.get_dict_vars(k1)
+           identifier = { "name" : k1 , "name.pretty" : v1}
+           vars_dict.update(identifier)
+           ups_list.append(vars_dict)
+        print(ups_list)
         return ups_list
 
 class HostServices(GObject.Object):

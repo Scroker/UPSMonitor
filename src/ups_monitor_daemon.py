@@ -22,11 +22,24 @@ class UPSMonitorService(dbus.service.Object):
 
     def run(self):
         self._ups_host_services = HostServices()
+        self._ups_host_connections = []
         GObject.timeout_add_seconds(10, self.hello)
         self._loop = GLib.MainLoop()
         print("UPS Monitor Service started")
         self._loop.run()
         print("UPS Monitor Service stopped")
+
+    @dbus.service.method("org.gdramis.UPSMonitorService.GetAllUPS", in_signature='', out_signature='aa{sv}')
+    def get_all_ups(self):
+        hosts = []
+        for host in self._ups_host_services.get_all_hosts():
+            host_dict = vars(host)
+            if (host_dict['username'] == None):
+                host_dict['username'] = 'None'
+            if (host_dict['password'] == None):
+                host_dict['password'] = 'None'
+            hosts.append(host_dict)
+        return hosts
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllHosts", in_signature='', out_signature='aa{sv}')
     def get_all_hosts(self):
@@ -92,10 +105,11 @@ class UPSMonitorService(dbus.service.Object):
         print("  shutting down")
         self._loop.quit()
 
-    @dbus.service.method("org.gdramis.UPSMonitorService.TestHostConnection", in_signature='a{sv}', out_signature='b')
-    def test_host_connection(self, host_dict:dict):
+    @dbus.service.method("org.gdramis.UPSMonitorService.HostConnection", in_signature='a{sv}', out_signature='b')
+    def host_connection(self, host_dict:dict):
         try:
-            upservices = UPServices(Host(host_dict=host_dict))
+            ups_services = UPServices(Host(host_dict=host_dict))
+            self.ups_host_connections.append(ups_services)
             return True
         except PyNUT3Error as error:
             print("Error during connection with Host: ", error.args[0])
@@ -107,13 +121,14 @@ class UPSMonitorClient(GObject.Object):
     def __init__(self):
         bus = dbus.SessionBus()
         service = bus.get_object('org.gdramis.UPSMonitorService', "/org/gdramis/UPSMonitorService")
+        self._introspect_dbus = service.get_dbus_method('Introspect', 'org.freedesktop.DBus.Introspectable')
         self._get_all_hosts_dbus = service.get_dbus_method('get_all_hosts', 'org.gdramis.UPSMonitorService.GetAllHosts')
         self._get_host_dbus = service.get_dbus_method('get_host', 'org.gdramis.UPSMonitorService.GetHost')
         self._get_host_by_name_dbus = service.get_dbus_method('get_host_by_name', 'org.gdramis.UPSMonitorService.GetHostByName')
         self._save_host_dbus = service.get_dbus_method('save_host', 'org.gdramis.UPSMonitorService.SaveHost')
         self._update_host_dbus = service.get_dbus_method('update_host', 'org.gdramis.UPSMonitorService.UpdateHost')
         self._delete_host_dbus = service.get_dbus_method('delete_host', 'org.gdramis.UPSMonitorService.DeleteHost')
-        self._test_host_connection_dbus = service.get_dbus_method('test_host_connection', 'org.gdramis.UPSMonitorService.TestHostConnection')
+        self._host_connection_dbus = service.get_dbus_method('host_connection', 'org.gdramis.UPSMonitorService.HostConnection')
         self._quit_service_dbus = service.get_dbus_method('quit', 'org.gdramis.UPSMonitorService.Quit')
 
     def _dbus_to_python(self, data):
@@ -142,6 +157,8 @@ class UPSMonitorClient(GObject.Object):
             return Host(host_dict=host_dict)
         else:
             return None
+    def introspect(self):
+        return self._introspect_dbus()
 
     def get_all_hosts(self):
         hosts = []
@@ -170,7 +187,7 @@ class UPSMonitorClient(GObject.Object):
     def delete_host(self, host_id:int):
         self._delete_host_dbus(host_id)
 
-    def test_host_connection(self, host:Host):
+    def host_connection(self, host:Host):
         host_dict = vars(host)
         if host_dict['host_id'] == None:
             host_dict['host_id'] = 'None'
@@ -180,7 +197,7 @@ class UPSMonitorClient(GObject.Object):
             host_dict['profile_name'] = 'None'
         if (host_dict['password'] == None):
             host_dict['password'] = 'None'
-        self._test_host_connection_dbus(host_dict)
+        self._host_connection_dbus(host_dict)
 
     def get_host(self, id):
         return self._list_to_object_host(self._dbus_to_python(self._get_host_dbus(id)))
@@ -191,12 +208,22 @@ class UPSMonitorClient(GObject.Object):
 class UPSMonitorServiceStarter(GObject.Object):
     __gtype_name__ = 'UPSMonitorServiceStarter'
 
+    def __init__(self):
+        self.process = None
+
     @staticmethod
     def start_backend():
         UPSMonitorService().run()
 
     def start(self):
         multiprocessing.set_start_method('spawn')
-        process = multiprocessing.Process(target = UPSMonitorServiceStarter.start_backend, daemon = True)
-        process.start()
-        return process
+        try:
+            UPSMonitorClient()
+        except dbus.exceptions.DBusException as e:
+            if e._dbus_error_name == 'org.freedesktop.DBus.Error.ServiceUnknown':
+                self.process = multiprocessing.Process(target = UPSMonitorServiceStarter.start_backend, daemon = True)
+                self.process.start()
+
+    def join(self):
+        if self.process != None:
+            self.process.join()

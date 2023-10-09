@@ -83,7 +83,7 @@
             </child>
             <child>
               <object class="AdwSpinRow" id="port">
-                <property name="title" translatable="yes">Spin Row</property>
+                <property name="title" translatable="yes">Port</property>
                 <property name="adjustment">
                   <object class="GtkAdjustment">
                     <property name="lower">0</property>

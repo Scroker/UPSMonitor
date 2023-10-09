@@ -66,7 +66,8 @@ class UpsmonitorApplication(Adw.Application):
             self.set_accels_for_action(f"app.{name}", shortcuts)
 
 def main(version):
-    daemon_process = UPSMonitorServiceStarter().start()
+    daemon_process = UPSMonitorServiceStarter()
+    daemon_process.start()
     app = UpsmonitorApplication()
     result = app.run(sys.argv)
     daemon_process.join()

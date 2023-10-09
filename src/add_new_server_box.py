@@ -84,7 +84,7 @@ class AddNewServerBox(Gtk.Box):
             host = Host(host_id=None, ip_address=ip_address, port=port, username=username, password=password)
         else:
             host = Host(host_id=None, ip_address=ip_address, port=port)
-        if not ups_monitor_client.test_host_connection(host):
+        if not ups_monitor_client.host_connection(host):
             self.banner.set_title(_("Ops! Connection error, please retry.."))
             self.banner.set_revealed(True)
             self.progress.set_visible(False)
