@@ -70,6 +70,7 @@ class AddNewServerBox(Gtk.Box):
         username = self.username.get_text()
         password = self.password.get_text()
         name = self.profile_name.get_text()
+        ups_monitor_client = UPSMonitorClient()
         try:
             port = int(self.port.get_text())
         except ValueError:
@@ -83,9 +84,7 @@ class AddNewServerBox(Gtk.Box):
             host = Host(host_id=None, ip_address=ip_address, port=port, username=username, password=password)
         else:
             host = Host(host_id=None, ip_address=ip_address, port=port)
-        try:
-            upservices = UPServices(host)
-        except nut3.PyNUT3Error:
+        if not ups_monitor_client.test_host_connection(host):
             self.banner.set_title(_("Ops! Connection error, please retry.."))
             self.banner.set_revealed(True)
             self.progress.set_visible(False)
@@ -98,9 +97,8 @@ class AddNewServerBox(Gtk.Box):
                     host.profile_name = host.ip_address
                 else:
                     host.profile_name = name
-                host_services = UPSMonitorClient()
-                host_services.save_host(host)
-                host = host_services.get_host_by_name(host.profile_name)
+                ups_monitor_client.save_host(host)
+                host = ups_monitor_client.get_host_by_name(host.profile_name)
             except Exception:
                 self.banner.set_title(_("Profile name already exist"))
                 self.banner.set_revealed(True)
