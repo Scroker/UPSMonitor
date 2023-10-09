@@ -1,5 +1,6 @@
 from gi.repository import Adw
 from gi.repository import Gtk
+from .ups_monitor_daemon import UPSMonitorClient
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_action_row.ui')
 class UpsActionRow(Adw.ActionRow):
@@ -13,11 +14,12 @@ class UpsActionRow(Adw.ActionRow):
             kwargs.pop("ups_data")
         super().__init__(**kwargs)
         self.ups_data = ups_data
-        self.set_title(self.ups_data.name)
-        if self.ups_data.host.profile_name != None:
-            self.set_subtitle(self.ups_data.host.profile_name)
+        self.set_title(self.ups_data.ups_name)
+        host = UPSMonitorClient().get_host(self.ups_data.host_id)
+        if host.profile_name != None:
+            self.set_subtitle(host.profile_name)
         else:
-            self.set_subtitle(self.ups_data.host.ip_address)
+            self.set_subtitle(host.ip_address)
         image_name = "battery-full-symbolic"
         if self.ups_data.ups["status"] == "OB":
             if int(self.ups_data.battery["charge"]) >= 90:

@@ -18,7 +18,7 @@ class UpsPreferencesPage(Adw.PreferencesPage):
             kwargs.pop("ups_data")
         super().__init__(**kwargs)
         if ups_data != None:
-            self.set_title(ups_data.name)
+            self.set_title(ups_data.ups_name)
             for k2 in ups_data.battery:
                 v2 = ups_data.battery[k2]
                 action_row = Adw.ActionRow()
@@ -56,4 +56,4 @@ class UpsPreferencesPage(Adw.PreferencesPage):
         action_row = Adw.ActionRow()
         action_row.set_title(_(title))
         action_row.add_suffix(Gtk.Label(label=value))
-        return action_row        
+        return action_row

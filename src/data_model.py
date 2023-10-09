@@ -48,14 +48,14 @@ class HostAlreadyExist(Exception):
 class UPS(GObject.Object):
     __gtype_name__ = 'UPS'
 
-    def __init__(self, key:str, name:str, host:Host):
+    def __init__(self, key:str, ups_name:str, host_id:int):
         super().__init__()
         self.key = key
-        self.name = name
+        self.ups_name = ups_name
         self.battery = {}
         self.device = {}
         self.driver = {}
         self.input = {}
         self.output = {}
         self.ups = {}
-        self.host = host
+        self.host_id = host_id

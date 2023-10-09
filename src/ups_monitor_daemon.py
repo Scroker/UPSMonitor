@@ -7,23 +7,47 @@ from gi.repository import GLib
 from gi.repository import GObject
 from pynut3.nut3 import PyNUT3Error
 
-from .data_model import Host
+from .data_model import Host, UPS
 from .service_model import HostServices, UPServices
 
 class UPSMonitorService(dbus.service.Object):
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-        bus_name = dbus.service.BusName("org.gdramis.UPSMonitorService", dbus.SessionBus())
+        session_bus = dbus.SessionBus()
+        bus_name = dbus.service.BusName("org.gdramis.UPSMonitorService", session_bus)
         dbus.service.Object.__init__(self, bus_name, "/org/gdramis/UPSMonitorService")
+        notification_service = session_bus.get_object('org.freedesktop.Notifications', "/org/freedesktop/Notifications")
+        self._notify = notification_service.get_dbus_method('Notify', 'org.freedesktop.Notifications')
+        self._ups_host_services = HostServices()
+        self._offline_ups_notified = []
+        self._low_battery_ups_notified = []
 
     def hello(self):
-       print("Hello world!")
-       return True
+        try:
+            for host_dict in self.get_all_ups():
+                if host_dict['ups.status'] != 'OL' and host_dict['name'] not in self._offline_ups_notified :
+                    self._offline_ups_notified.append(host_dict['name'])
+                    self._notify("", 0, "battery-caution-symbolic", host_dict['name.pretty'] + " is now offline!", "Charge at " + host_dict['battery.charge'] + "%", [], {"urgency": 1}, 3000)
+                if host_dict['ups.status'] != 'OL' and int(host_dict['battery.charge']) <= 20 and host_dict['name'] not in self._low_battery_ups_notified :
+                    self._offline_ups_notified.append(host_dict['name'])
+                    self._notify("", 0, "battery-empty-symbolic", host_dict['name.pretty'] + " have low battery!", "Charge at " + host_dict['battery.charge'] + "%", [], {"urgency": 1}, 3000)
+        except PyNUT3Error as e:
+            print("Error, try reset connections!")
+            self._start_connection()
+        return True
+
+    def _start_connection(self):
+        self._ups_host_connections = []
+        for host in self._ups_host_services.get_all_hosts():
+            try:
+                ups_services = UPServices(host)
+                self._ups_host_connections.append(ups_services)
+            except PyNUT3Error as e:
+                pass
 
     def run(self):
-        self._ups_host_services = HostServices()
-        self._ups_host_connections = []
-        GObject.timeout_add_seconds(10, self.hello)
+        self._start_connection()
+        GObject.timeout_add_seconds(5, self.hello)
         self._loop = GLib.MainLoop()
         print("UPS Monitor Service started")
         self._loop.run()
@@ -31,15 +55,10 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllUPS", in_signature='', out_signature='aa{sv}')
     def get_all_ups(self):
-        hosts = []
-        for host in self._ups_host_services.get_all_hosts():
-            host_dict = vars(host)
-            if (host_dict['username'] == None):
-                host_dict['username'] = 'None'
-            if (host_dict['password'] == None):
-                host_dict['password'] = 'None'
-            hosts.append(host_dict)
-        return hosts
+        UPSs = []
+        for connection in self._ups_host_connections:
+            UPSs += connection.get_all_hosts_ups()
+        return UPSs
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllHosts", in_signature='', out_signature='aa{sv}')
     def get_all_hosts(self):
@@ -122,6 +141,7 @@ class UPSMonitorClient(GObject.Object):
         bus = dbus.SessionBus()
         service = bus.get_object('org.gdramis.UPSMonitorService', "/org/gdramis/UPSMonitorService")
         self._introspect_dbus = service.get_dbus_method('Introspect', 'org.freedesktop.DBus.Introspectable')
+        self._get_all_ups_dbus = service.get_dbus_method('get_all_ups', 'org.gdramis.UPSMonitorService.GetAllUPS')
         self._get_all_hosts_dbus = service.get_dbus_method('get_all_hosts', 'org.gdramis.UPSMonitorService.GetAllHosts')
         self._get_host_dbus = service.get_dbus_method('get_host', 'org.gdramis.UPSMonitorService.GetHost')
         self._get_host_by_name_dbus = service.get_dbus_method('get_host_by_name', 'org.gdramis.UPSMonitorService.GetHostByName')
@@ -159,6 +179,29 @@ class UPSMonitorClient(GObject.Object):
             return None
     def introspect(self):
         return self._introspect_dbus()
+
+    def get_all_ups(self):
+        UPSs = []
+        for ups_dict in self._dbus_to_python(self._get_all_ups_dbus()):
+            ups = UPS(ups_dict["name"] , ups_dict["name.pretty"], ups_dict["host_id"])
+            for k2, v2 in ups_dict.items():
+                if "battery." in k2:
+                    ups.battery[k2.replace('battery.','')]=v2
+                elif "device." in k2:
+                    ups.device[k2.replace('device.','')]=v2
+                elif "driver." in k2:
+                    k2.replace('driver.','')
+                    ups.driver[k2.replace('driver.','')]=v2
+                elif "input." in k2:
+                    k2.replace('input.','')
+                    ups.input[k2.replace('input.','')]=v2
+                elif "output." in k2:
+                    k2.replace('output.','')
+                    ups.output[k2.replace('output.','')]=v2
+                elif "ups." in k2:
+                    ups.ups[k2.replace('ups.','')]=v2
+            UPSs.append(ups)
+        return UPSs
 
     def get_all_hosts(self):
         hosts = []

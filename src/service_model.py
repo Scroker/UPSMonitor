@@ -17,41 +17,14 @@ class UPServices(GObject.Object):
         else:
             self.client = nut3.PyNUT3Client(host=host.ip_address, port=host.port)
 
-    def get_all_ups(self):
-        ups_dict = self.client.get_dict_ups()
-        ups_list = []
-        for k1, v1 in ups_dict.items():
-            ups = UPS(k1 , v1, self.host)
-            vars_dict = self.client.get_dict_vars(k1)
-            for k2, v2 in vars_dict.items():
-                if "battery." in k2:
-                    ups.battery[k2.replace('battery.','')]=v2
-                elif "device." in k2:
-                    ups.device[k2.replace('device.','')]=v2
-                elif "driver." in k2:
-                    k2.replace('driver.','')
-                    ups.driver[k2.replace('driver.','')]=v2
-                elif "input." in k2:
-                    k2.replace('input.','')
-                    ups.input[k2.replace('input.','')]=v2
-                elif "output." in k2:
-                    k2.replace('output.','')
-                    ups.output[k2.replace('output.','')]=v2
-                elif "ups." in k2:
-                    ups.ups[k2.replace('ups.','')]=v2
-            ups_list.append(ups)
-        self.get_all_hosts_ups()
-        return ups_list
-
     def get_all_hosts_ups(self):
         ups_list = []
         ups_dict = self.client.get_dict_ups()
         for k1, v1 in ups_dict.items():
            vars_dict = self.client.get_dict_vars(k1)
-           identifier = { "name" : k1 , "name.pretty" : v1}
+           identifier = { "name" : k1 , "name.pretty" : v1, "host_id" : self.host.host_id }
            vars_dict.update(identifier)
            ups_list.append(vars_dict)
-        print(ups_list)
         return ups_list
 
 class HostServices(GObject.Object):
@@ -83,7 +56,6 @@ class HostServices(GObject.Object):
 
     def get_host(self, host_id:int) -> []:
         cursor = self.conn.cursor()
-        print(host_id)
         result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE id=?", (host_id,))
         for row in result:
            return Host(row[2], row[3], row[1], row[0], row[3], row[4])

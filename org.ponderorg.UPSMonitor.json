@@ -25,8 +25,8 @@
         "*.a"
     ],
     "modules" : [
-        {
-    	    "name": "python3-pynut3",
+       {
+	    "name": "python3-pynut3",
 	    "buildsystem": "simple",
 	    "build-commands": [
 		"pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pynut3\" --no-build-isolation"
@@ -34,8 +34,8 @@
 	    "sources": [
 		{
 		    "type": "file",
-		    "url": "https://files.pythonhosted.org/packages/02/3d/e00efc3189a5d2cb192d972f021c182849444eacc82fb91957fe0a41c8f9/pynut3-1.2.5-py3-none-any.whl",
-		    "sha256": "6b14cb8138f68fadb87e5c84f3a8ccebf849342d605d2a59d2e3a5109db378b8"
+		    "url": "https://files.pythonhosted.org/packages/7f/2c/cc030cab4669c4ec431f54baf235db33648dbb2e303443dac096cc7c42ae/pynut3-1.4.4-py3-none-any.whl",
+		    "sha256": "5d131c91253eb480a76ef95db54b8b61f85396a966f1e8f5340796d383530920"
 		}
 	    ]
 	},
