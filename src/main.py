@@ -78,6 +78,7 @@ def start_gui():
     return app.run(sys.argv)
 
 def main(version):
-    UPSMonitorServiceStarter().start()
+    daemon_process = UPSMonitorServiceStarter().start()
     start_gui()
+    daemon_process.join
 

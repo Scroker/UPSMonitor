@@ -47,3 +47,4 @@ class UPSMonitorServiceStarter(GObject.Object):
         multiprocessing.set_start_method('spawn')
         process = multiprocessing.Process(target = start_backend, daemon = True)
         process.start()
+        return process
