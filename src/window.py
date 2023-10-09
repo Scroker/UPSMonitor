@@ -29,6 +29,7 @@ from .service_model import HostServices, UPServices
 from .data_model import UPS
 from .ups_action_row import UpsActionRow
 from .host_action_row import HostActionRow
+from .ups_monitor_client import UPSMonitorClient
 from .ups_preferences_page import UpsPreferencesPage
 from .host_preferences_page import HostPreferencesPage
 from .add_new_server_box import AddNewServerBox

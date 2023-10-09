@@ -20,20 +20,18 @@ import sys
 import gi
 import time
 import dbus
-from threading import Thread, Timer
+
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 
-from gi.repository import Gtk, Gio, Adw
 from .window import UpsmonitorWindow
-from .ups_monitor_service import UPSMonitorService
+from gi.repository import Gtk, Gio, Adw
+from .ups_monitor_client import UPSMonitorClient
+from .ups_monitor_service import UPSMonitorServiceStarter
 from .monitor_preferences_window import MonitorPreferencesWindow
 
-
 class UpsmonitorApplication(Adw.Application):
-    """The main application singleton class."""
-
     def __init__(self):
         super().__init__(application_id='org.ponderorg.UPSMonitor',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
@@ -42,18 +40,12 @@ class UpsmonitorApplication(Adw.Application):
         self.create_action('preferences', self.on_preferences_action)
 
     def do_activate(self):
-        """Called when the application is activated.
-
-        We raise the application's main window, creating it if
-        necessary.
-        """
         win = self.props.active_window
         if not win:
             win = UpsmonitorWindow(application=self)
         win.present()
 
     def on_about_action(self, widget, _):
-        """Callback for the app.about action."""
         about = Adw.AboutWindow(transient_for=self.props.active_window,
                                 application_name='UPSMonitor',
                                 application_icon='org.ponderorg.UPSMonitor',
@@ -64,46 +56,28 @@ class UpsmonitorApplication(Adw.Application):
         about.present()
 
     def on_preferences_action(self, widget, _):
-        """Callback for the app.preferences action."""
-        print('app.preferences action activated')
         about = MonitorPreferencesWindow()
         about.present()
 
     def create_action(self, name, callback, shortcuts=None):
-        """Add an application action.
-
-        Args:
-            name: the name of the action
-            callback: the function to be called when the action is
-              activated
-            shortcuts: an optional list of accelerators
-        """
         action = Gio.SimpleAction.new(name, None)
         action.connect("activate", callback)
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
-class Client():
-    def __init__(self):
-        bus = dbus.SessionBus()
-        service = bus.get_object('org.gdramis.UPSMonitorService', "/org/gdramis/UPSMonitorService")
-        self._message = service.get_dbus_method('get_message', 'org.gdramis.UPSMonitorService.Message')
-        self._quit = service.get_dbus_method('quit', 'org.gdramis.UPSMonitorService.Quit')
-
-    def run(self):
-        print ("Hosts:", self._message())
-        self._quit()
 
 def start_gui():
-    Client().run()
+    a = True
+    while a:
+        try:
+            UPSMonitorClient().run()
+            a = False
+        except dbus.exceptions.DBusException as e:
+            pass
     app = UpsmonitorApplication()
     return app.run(sys.argv)
 
-def start_backend():
-    UPSMonitorService().run()
-
 def main(version):
-    t_backend = Thread(target=start_backend)
-    t_backend.start()
+    UPSMonitorServiceStarter().start()
     start_gui()
 
