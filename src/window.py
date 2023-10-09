@@ -19,17 +19,19 @@
 
 import sqlite3
 import threading
+import dbus
+import time
 
 from pynut3.nut3 import PyNUT3Error
 
 from gi.repository import Adw
 from gi.repository import Gtk
 
-from .service_model import HostServices, UPServices
+from .service_model import UPServices
 from .data_model import UPS
 from .ups_action_row import UpsActionRow
 from .host_action_row import HostActionRow
-from .ups_monitor_client import UPSMonitorClient
+from .ups_monitor_daemon import UPSMonitorClient
 from .ups_preferences_page import UpsPreferencesPage
 from .host_preferences_page import HostPreferencesPage
 from .add_new_server_box import AddNewServerBox
@@ -52,7 +54,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        host_services = HostServices()
         self.back_button.connect("clicked", self.on_back_button_clicked)
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
         self.update_button.connect("clicked", self.on_update_button_clicked)
@@ -62,7 +63,14 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.add_server_box.connect("conncetion_ok", self.on_connection)
         self.show_servers_button.connect("toggled", self.on_show_servers_toggled)
         self.add_server_box.set_visible(False)
-        self.hosts = host_services.get_all_hosts()
+        dbus_ready = False
+        while not dbus_ready:
+            try:
+                self.hosts = UPSMonitorClient().get_all_hosts()
+                dbus_ready = True
+            except dbus.exceptions.DBusException as e:
+                print('DBus daemo not ready: ', e)
+                time.sleep(1)
         thread = threading.Thread(target=self.refresh_ups_data, daemon=True)
         thread.start()
 
@@ -82,14 +90,13 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     def on_save_host(self, widget):
         child = self.ups_page_leaflet.get_last_child()
         if isinstance(child, Adw.PreferencesPage):
-            host_services = HostServices()
             host = child.host_data
             host.profile_name = child.server_name_row.get_text()
             host.ip_address = child.ip_address_row.get_text()
             host.port = child.port_row.get_text()
             host.username = child.username_row.get_text()
             host.password = child.password_row.get_text()
-            host_services.update_host(host)
+            UPSMonitorClient().update_host(host)
             if self.show_servers_button.get_active():
                 self.update_host_row()
 
@@ -117,8 +124,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         if response == Gtk.ResponseType.OK:
             child = self.ups_page_leaflet.get_last_child()
             if isinstance(child, Adw.PreferencesPage):
-                host_services = HostServices()
-                host_services.delete_host(child.host_data.host_id)
+                UPSMonitorClient().delete_host(child.host_data.host_id)
                 self.hosts.remove(child.host_data)
                 self.save_button.set_visible(False)
                 self.delete_button.set_visible(False)

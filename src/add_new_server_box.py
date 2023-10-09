@@ -6,7 +6,8 @@ from pynut3 import nut3
 from gi.repository import Adw, Gtk, GLib, GObject
 
 from .data_model import Host
-from .service_model import HostServices, UPServices
+from .ups_monitor_daemon import UPSMonitorClient
+from .service_model import UPServices
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/add_new_server_box.ui')
 class AddNewServerBox(Gtk.Box):
@@ -97,7 +98,7 @@ class AddNewServerBox(Gtk.Box):
                     host.profile_name = host.ip_address
                 else:
                     host.profile_name = name
-                host_services = HostServices()
+                host_services = UPSMonitorClient()
                 host_services.save_host(host)
                 host = host_services.get_host_by_name(host.profile_name)
             except Exception:

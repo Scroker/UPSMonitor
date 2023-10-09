@@ -71,17 +71,18 @@ class HostServices(GObject.Object):
 
     def get_host(self, host_id:int) -> []:
         cursor = self.conn.cursor()
+        print(host_id)
         result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE id=?", (host_id,))
         for row in result:
            return Host(row[2], row[3], row[1], row[0], row[3], row[4])
-        return host_list
+        return None
 
     def get_host_by_name(self, host_name:str) -> []:
         cursor = self.conn.cursor()
         result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name=?", (host_name,))
         for row in result:
            return Host(row[2], row[3], row[1], row[0], row[4], row[5])
-        return host_list
+        return None
 
     def save_host(self, host:Host):
         cursor = self.conn.cursor()

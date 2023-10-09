@@ -27,8 +27,7 @@ gi.require_version('Adw', '1')
 
 from .window import UpsmonitorWindow
 from gi.repository import Gtk, Gio, Adw
-from .ups_monitor_client import UPSMonitorClient
-from .ups_monitor_service import UPSMonitorServiceStarter
+from .ups_monitor_daemon import UPSMonitorServiceStarter
 from .monitor_preferences_window import MonitorPreferencesWindow
 
 class UpsmonitorApplication(Adw.Application):
@@ -66,19 +65,10 @@ class UpsmonitorApplication(Adw.Application):
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
 
-def start_gui():
-    a = True
-    while a:
-        try:
-            UPSMonitorClient().run()
-            a = False
-        except dbus.exceptions.DBusException as e:
-            pass
-    app = UpsmonitorApplication()
-    return app.run(sys.argv)
-
 def main(version):
     daemon_process = UPSMonitorServiceStarter().start()
-    start_gui()
-    daemon_process.join
+    app = UpsmonitorApplication()
+    result = app.run(sys.argv)
+    daemon_process.join()
+    return result
 
