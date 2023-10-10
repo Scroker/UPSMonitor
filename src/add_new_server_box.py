@@ -10,7 +10,7 @@ from .ups_monitor_daemon import UPSMonitorClient
 from .service_model import UPServices
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/add_new_server_box.ui')
-class AddNewServerBox(Gtk.Box):
+class AddNewServerBox(Adw.Window):
     __gtype_name__ = 'AddNewServerBox'
 
     port = Gtk.Template.Child()

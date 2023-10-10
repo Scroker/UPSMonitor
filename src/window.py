@@ -24,8 +24,7 @@ import time
 
 from pynut3.nut3 import PyNUT3Error
 
-from gi.repository import Adw
-from gi.repository import Gtk
+from gi.repository import Adw, Gtk
 
 from .data_model import UPS
 from .ups_action_row import UpsActionRow
@@ -39,25 +38,18 @@ from .add_new_server_box import AddNewServerBox
 class UpsmonitorWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'UpsmonitorWindow'
 
-    leaflet = Gtk.Template.Child()
-    add_server_box = Gtk.Template.Child()
     ups_list_box = Gtk.Template.Child()
-    ups_page_leaflet = Gtk.Template.Child()
     content_window_title = Gtk.Template.Child()
     add_server_button = Gtk.Template.Child()
-    update_button = Gtk.Template.Child()
-    back_button = Gtk.Template.Child()
+    split_view = Gtk.Template.Child()
+    toolbar_view = Gtk.Template.Child()
     show_servers_button = Gtk.Template.Child()
+    add_new_server_box = AddNewServerBox()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.back_button.connect("clicked", self.on_back_button_clicked)
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
-        self.update_button.connect("clicked", self.on_update_button_clicked)
-        self.add_server_box.connect("cancel_connection", self.close_connection_window)
-        self.add_server_box.connect("conncetion_ok", self.on_connection)
         self.show_servers_button.connect("toggled", self.on_show_servers_toggled)
-        self.add_server_box.set_visible(False)
         dbus_ready = False
         while not dbus_ready:
             try:
@@ -72,12 +64,8 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     def on_show_servers_toggled(self, widget):
         if self.show_servers_button.get_active():
-            self.update_button.set_visible(False)
-            self.add_server_button.set_visible(False)
             self.update_host_row()
         else:
-            self.update_button.set_visible(True)
-            self.add_server_button.set_visible(True)
             for element in self.ups_list_box:
                 self.ups_list_box.remove(element)
             thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
@@ -117,9 +105,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.set_deletable(True)
 
     def on_add_server_button_clicked(self, widget):
-        self.add_server_box.set_visible(True)
-        self.leaflet.set_visible(False)
-        self.set_deletable(False)
+        self.add_server_box.present()
 
     def on_update_button_clicked(self, widget):
         thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
@@ -134,24 +120,14 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             self.ups_list_box.insert(ups_action_row, -1)
 
     def on_ups_row_selected(self, widget):
-        child = self.ups_page_leaflet.get_last_child()
-        if isinstance(child, Adw.PreferencesPage):
-            self.ups_page_leaflet.remove(child)
         self.content_window_title.set_title(widget.get_title())
         self.content_window_title.set_subtitle(widget.get_subtitle())
-        self.ups_page_leaflet.append(UpsPreferencesPage(ups_data=widget.ups_data))
-        self.leaflet.navigate(Adw.NavigationDirection.FORWARD)
+        self.split_view.set_show_content(True)
+        self.toolbar_view.set_content(UpsPreferencesPage(ups_data=widget.ups_data))
 
     def on_host_row_selected(self, widget):
-        child = self.ups_page_leaflet.get_last_child()
-        if isinstance(child, Adw.PreferencesPage):
-            self.ups_page_leaflet.remove(child)
         self.content_window_title.set_title(widget.get_title())
         self.content_window_title.set_subtitle(widget.get_subtitle())
-        self.ups_page_leaflet.append(HostPreferencesPage(host_data=widget.host_data))
-        self.leaflet.navigate(Adw.NavigationDirection.FORWARD)
-
-    def on_back_button_clicked(self, widget):
-        self.leaflet.navigate(Adw.NavigationDirection.BACK)
-
+        self.split_view.set_show_content(True)
+        self.toolbar_view.set_content(HostPreferencesPage(host_data=widget.host_data))
 
