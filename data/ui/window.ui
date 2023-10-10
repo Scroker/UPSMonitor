@@ -67,8 +67,8 @@
         </property>
         <property name="content">
           <object class="AdwNavigationPage">
-            <property name="title" translatable="true">Content</property>
-            <property name="tag">content</property>
+            <property name="title" translatable="true">Welcome</property>
+            <property name="tag">welcomw</property>
             <property name="child">
               <object class="AdwToolbarView" id="toolbar_view">
                 <child type="top">
@@ -81,11 +81,31 @@
                 </child>
                 <property name="content">
                   <object class="AdwStatusPage">
-                    <property name="title" translatable="true">Content</property>
+                    <property name="title" translatable="true">Welcome to UPSMonitor</property>
                     <child>
-                      <object class="GtkLinkButton">
-                        <property name="label" translatable="true">API Reference</property>
-                        <property name="uri">https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1.4/class.NavigationSplitView.html</property>
+                      <object class="GtkBox" id="welcome">
+                        <property name="orientation">1</property>
+                        <property name="valign">3</property>
+                        <property name="halign">3</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="name">logo</property>
+                            <property name="icon-name">org.ponderorg.UPSMonitor</property>
+                            <property name="pixel-size">196</property>
+                            <property name="margin-bottom">30</property>
+                            <style>
+                              <class name="icon-dropshadow"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="button">
+                            <property name="label" translatable="true">New NUT-Server connection</property>
+                            <style>
+                              <class name="pill"/>
+                            </style>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
