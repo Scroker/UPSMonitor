@@ -44,12 +44,14 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     split_view = Gtk.Template.Child()
     toolbar_view = Gtk.Template.Child()
     show_servers_button = Gtk.Template.Child()
-    add_new_server_box = AddNewServerBox()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
         self.show_servers_button.connect("toggled", self.on_show_servers_toggled)
+        self.add_server_box = AddNewServerBox()
+        self.add_server_box.set_transient_for(self)
+        self.add_server_box.set_modal(True)
         dbus_ready = False
         while not dbus_ready:
             try:
@@ -81,8 +83,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                 self.ups_list_box.insert(host_action_row, -1)
 
     def on_connection(self, widget, host):
-        self.add_server_box.set_visible(False)
-        self.leaflet.set_visible(True)
         self.set_deletable(True)
         self.close_connection_window()
         self.hosts.append(host)
@@ -100,11 +100,20 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             self.update_ups_row()
 
     def close_connection_window(self, widget=None):
-        self.add_server_box.set_visible(False)
-        self.leaflet.set_visible(True)
         self.set_deletable(True)
 
     def on_add_server_button_clicked(self, widget):
+        max_width = 600
+        max_height = 600
+        allocation = self.get_allocation()
+        if allocation.width < max_width and allocation.height < max_height :
+            self.add_server_box.set_default_size(allocation.width, allocation.height)
+        elif allocation.width < max_width :
+            self.add_server_box.set_default_size(allocation.width, max_height)
+        elif allocation.height < max_height :
+            self.add_server_box.set_default_size(max_width, allocation.height)
+        else:
+            self.add_server_box.set_default_size(max_width, max_height)
         self.add_server_box.present()
 
     def on_update_button_clicked(self, widget):
