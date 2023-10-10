@@ -2,100 +2,109 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
-  <template class="HostPreferencesPage" parent="AdwPreferencesPage">
-    <child>
-      <object class="AdwPreferencesGroup">
-        <property name="title">Profile</property>
-        <property name="description">Save host profile</property>
-        <child>
-          <object class="AdwEntryRow" id="server_name_row">
-            <property name="title">Server name</property>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="AdwPreferencesGroup">
-        <property name="title">Connection</property>
-        <property name="description">Set the host connection parameters</property>
-        <child>
-          <object class="AdwEntryRow" id="ip_address_row">
-            <property name="title">Address</property>
-          </object>
-        </child>
-        <child>
-          <object class="AdwSpinRow" id="port_row">
-            <property name="title" translatable="yes">Port</property>
-            <property name="adjustment">
-              <object class="GtkAdjustment">
-                <property name="lower">0</property>
-                <property name="upper">65535</property>
-                <property name="value">3493</property>
-                <property name="page-increment">10</property>
-                <property name="step-increment">1</property>
-              </object>
-            </property>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="AdwPreferencesGroup">
-        <property name="title">Use authentication</property>
-        <property name="description">Authentication parameters</property>
-        <property name="header-suffix">
-          <object class="GtkSwitch" id="authentication_switch">
-            <property name="margin-top">10</property>
-            <property name="margin-bottom">10</property>
-          </object>
-        </property>
-        <child>
-          <object class="AdwEntryRow" id="username_row">
-            <property name="title">Username</property>
-          </object>
-        </child>
-        <child>
-          <object class="AdwPasswordEntryRow" id="password_row">
-            <property name="title">Password</property>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="AdwPreferencesGroup">
-        <child>
-          <object class="GtkButton" id="save_button">
-            <child>
-              <object class="AdwButtonContent">
-                <property name="icon-name">document-save-symbolic</property>
-                <property name="label" translatable="yes">_Save</property>
-                <property name="use-underline">True</property>
-              </object>
-            </child>
-            <style>
-              <class name="suggested-action"/>
-            </style>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="AdwPreferencesGroup">
-        <child>
-          <object class="GtkButton" id="delete_button">
-            <child>
-              <object class="AdwButtonContent">
-                <property name="icon-name">user-trash-symbolic</property>
-                <property name="label" translatable="yes">_Delete</property>
-                <property name="use-underline">True</property>
-              </object>
-            </child>
-            <style>
-              <class name="destructive-action"/>
-            </style>
-          </object>
-        </child>
-      </object>
-    </child>
+  <template class="HostPreferencesPage" parent="AdwNavigationPage">
+  <property name="title" translatable="yes">Modify host connection</property>
+      <property name="tag">modify_host_connection</property>
+      <property name="child">
+        <object class="AdwToolbarView">
+          <child type="top">
+            <object class="AdwHeaderBar"/>
+          </child>
+          <property name="content">
+            <object class="AdwPreferencesPage">
+              <child>
+                <object class="AdwPreferencesGroup">
+                  <property name="title">Profile</property>
+                  <property name="description">Save host profile</property>
+                  <child>
+                    <object class="AdwEntryRow" id="server_name_row">
+                      <property name="title">Server name</property>
+                    </object>
+                  </child>
+                </object>
+              </child>
+              <child>
+                <object class="AdwPreferencesGroup">
+                  <property name="title">Connection</property>
+                  <property name="description">Set the host connection parameters</property>
+                  <child>
+                    <object class="AdwEntryRow" id="ip_address_row">
+                      <property name="title">Address</property>
+                    </object>
+                  </child>
+                  <child>
+                    <object class="AdwSpinRow" id="port_row">
+                      <property name="title" translatable="yes">Port</property>
+                      <property name="adjustment">
+                        <object class="GtkAdjustment">
+                          <property name="lower">0</property>
+                          <property name="upper">65535</property>
+                          <property name="value">3493</property>
+                          <property name="page-increment">10</property>
+                          <property name="step-increment">1</property>
+                        </object>
+                      </property>
+                    </object>
+                  </child>
+                </object>
+              </child>
+              <child>
+                <object class="AdwPreferencesGroup">
+                  <property name="title">Use authentication</property>
+                  <property name="description">Authentication parameters</property>
+                  <property name="header-suffix">
+                    <object class="GtkSwitch" id="authentication_switch">
+                      <property name="margin-top">10</property>
+                      <property name="margin-bottom">10</property>
+                    </object>
+                  </property>
+                  <child>
+                    <object class="AdwEntryRow" id="username_row">
+                      <property name="title">Username</property>
+                    </object>
+                  </child>
+                  <child>
+                    <object class="AdwPasswordEntryRow" id="password_row">
+                      <property name="title">Password</property>
+                    </object>
+                  </child>
+                </object>
+              </child>
+            </object>
+          </property>
+          <child type="bottom">
+            <object class="GtkActionBar">
+              <child type="start">
+                <object class="GtkButton" id="save_button">
+                  <child>
+                    <object class="AdwButtonContent">
+                      <property name="icon-name">document-save-symbolic</property>
+                      <property name="label" translatable="yes">_Save</property>
+                      <property name="use-underline">True</property>
+                    </object>
+                  </child>
+                  <style>
+                    <class name="suggested-action"/>
+                  </style>
+                </object>
+              </child>
+              <child type="end">
+                <object class="GtkButton" id="delete_button">
+                  <child>
+                    <object class="AdwButtonContent">
+                      <property name="icon-name">user-trash-symbolic</property>
+                      <property name="label" translatable="yes">_Delete</property>
+                      <property name="use-underline">True</property>
+                    </object>
+                  </child>
+                  <style>
+                    <class name="destructive-action"/>
+                  </style>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </property>
   </template>
 </interface>

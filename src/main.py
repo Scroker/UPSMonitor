@@ -55,8 +55,10 @@ class UpsmonitorApplication(Adw.Application):
         about.present()
 
     def on_preferences_action(self, widget, _):
-        about = MonitorPreferencesWindow()
-        about.present()
+        preference = MonitorPreferencesWindow()
+        preference.set_transient_for(self.props.active_window)
+        preference.set_modal(True)
+        preference.present()
 
     def create_action(self, name, callback, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)

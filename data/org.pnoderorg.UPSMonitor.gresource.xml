@@ -13,5 +13,6 @@
   <gresource prefix="/org/ponderorg/UPSMonitor/icons/scalable/actions/">
     <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">icons/hicolor/scalable/actions/plus-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="update-symbolic.svg">icons/hicolor/scalable/actions/update-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="settings-symbolic.svg">icons/hicolor/scalable/actions/settings-symbolic.svg</file>
   </gresource>
 </gresources>

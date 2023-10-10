@@ -2,7 +2,7 @@ from gi.repository import Adw
 from gi.repository import Gtk
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/host_preferences_page.ui')
-class HostPreferencesPage(Adw.PreferencesPage):
+class HostPreferencesPage(Adw.NavigationPage):
     __gtype_name__ = 'HostPreferencesPage'
 
     port_row = Gtk.Template.Child()
