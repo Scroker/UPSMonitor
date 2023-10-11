@@ -1,5 +1,4 @@
-from gi.repository import Adw
-from gi.repository import Gtk
+from gi.repository import Adw, Gtk, Gio
 
 from .data_model import Host
 from .service_model import HostServices
@@ -12,11 +11,14 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
 
     saved_profiles_list = Gtk.Template.Child()
     connect_button = Gtk.Template.Child()
+    run_in_background = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.update_data(None)
         self.connect_button.connect("clicked", self.on_add_server_button_clicked)
+        setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
+        setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
 
     def on_add_server_button_clicked(self, widget):
         max_width = 600

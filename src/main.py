@@ -27,7 +27,7 @@ gi.require_version('Adw', '1')
 
 from .window import UpsmonitorWindow
 from gi.repository import Gtk, Gio, Adw
-from .ups_monitor_daemon import UPSMonitorServiceStarter
+from .ups_monitor_daemon import UPSMonitorServiceStarter, UPSMonitorClient
 from .monitor_preferences_window import MonitorPreferencesWindow
 
 class UpsmonitorApplication(Adw.Application):
@@ -37,6 +37,8 @@ class UpsmonitorApplication(Adw.Application):
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
+        self.connect("shutdown", self.destroy_daemon)
+
 
     def do_activate(self):
         win = self.props.active_window
@@ -66,6 +68,11 @@ class UpsmonitorApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
+
+    def destroy_daemon(self, widget):
+        settings = Gio.Settings.new('org.ponderorg.UPSMonitor')
+        if not settings.get_value('run-in-background'):
+            UPSMonitorClient().quit_service_dbus()
 
 def main(version):
     daemon_process = UPSMonitorServiceStarter()

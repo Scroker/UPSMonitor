@@ -19,7 +19,7 @@
               </object>
             </child>
             <child>
-              <object class="AdwSwitchRow">
+              <object class="AdwSwitchRow" id="run_in_background">
                 <property name="title">Run in background</property>
                 <property name="subtitle">Enable to start at boot in background</property>
               </object>
