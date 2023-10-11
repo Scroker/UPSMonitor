@@ -1,5 +1,6 @@
-from gi.repository import Adw
-from gi.repository import Gtk
+from gi.repository import Adw, Gtk, GObject
+
+from .ups_monitor_daemon import UPSMonitorClient
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/host_preferences_page.ui')
 class HostPreferencesPage(Adw.NavigationPage):
@@ -12,13 +13,24 @@ class HostPreferencesPage(Adw.NavigationPage):
     ip_address_row = Gtk.Template.Child()
     save_button = Gtk.Template.Child()
     delete_button = Gtk.Template.Child()
+    overlay = Gtk.Template.Child()
+
+    @GObject.Signal
+    def host_saved(self):
+        pass
 
     def __init__(self, **kwargs):
         host_data = kwargs.get("host_data", None)
+        real_parent = kwargs.get("real_parent", None)
+        self.real_parent = real_parent
         self.host_data = host_data
         if host_data != None:
             kwargs.pop("host_data")
+        if real_parent != None:
+            kwargs.pop("real_parent")
         super().__init__(**kwargs)
+        self.save_button.connect("clicked", self.on_save_host)
+        self.delete_button.connect("clicked",self.on_delete_host)
         if host_data != None:
             self.port_row.set_text(str(host_data.port))
             if host_data.password != None and host_data.username != None:
@@ -28,26 +40,29 @@ class HostPreferencesPage(Adw.NavigationPage):
             self.ip_address_row.set_text(host_data.ip_address)
 
     def on_save_host(self, widget):
-        child = self.ups_page_leaflet.get_last_child()
-        if isinstance(child, Adw.PreferencesPage):
-            host = child.host_data
-            host.profile_name = child.server_name_row.get_text()
-            host.ip_address = child.ip_address_row.get_text()
-            host.port = child.port_row.get_text()
-            host.username = child.username_row.get_text()
-            host.password = child.password_row.get_text()
-            UPSMonitorClient().update_host(host)
-            if self.show_servers_button.get_active():
-                self.update_host_row()
+        host = self.host_data
+        host.profile_name = self.server_name_row.get_text()
+        host.ip_address = self.ip_address_row.get_text()
+        host.port = self.port_row.get_text()
+        host.username = self.username_row.get_text()
+        host.password = self.password_row.get_text()
+        UPSMonitorClient().update_host(host)
+        saved_notification = Adw.Toast()
+        saved_notification.set_title("Host modification saved!")
+        saved_notification.set_timeout(2)
+        self.overlay.add_toast(saved_notification)
+        self.emit("host_saved")
+
 
     def on_delete_host(self, widget):
         dialog = Gtk.MessageDialog(
-            transient_for=self,
+            transient_for=self.real_parent,
             message_type=Gtk.MessageType.WARNING,
             buttons=Gtk.ButtonsType.OK_CANCEL,
             text="Deleating Host",
             secondary_text="Are you sure to delete this Host?"
         )
+        dialog.set_modal(True)
         dialog.connect("response", self._delete_host)
         dialog.present()
 

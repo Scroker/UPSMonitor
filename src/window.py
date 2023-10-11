@@ -49,9 +49,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         super().__init__(**kwargs)
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
         self.show_servers_button.connect("toggled", self.on_show_servers_toggled)
-        self.add_server_box = AddNewServerBox()
-        self.add_server_box.set_transient_for(self)
-        self.add_server_box.set_modal(True)
         dbus_ready = False
         while not dbus_ready:
             try:
@@ -104,17 +101,20 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     def on_add_server_button_clicked(self, widget):
         max_width = 600
-        max_height = 600
+        max_height = 680
         allocation = self.get_allocation()
+        add_server_box = AddNewServerBox()
+        add_server_box.set_transient_for(self)
+        add_server_box.set_modal(True)
         if allocation.width < max_width and allocation.height < max_height :
-            self.add_server_box.set_default_size(allocation.width, allocation.height)
+            add_server_box.set_default_size(allocation.width, allocation.height)
         elif allocation.width < max_width :
-            self.add_server_box.set_default_size(allocation.width, max_height)
+            add_server_box.set_default_size(allocation.width, max_height)
         elif allocation.height < max_height :
-            self.add_server_box.set_default_size(max_width, allocation.height)
+            add_server_box.set_default_size(max_width, allocation.height)
         else:
-            self.add_server_box.set_default_size(max_width, max_height)
-        self.add_server_box.present()
+            add_server_box.set_default_size(max_width, max_height)
+        add_server_box.present()
 
     def on_update_button_clicked(self, widget):
         thread = threading.Thread(target=self.refresh_ups_data, daemon = True)

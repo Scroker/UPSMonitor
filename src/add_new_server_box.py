@@ -32,17 +32,13 @@ class AddNewServerBox(Adw.Window):
     def conncetion_ok(self, *host):
         pass
 
-    @GObject.Signal
-    def cancel_connection(self):
-        pass
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.connect_button.connect("clicked", self.do_connect)
         self.cancel_button.connect("clicked",self.cancel)
 
     def cancel(self, widget):
-        self.emit("cancel_connection")
+        self.destroy()
 
     def do_connect(self, widget):
         self.progress.set_visible(True)
@@ -69,7 +65,7 @@ class AddNewServerBox(Adw.Window):
         ip_address = self.ip_address.get_text()
         username = self.username.get_text()
         password = self.password.get_text()
-        name = self.profile_name.get_text()
+        profile_name = self.profile_name.get_text()
         ups_monitor_client = UPSMonitorClient()
         try:
             port = int(self.port.get_text())
@@ -93,10 +89,10 @@ class AddNewServerBox(Adw.Window):
             return
         if self.save_profile_switch.get_active():
             try:
-                if name == "" or name == None:
+                if profile_name == "" or profile_name == None:
                     host.profile_name = host.ip_address
                 else:
-                    host.profile_name = name
+                    host.profile_name = profile_name
                 ups_monitor_client.save_host(host)
                 host = ups_monitor_client.get_host_by_name(host.profile_name)
             except Exception:
@@ -107,4 +103,4 @@ class AddNewServerBox(Adw.Window):
                 thread.start()
                 return
         self.emit("conncetion_ok", host)
-        self.progress.set_visible(False)
+        self.destroy()

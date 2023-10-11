@@ -58,6 +58,7 @@ class UPSMonitorService(dbus.service.Object):
         UPSs = []
         for connection in self._ups_host_connections:
             UPSs += connection.get_all_hosts_ups()
+        print(UPSs)
         return UPSs
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllHosts", in_signature='', out_signature='aa{sv}')

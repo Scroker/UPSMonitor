@@ -34,7 +34,24 @@
         <property name="icon-name">network-server-symbolic</property>
         <child>
           <object class="AdwPreferencesGroup">
-            <property name="title" translatable="yes">Saved Profiles</property>
+            <property name="title" translatable="yes">Profiles</property>
+            <property name="description" translatable="yes">Add new profiles or manage others</property>
+            <property name="header-suffix">
+              <object class="GtkButton" id="connect_button">
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="child">
+                  <object class="AdwButtonContent">
+                    <property name="icon-name">plus-symbolic</property>
+                    <property name="label" translatable="yes">_Add new</property>
+                    <property name="use-underline">True</property>
+                  </object>
+                </property>
+                <style>
+                  <class name="suggested-action"/>
+                </style>
+              </object>
+            </property>
             <child>
               <object class="GtkListBox" id="saved_profiles_list">
                 <style>

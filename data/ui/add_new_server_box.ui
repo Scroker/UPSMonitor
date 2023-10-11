@@ -45,6 +45,7 @@
         </child>
         <property name="content">
           <object class="GtkBox">
+            <property name="orientation">vertical</property>
             <child>
               <object class="GtkProgressBar" id="progress">
                 <property name="visible">False</property>
@@ -148,3 +149,4 @@
     </child>
   </template>
 </interface>
+
