@@ -58,7 +58,6 @@ class UPSMonitorService(dbus.service.Object):
         UPSs = []
         for connection in self._ups_host_connections:
             UPSs += connection.get_all_hosts_ups()
-        print(UPSs)
         return UPSs
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllHosts", in_signature='', out_signature='aa{sv}')
@@ -114,6 +113,7 @@ class UPSMonitorService(dbus.service.Object):
             host_dict['username'] = None
         if (host_dict['password'] == 'None'):
             host_dict['password'] = None
+        print(host_dict)
         self._ups_host_services.update_host(Host(host_dict=host_dict))
 
     @dbus.service.method("org.gdramis.UPSMonitorService.DeleteHost", in_signature='i', out_signature='')
@@ -127,6 +127,10 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService.HostConnection", in_signature='a{sv}', out_signature='b')
     def host_connection(self, host_dict:dict):
+        if host_dict['username'] == 'None':
+            host_dict['username'] = None
+        if (host_dict['password'] == 'None'):
+            host_dict['password'] = None
         try:
             ups_services = UPServices(Host(host_dict=host_dict))
             self.ups_host_connections.append(ups_services)
@@ -261,6 +265,7 @@ class UPSMonitorServiceStarter(GObject.Object):
 
     def start(self):
         multiprocessing.set_start_method('spawn')
+        print("Starting ups services")
         try:
             UPSMonitorClient()
         except dbus.exceptions.DBusException as e:

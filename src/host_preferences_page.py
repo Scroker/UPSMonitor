@@ -14,6 +14,7 @@ class HostPreferencesPage(Adw.NavigationPage):
     save_button = Gtk.Template.Child()
     delete_button = Gtk.Template.Child()
     overlay = Gtk.Template.Child()
+    authentication_switch = Gtk.Template.Child()
 
     @GObject.Signal
     def host_saved(self):
@@ -44,8 +45,12 @@ class HostPreferencesPage(Adw.NavigationPage):
         host.profile_name = self.server_name_row.get_text()
         host.ip_address = self.ip_address_row.get_text()
         host.port = self.port_row.get_text()
-        host.username = self.username_row.get_text()
-        host.password = self.password_row.get_text()
+        if self.authentication_switch.get_active() and username != "" and password != "":
+            host.username = self.username_row.get_text()
+            host.password = self.password_row.get_text()
+        else:
+            host.username = None
+            host.password = None
         UPSMonitorClient().update_host(host)
         saved_notification = Adw.Toast()
         saved_notification.set_title("Host modification saved!")

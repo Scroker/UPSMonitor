@@ -15,6 +15,7 @@ class UPServices(GObject.Object):
         if host.username != None and host.password != None:
             self.client = nut3.PyNUT3Client(host=host.ip_address, login=host.username, password=host.password, port=host.port)
         else:
+            print("IP: ", host.ip_address, " Username: ", host.username, " Password: ", host.password, " PORT: ", host.port)
             self.client = nut3.PyNUT3Client(host=host.ip_address, port=host.port)
 
     def get_all_hosts_ups(self):
