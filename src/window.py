@@ -39,16 +39,18 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'UpsmonitorWindow'
 
     ups_list_box = Gtk.Template.Child()
+    welcome_connect_button = Gtk.Template.Child()
     content_window_title = Gtk.Template.Child()
     add_server_button = Gtk.Template.Child()
     split_view = Gtk.Template.Child()
     toolbar_view = Gtk.Template.Child()
-    show_servers_button = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
-        self.show_servers_button.connect("toggled", self.on_show_servers_toggled)
+        self.welcome_connect_button.connect("clicked", self.on_add_server_button_clicked)
+        self.add_server_box = AddNewServerBox()
+        self.add_server_box.connect("connection_ok", self.on_connection)
         dbus_ready = False
         while not dbus_ready:
             try:
@@ -61,27 +63,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         thread = threading.Thread(target=self.refresh_ups_data, daemon=True)
         thread.start()
 
-    def on_show_servers_toggled(self, widget):
-        if self.show_servers_button.get_active():
-            self.update_host_row()
-        else:
-            for element in self.ups_list_box:
-                self.ups_list_box.remove(element)
-            thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
-            thread.start()
-
-    def update_host_row(self):
-        while self.ups_list_box.get_last_child() != None:
-            self.ups_list_box.remove(self.ups_list_box.get_last_child())
-        for host in self.hosts:
-            if host.profile_name != None:
-                host_action_row = HostActionRow(host_data = host)
-                host_action_row.connect("activated", self.on_host_row_selected)
-                self.ups_list_box.insert(host_action_row, -1)
-
     def on_connection(self, widget, host):
-        self.set_deletable(True)
-        self.close_connection_window()
         self.hosts.append(host)
         thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
         thread.start()
@@ -93,40 +75,28 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                 self.ups_list.extend(self.dbus_client.get_all_ups())
             except Exception as instance:
                 print(instance.args)
-        if not self.show_servers_button.get_active():
-            self.update_ups_row()
-
-    def close_connection_window(self, widget=None):
-        self.set_deletable(True)
-
-    def on_add_server_button_clicked(self, widget):
-        max_width = 600
-        max_height = 680
-        allocation = self.get_allocation()
-        add_server_box = AddNewServerBox()
-        add_server_box.set_transient_for(self)
-        add_server_box.set_modal(True)
-        if allocation.width < max_width and allocation.height < max_height :
-            add_server_box.set_default_size(allocation.width, allocation.height)
-        elif allocation.width < max_width :
-            add_server_box.set_default_size(allocation.width, max_height)
-        elif allocation.height < max_height :
-            add_server_box.set_default_size(max_width, allocation.height)
-        else:
-            add_server_box.set_default_size(max_width, max_height)
-        add_server_box.present()
-
-    def on_update_button_clicked(self, widget):
-        thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
-        thread.start()
-
-    def update_ups_row(self):
         while self.ups_list_box.get_last_child() != None:
             self.ups_list_box.remove(self.ups_list_box.get_last_child())
         for ups in self.ups_list:
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_ups_row_selected)
             self.ups_list_box.insert(ups_action_row, -1)
+
+    def on_add_server_button_clicked(self, widget):
+        max_width = 600
+        max_height = 680
+        allocation = self.get_allocation()
+        self.add_server_box.set_transient_for(self)
+        self.add_server_box.set_modal(True)
+        if allocation.width < max_width and allocation.height < max_height :
+            self.add_server_box.set_default_size(allocation.width, allocation.height)
+        elif allocation.width < max_width :
+            self.add_server_box.set_default_size(allocation.width, max_height)
+        elif allocation.height < max_height :
+            self.add_server_box.set_default_size(max_width, allocation.height)
+        else:
+            self.add_server_box.set_default_size(max_width, max_height)
+        self.add_server_box.present()
 
     def on_ups_row_selected(self, widget):
         self.content_window_title.set_title(widget.get_title())

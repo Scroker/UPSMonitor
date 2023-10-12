@@ -11,6 +11,7 @@ from .data_model import Host, UPS
 from .service_model import HostServices, UPServices
 
 class UPSMonitorService(dbus.service.Object):
+
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         session_bus = dbus.SessionBus()
@@ -21,6 +22,30 @@ class UPSMonitorService(dbus.service.Object):
         self._ups_host_services = HostServices()
         self._offline_ups_notified = []
         self._low_battery_ups_notified = []
+        self._ups_saved_host_connections = []
+        self._temporary_host_list = []
+
+    def _python_to_string(self, host_dict:dict):
+        if host_dict['host_id'] == None:
+            host_dict['host_id'] = 'None'
+        if host_dict['username'] == None:
+            host_dict['username'] = 'None'
+        if host_dict['profile_name'] == None:
+            host_dict['profile_name'] ='None'
+        if (host_dict['password'] == None):
+            host_dict['password'] = 'None'
+        return host_dict
+
+    def _string_to_python(self, host_dict:dict):
+        if host_dict['host_id'] == 'None':
+            host_dict['host_id'] = None
+        if host_dict['username'] == 'None':
+            host_dict['username'] = None
+        if host_dict['profile_name'] == 'None':
+            host_dict['profile_name'] = None
+        if (host_dict['password'] == 'None'):
+            host_dict['password'] = None
+        return host_dict
 
     def _check_routine(self):
         try:
@@ -33,15 +58,20 @@ class UPSMonitorService(dbus.service.Object):
                     self._notify("", 0, "battery-empty-symbolic", host_dict['name.pretty'] + " have low battery!", "Charge at " + host_dict['battery.charge'] + "%", [], {"urgency": 1}, 3000)
         except PyNUT3Error as e:
             print("Error, try reset connections!")
+            self._ups_saved_host_connections = []
             self._start_connection()
         return True
 
     def _start_connection(self):
-        self._ups_host_connections = []
-        for host in self._ups_host_services.get_all_hosts():
+        host_list = self._ups_host_services.get_all_hosts()
+        host_list += self._temporary_host_list
+        for host in host_list:
             try:
-                ups_services = UPServices(host)
-                self._ups_host_connections.append(ups_services)
+                if isinstance(host, Host):
+                    ups_services = UPServices(host)
+                else:
+                    ups_services = UPServices(Host(host_dict=host))
+                self._ups_saved_host_connections.append(ups_services)
             except PyNUT3Error as e:
                 pass
 
@@ -56,7 +86,7 @@ class UPSMonitorService(dbus.service.Object):
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllUPS", in_signature='', out_signature='aa{sv}')
     def get_all_ups(self):
         UPSs = []
-        for connection in self._ups_host_connections:
+        for connection in self._ups_saved_host_connections:
             UPSs += connection.get_all_hosts_ups()
         return UPSs
 
@@ -64,7 +94,7 @@ class UPSMonitorService(dbus.service.Object):
     def get_all_hosts(self):
         hosts = []
         for host in self._ups_host_services.get_all_hosts():
-            host_dict = self._string_to_python(vars(host))
+            host_dict = self._python_to_string(vars(host))
             hosts.append(host_dict)
         return hosts
 
@@ -73,7 +103,7 @@ class UPSMonitorService(dbus.service.Object):
         host_dict = {}
         host = self._ups_host_services.get_host(id)
         if host != None:
-            host_dict = self._string_to_python(vars(host))
+            host_dict = self._python_to_string(vars(host))
         return host_dict
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetHostByName", in_signature='s', out_signature='a{sv}')
@@ -81,7 +111,7 @@ class UPSMonitorService(dbus.service.Object):
         host_dict = {}
         host = self._ups_host_services.get_host_by_name(name)
         if host != None:
-            host_dict = self._string_to_python(vars(host))
+            host_dict = self._python_to_string(vars(host))
         return host_dict
 
     @dbus.service.method("org.gdramis.UPSMonitorService.SaveHost", in_signature='a{sv}', out_signature='')
@@ -93,7 +123,6 @@ class UPSMonitorService(dbus.service.Object):
     @dbus.service.method("org.gdramis.UPSMonitorService.UpdateHost", in_signature='a{sv}', out_signature='')
     def update_host(self, host_dict:dict):
         host_dict = self._string_to_python(host_dict)
-        print(host_dict)
         self._ups_host_services.update_host(Host(host_dict=host_dict))
 
     @dbus.service.method("org.gdramis.UPSMonitorService.DeleteHost", in_signature='i', out_signature='')
@@ -105,27 +134,40 @@ class UPSMonitorService(dbus.service.Object):
         print("  shutting down")
         self._loop.quit()
 
+    def _dbus_to_python(self, data):
+        if isinstance(data, dbus.String):
+            if str(data) == 'None':
+                data = None
+            else:
+                data = str(data)
+        elif isinstance(data, dbus.Boolean):
+            data = bool(data)
+        elif isinstance(data, dbus.Int64) or isinstance(data, dbus.Int32):
+            data = int(data)
+        elif isinstance(data, dbus.Double):
+            data = float(data)
+        elif isinstance(data, dbus.Array):
+            data = [self._dbus_to_python(value) for value in data]
+        elif isinstance(data, dbus.Dictionary):
+            new_data = dict()
+            for key in data.keys():
+                new_data[self._dbus_to_python(key)] = self._dbus_to_python(data[key])
+            data = new_data
+        return data
+
     @dbus.service.method("org.gdramis.UPSMonitorService.HostConnection", in_signature='a{sv}', out_signature='b')
     def host_connection(self, host_dict:dict):
-        host_dict = self._string_to_python(host_dict)
+        host_dict = self._string_to_python(self._dbus_to_python(host_dict))
         try:
             ups_services = UPServices(Host(host_dict=host_dict))
-            self.ups_host_connections.append(ups_services)
+            if host_dict['host_id'] != None:
+                self._ups_saved_host_connections.append(ups_services)
+            else:
+                self._temporary_host_list.append(host_dict)
             return True
         except PyNUT3Error as error:
             print("Error during connection with Host: ", error.args[0])
             return False
-
-    def _string_to_python(self, host_dict:dict):
-        if host_dict['host_id'] == 'None':
-            host_dict['host_id'] = None
-        if host_dict['username'] == 'None':
-            host_dict['username'] = None
-        if host_dict['profile_name'] == 'None':
-            host_dict['profile_name'] = None
-        if (host_dict['password'] == 'None'):
-            host_dict['password'] = None
-        return host_dict
 
 class UPSMonitorClient(GObject.Object):
     __gtype_name__ = 'UPSMonitorClient'
@@ -143,6 +185,18 @@ class UPSMonitorClient(GObject.Object):
         self._delete_host_dbus = service.get_dbus_method('delete_host', 'org.gdramis.UPSMonitorService.DeleteHost')
         self._host_connection_dbus = service.get_dbus_method('host_connection', 'org.gdramis.UPSMonitorService.HostConnection')
         self._quit_service_dbus = service.get_dbus_method('quit', 'org.gdramis.UPSMonitorService.Quit')
+
+    def _python_to_string(self, host:Host) -> dict:
+        host_dict = vars(host)
+        if host_dict['host_id'] == None:
+            host_dict['host_id'] = 'None'
+        if host_dict['username'] == None:
+            host_dict['username'] = 'None'
+        if host_dict['profile_name'] == None:
+            host_dict['profile_name'] ='None'
+        if (host_dict['password'] == None):
+            host_dict['password'] = 'None'
+        return host_dict
 
     def _dbus_to_python(self, data):
         if isinstance(data, dbus.String):
@@ -203,37 +257,19 @@ class UPSMonitorClient(GObject.Object):
         return hosts
 
     def save_host(self, host:Host):
-        host_dict = vars(host)
-        if host_dict['host_id'] == None:
-            host_dict['host_id'] = 'None'
-        if host_dict['username'] == None:
-            host_dict['username'] = 'None'
-        if (host_dict['password'] == None):
-            host_dict['password'] = 'None'
+        host_dict = self._python_to_string(host)
         self._save_host_dbus(host_dict)
 
     def update_host(self, host:Host):
-        host_dict = vars(host)
-        if host_dict['username'] == None:
-            host_dict['username'] = 'None'
-        if (host_dict['password'] == None):
-            host_dict['password'] = 'None'
+        host_dict = self._python_to_string(host)
         self._update_host_dbus(host_dict)
 
     def delete_host(self, host_id:int):
         self._delete_host_dbus(host_id)
 
     def host_connection(self, host:Host):
-        host_dict = vars(host)
-        if host_dict['host_id'] == None:
-            host_dict['host_id'] = 'None'
-        if host_dict['username'] == None:
-            host_dict['username'] = 'None'
-        if host_dict['profile_name'] == None:
-            host_dict['profile_name'] = 'None'
-        if (host_dict['password'] == None):
-            host_dict['password'] = 'None'
-        self._host_connection_dbus(host_dict)
+        host_dict = self._python_to_string(host)
+        return self._host_connection_dbus(host_dict)
 
     def get_host(self, id):
         return self._list_to_object_host(self._dbus_to_python(self._get_host_dbus(id)))

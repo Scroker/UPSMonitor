@@ -25,11 +25,10 @@ class AddNewServerBox(Adw.Window):
     save_profile_switch = Gtk.Template.Child()
     authentication_switch = Gtk.Template.Child()
 
-
     @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
                     arg_types=(object,),
                     accumulator=GObject.signal_accumulator_true_handled)
-    def conncetion_ok(self, *host):
+    def connection_ok(self, *host):
         pass
 
     def __init__(self, **kwargs):
@@ -42,10 +41,10 @@ class AddNewServerBox(Adw.Window):
 
     def do_connect(self, widget):
         self.progress.set_visible(True)
-        thread = threading.Thread(target=self.load_function, daemon = True)
-        thread.start()
-        thread = threading.Thread(target=self._do_connect, daemon = True)
-        thread.start()
+        connect_thread = threading.Thread(target=self._do_connect, daemon = True)
+        connect_thread.start()
+        load_thread = threading.Thread(target=self.load_function, daemon = True)
+        load_thread.start()
 
     def close_banner(self):
         time.sleep(5)
@@ -55,6 +54,7 @@ class AddNewServerBox(Adw.Window):
         for i in range(50):
             GLib.idle_add(self.update_progess, i)
             time.sleep(0.2)
+        self.progress.set_visible(False)
 
     def update_progess(self, i):
         self.progress.pulse()
@@ -62,6 +62,7 @@ class AddNewServerBox(Adw.Window):
         return False
 
     def _do_connect(self):
+        self.banner.set_revealed(False)
         ip_address = self.ip_address.get_text()
         username = self.username.get_text()
         password = self.password.get_text()
@@ -102,5 +103,6 @@ class AddNewServerBox(Adw.Window):
                 thread = threading.Thread(target=self.close_banner, daemon = True)
                 thread.start()
                 return
-        self.emit("conncetion_ok", host)
-        self.destroy()
+        self.emit("connection_ok", host)
+        self.progress.set_visible(False)
+        self.hide()

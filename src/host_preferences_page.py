@@ -73,21 +73,8 @@ class HostPreferencesPage(Adw.NavigationPage):
 
     def _delete_host(self, widget, response):
         if response == Gtk.ResponseType.OK:
-            child = self.ups_page_leaflet.get_last_child()
-            if isinstance(child, Adw.PreferencesPage):
-                UPSMonitorClient().delete_host(child.host_data.host_id)
-                self.hosts.remove(child.host_data)
-                self.ups_page_leaflet.remove(child)
-                if self.show_servers_button.get_active():
-                    self.update_host_row()
-                else:
-                    for element in self.ups_list_box:
-                        self.ups_list_box.remove(element)
-                    thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
-                    thread.start()
-                self.content_window_title.set_title("")
-                self.content_window_title.set_subtitle("")
-                self.leaflet.navigate(Adw.NavigationDirection.BACK)
+            UPSMonitorClient().delete_host(self.host_data.host_id)
+            self.emit("host_saved")
         elif response == Gtk.ResponseType.CANCEL:
             pass
         widget.destroy()

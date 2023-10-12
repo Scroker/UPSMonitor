@@ -41,12 +41,6 @@
                         <property name="menu-model">app_menu</property>
                       </object>
                     </child>
-                    <child type="end">
-                      <object class="GtkToggleButton" id="show_servers_button">
-                        <property name="visible">False</property>
-                        <property name="icon-name">network-server-symbolic</property>
-                      </object>
-                    </child>
                   </object>
                 </child>
                 <property name="content">
@@ -99,7 +93,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkButton" id="button">
+                          <object class="GtkButton" id="welcome_connect_button">
                             <property name="label" translatable="true">New NUT-Server connection</property>
                             <style>
                               <class name="pill"/>

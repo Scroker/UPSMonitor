@@ -58,6 +58,7 @@ class UpsmonitorApplication(Adw.Application):
 
     def on_preferences_action(self, widget, _):
         preference = MonitorPreferencesWindow()
+        preference.connect("connection_ok", self.props.active_window.on_connection)
         preference.set_transient_for(self.props.active_window)
         preference.set_modal(True)
         preference.present()
@@ -81,4 +82,5 @@ def main(version):
     result = app.run(sys.argv)
     daemon_process.join()
     return result
+
 

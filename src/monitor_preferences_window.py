@@ -1,4 +1,4 @@
-from gi.repository import Adw, Gtk, Gio
+from gi.repository import Adw, Gtk, Gio, GObject
 
 from .data_model import Host
 from .service_model import HostServices
@@ -15,30 +15,36 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.update_data(None)
+        self.update_data()
         self.connect_button.connect("clicked", self.on_add_server_button_clicked)
+        self.add_server_box = AddNewServerBox()
+        self.add_server_box.set_transient_for(self)
+        self.add_server_box.set_modal(True)
+        self.add_server_box.connect("connection_ok", self.update_data)
         setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
         setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
+
+    @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
+                    arg_types=(object,),
+                    accumulator=GObject.signal_accumulator_true_handled)
+    def connection_ok(self, *host):
+        pass
 
     def on_add_server_button_clicked(self, widget):
         max_width = 600
         max_height = 680
         allocation = self.get_allocation()
-        add_server_box = AddNewServerBox()
-        add_server_box.set_transient_for(self)
-        add_server_box.set_modal(True)
         if allocation.width < max_width and allocation.height < max_height :
-            add_server_box.set_default_size(allocation.width, allocation.height)
+            self.add_server_box.set_default_size(allocation.width, allocation.height)
         elif allocation.width < max_width :
-            add_server_box.set_default_size(allocation.width, max_height)
+            self.add_server_box.set_default_size(allocation.width, max_height)
         elif allocation.height < max_height :
-            add_server_box.set_default_size(max_width, allocation.height)
+            self.add_server_box.set_default_size(max_width, allocation.height)
         else:
-            add_server_box.set_default_size(max_width, max_height)
-        add_server_box.connect("conncetion_ok", self.update_data)
-        add_server_box.present()
+            self.add_server_box.set_default_size(max_width, max_height)
+        self.add_server_box.present()
 
-    def update_data(self, widget):
+    def update_data(self, widget = None, host_var = None):
         while self.saved_profiles_list.get_last_child() != None:
             self.saved_profiles_list.remove(self.saved_profiles_list.get_last_child())
         host_services = HostServices()
@@ -50,6 +56,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         for host in host_list:
             action_row = self.create_action_row(host)
             self.saved_profiles_list.append(action_row)
+        self.emit("connection_ok", host)
 
     def create_action_row(self, host:Host) -> Adw.ActionRow:
         action_row = Adw.ActionRow()
