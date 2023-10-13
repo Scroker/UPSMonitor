@@ -90,6 +90,10 @@ class UPSMonitorService(dbus.service.Object):
             UPSs += connection.get_all_hosts_ups()
         return UPSs
 
+    @dbus.service.method("org.gdramis.UPSMonitorService.GetAllTemporaryHosts", in_signature='', out_signature='aa{sv}')
+    def get_all_temporary_hosts(self):
+        return self._temporary_host_list
+
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllHosts", in_signature='', out_signature='aa{sv}')
     def get_all_hosts(self):
         hosts = []
@@ -118,7 +122,6 @@ class UPSMonitorService(dbus.service.Object):
     def save_host(self, host_dict:dict):
         host_dict = self._string_to_python(host_dict)
         self._ups_host_services.save_host(Host(host_dict=host_dict))
-
 
     @dbus.service.method("org.gdramis.UPSMonitorService.UpdateHost", in_signature='a{sv}', out_signature='')
     def update_host(self, host_dict:dict):
@@ -178,6 +181,7 @@ class UPSMonitorClient(GObject.Object):
         self._introspect_dbus = service.get_dbus_method('Introspect', 'org.freedesktop.DBus.Introspectable')
         self._get_all_ups_dbus = service.get_dbus_method('get_all_ups', 'org.gdramis.UPSMonitorService.GetAllUPS')
         self._get_all_hosts_dbus = service.get_dbus_method('get_all_hosts', 'org.gdramis.UPSMonitorService.GetAllHosts')
+        self._get_all_temporary_hosts_dbus = service.get_dbus_method('get_all_temporary_hosts', 'org.gdramis.UPSMonitorService.GetAllTemporaryHosts')
         self._get_host_dbus = service.get_dbus_method('get_host', 'org.gdramis.UPSMonitorService.GetHost')
         self._get_host_by_name_dbus = service.get_dbus_method('get_host_by_name', 'org.gdramis.UPSMonitorService.GetHostByName')
         self._save_host_dbus = service.get_dbus_method('save_host', 'org.gdramis.UPSMonitorService.SaveHost')
@@ -253,6 +257,12 @@ class UPSMonitorClient(GObject.Object):
     def get_all_hosts(self):
         hosts = []
         for host_dict in self._dbus_to_python(self._get_all_hosts_dbus()):
+            hosts.append(Host(host_dict=host_dict))
+        return hosts
+
+    def get_all_temporary_hosts(self):
+        hosts = []
+        for host_dict in self._dbus_to_python(self._get_all_temporary_hosts_dbus()):
             hosts.append(Host(host_dict=host_dict))
         return hosts
 

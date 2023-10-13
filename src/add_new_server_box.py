@@ -37,7 +37,7 @@ class AddNewServerBox(Adw.Window):
         self.cancel_button.connect("clicked",self.cancel)
 
     def cancel(self, widget):
-        self.destroy()
+        self.hide()
 
     def do_connect(self, widget):
         self.progress.set_visible(True)
@@ -68,10 +68,17 @@ class AddNewServerBox(Adw.Window):
         password = self.password.get_text()
         profile_name = self.profile_name.get_text()
         ups_monitor_client = UPSMonitorClient()
+        if ip_address == "":
+            self.banner.set_title("Host address should not be null")
+            self.banner.set_revealed(True)
+            self.progress.set_visible(False)
+            thread = threading.Thread(target=self.close_banner, daemon = True)
+            thread.start()
+            return
         try:
             port = int(self.port.get_text())
         except ValueError:
-            self.banner.set_title("Port value not valid")
+            self.banner.set_title("Not valid port number")
             self.banner.set_revealed(True)
             self.progress.set_visible(False)
             thread = threading.Thread(target=self.close_banner, daemon = True)
