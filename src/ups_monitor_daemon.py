@@ -155,6 +155,8 @@ class UPSMonitorService(dbus.service.Object):
     @dbus.service.method("org.gdramis.UPSMonitorService.DeleteHost", in_signature='i', out_signature='')
     def delete_host(self, id):
         self._ups_host_services.delete_host(id)
+        self._ups_saved_host_connections = []
+        self._start_connection()
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Quit", in_signature='', out_signature='')
     def quit(self):
@@ -166,7 +168,7 @@ class UPSMonitorService(dbus.service.Object):
         host_dict = self._string_to_python(self._dbus_to_python(host_dict))
         try:
             ups_services = UPServices(Host(host_dict=host_dict))
-            if host_dict['host_id'] != None:
+            if host_dict['profile_name'] != None:
                 self._ups_saved_host_connections.append(ups_services)
             else:
                 self._temporary_host_list.append(host_dict)

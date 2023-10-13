@@ -18,6 +18,8 @@ class UpsActionRow(Adw.ActionRow):
         self.ups_monitor_client = UPSMonitorClient()
         if self.ups_data.host_id != None:
             host = self.ups_monitor_client.get_host(self.ups_data.host_id)
+            print(host)
+            print(vars(host))
             self.set_subtitle(host.profile_name)
         else:
             self.set_subtitle("Temporary")

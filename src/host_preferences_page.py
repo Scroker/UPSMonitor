@@ -20,6 +20,10 @@ class HostPreferencesPage(Adw.NavigationPage):
     def host_saved(self):
         pass
 
+    @GObject.Signal
+    def host_deleated(self):
+        pass
+
     def __init__(self, **kwargs):
         host_data = kwargs.get("host_data", None)
         real_parent = kwargs.get("real_parent", None)
@@ -74,7 +78,7 @@ class HostPreferencesPage(Adw.NavigationPage):
     def _delete_host(self, widget, response):
         if response == Gtk.ResponseType.OK:
             UPSMonitorClient().delete_host(self.host_data.host_id)
-            self.emit("host_saved")
+            self.emit("host_deleated")
         elif response == Gtk.ResponseType.CANCEL:
             pass
         widget.destroy()

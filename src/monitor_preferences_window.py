@@ -108,4 +108,10 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def on_clicked(self, widget):
         new_page = HostPreferencesPage(host_data=widget.host, real_parent=self)
         new_page.connect("host_saved", self.update_profiles)
+        new_page.connect("host_deleated", self.delete_profile)
         self.push_subpage(new_page)
+
+    def delete_profile(self, widget):
+        self.pop_subpage()
+        self.update_profiles()
+
