@@ -47,6 +47,27 @@ class UPSMonitorService(dbus.service.Object):
             host_dict['password'] = None
         return host_dict
 
+    def _dbus_to_python(self, data):
+        if isinstance(data, dbus.String):
+            if str(data) == 'None':
+                data = None
+            else:
+                data = str(data)
+        elif isinstance(data, dbus.Boolean):
+            data = bool(data)
+        elif isinstance(data, dbus.Int64) or isinstance(data, dbus.Int32):
+            data = int(data)
+        elif isinstance(data, dbus.Double):
+            data = float(data)
+        elif isinstance(data, dbus.Array):
+            data = [self._dbus_to_python(value) for value in data]
+        elif isinstance(data, dbus.Dictionary):
+            new_data = dict()
+            for key in data.keys():
+                new_data[self._dbus_to_python(key)] = self._dbus_to_python(data[key])
+            data = new_data
+        return data
+
     def _check_routine(self):
         try:
             for host_dict in self.get_all_ups():
@@ -92,7 +113,10 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllTemporaryHosts", in_signature='', out_signature='aa{sv}')
     def get_all_temporary_hosts(self):
-        return self._temporary_host_list
+        host_list = []
+        for host in self._temporary_host_list:
+            host_list.append(self._python_to_string(host))
+        return host_list
 
     @dbus.service.method("org.gdramis.UPSMonitorService.GetAllHosts", in_signature='', out_signature='aa{sv}')
     def get_all_hosts(self):
@@ -137,27 +161,6 @@ class UPSMonitorService(dbus.service.Object):
         print("  shutting down")
         self._loop.quit()
 
-    def _dbus_to_python(self, data):
-        if isinstance(data, dbus.String):
-            if str(data) == 'None':
-                data = None
-            else:
-                data = str(data)
-        elif isinstance(data, dbus.Boolean):
-            data = bool(data)
-        elif isinstance(data, dbus.Int64) or isinstance(data, dbus.Int32):
-            data = int(data)
-        elif isinstance(data, dbus.Double):
-            data = float(data)
-        elif isinstance(data, dbus.Array):
-            data = [self._dbus_to_python(value) for value in data]
-        elif isinstance(data, dbus.Dictionary):
-            new_data = dict()
-            for key in data.keys():
-                new_data[self._dbus_to_python(key)] = self._dbus_to_python(data[key])
-            data = new_data
-        return data
-
     @dbus.service.method("org.gdramis.UPSMonitorService.HostConnection", in_signature='a{sv}', out_signature='b')
     def host_connection(self, host_dict:dict):
         host_dict = self._string_to_python(self._dbus_to_python(host_dict))
@@ -167,6 +170,7 @@ class UPSMonitorService(dbus.service.Object):
                 self._ups_saved_host_connections.append(ups_services)
             else:
                 self._temporary_host_list.append(host_dict)
+                self._ups_saved_host_connections.append(ups_services)
             return True
         except PyNUT3Error as error:
             print("Error during connection with Host: ", error.args[0])

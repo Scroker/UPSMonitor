@@ -97,6 +97,7 @@
                             <property name="label" translatable="true">New NUT-Server connection</property>
                             <style>
                               <class name="pill"/>
+                              <class name="suggested-action"/>
                             </style>
                           </object>
                         </child>

@@ -15,14 +15,18 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     run_in_background = Gtk.Template.Child()
     temporary_profiles_list = Gtk.Template.Child()
     temporary_profiles_group = Gtk.Template.Child()
+    first_connect_button = Gtk.Template.Child()
+    no_host_connection = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.update_profiles()
-        self.connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.add_server_box = AddNewServerBox()
         self.add_server_box.set_transient_for(self)
         self.add_server_box.set_modal(True)
+        self.ups_monitor_client = UPSMonitorClient()
+        self.update_profiles()
+        self.connect_button.connect("clicked", self.on_add_server_button_clicked)
+        self.first_connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.add_server_box.connect("connection_ok", self.update_profiles)
         self.add_server_box.connect("connection_ok", self.call_connection_ok)
         setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
@@ -34,7 +38,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def connection_ok(self, *host):
         pass
 
-    def call_connection_ok(self, host):
+    def call_connection_ok(self, widget, host):
         self.emit("connection_ok", host)
 
     def on_add_server_button_clicked(self, widget):
@@ -54,13 +58,15 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def update_profiles(self, widget = None, host_var = None):
         self.update_temporary_profiles(widget, host_var)
         self.update_saved_profiles(widget, host_var)
+        self.emit("connection_ok", host_var)
 
     def update_temporary_profiles(self, widget = None, host_var = None):
         while self.temporary_profiles_list.get_last_child() != None:
             self.temporary_profiles_list.remove(self.temporary_profiles_list.get_last_child())
-        host_list = UPSMonitorClient().get_all_temporary_hosts()
+        host_list = self.ups_monitor_client.get_all_temporary_hosts()
         if len(host_list) > 0:
             self.temporary_profiles_group.set_visible(True)
+            self.no_host_connection.set_visible(False)
         else:
             self.temporary_profiles_group.set_visible(False)
         for host in host_list:
@@ -70,24 +76,28 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def update_saved_profiles(self, widget = None, host_var = None):
         while self.saved_profiles_list.get_last_child() != None:
             self.saved_profiles_list.remove(self.saved_profiles_list.get_last_child())
-        host_list = UPSMonitorClient().get_all_hosts()
+        host_list = self.ups_monitor_client.get_all_hosts()
         if len(host_list) > 0:
             self.saved_profiles_group.set_visible(True)
+            self.no_host_connection.set_visible(False)
         else:
             self.saved_profiles_group.set_visible(False)
         for host in host_list:
             action_row = self.create_action_row(host)
             self.saved_profiles_list.append(action_row)
-        #self.emit("connection_ok", host)
 
     def create_action_row(self, host:Host) -> Adw.ActionRow:
         action_row = Adw.ActionRow()
-        action_row.set_title(host.profile_name)
-        action_row.set_subtitle(host.ip_address)
-        next_image = Gtk.Image.new_from_icon_name("go-next-symbolic")
-        action_row.add_suffix(next_image)
-        action_row.set_activatable(True)
-        action_row.connect("activated", self.on_clicked)
+        if host.profile_name != None:
+            action_row.set_title(host.profile_name)
+            action_row.host = host
+            action_row.set_subtitle(host.ip_address)
+            next_image = Gtk.Image.new_from_icon_name("go-next-symbolic")
+            action_row.add_suffix(next_image)
+            action_row.set_activatable(True)
+            action_row.connect("activated", self.on_clicked)
+        else:
+            action_row.set_title(host.ip_address)
         return action_row
 
     def cancel_row(self, widget):

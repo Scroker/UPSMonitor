@@ -55,7 +55,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         while not dbus_ready:
             try:
                 self.dbus_client = UPSMonitorClient()
-                self.hosts = self.dbus_client.get_all_hosts()
                 dbus_ready = True
             except dbus.exceptions.DBusException as e:
                 print('DBus daemo not ready: ', e)
@@ -64,17 +63,15 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         thread.start()
 
     def on_connection(self, widget, host):
-        self.hosts.append(host)
         thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
         thread.start()
 
     def refresh_ups_data(self):
         self.ups_list = []
-        for host in self.hosts:
-            try:
-                self.ups_list.extend(self.dbus_client.get_all_ups())
-            except Exception as instance:
-                print(instance.args)
+        try:
+            self.ups_list.extend(self.dbus_client.get_all_ups())
+        except Exception as instance:
+            print(instance.args)
         while self.ups_list_box.get_last_child() != None:
             self.ups_list_box.remove(self.ups_list_box.get_last_child())
         for ups in self.ups_list:

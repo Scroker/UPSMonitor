@@ -21,10 +21,14 @@ class UPServices(GObject.Object):
         ups_list = []
         ups_dict = self.client.get_dict_ups()
         for k1, v1 in ups_dict.items():
-           vars_dict = self.client.get_dict_vars(k1)
-           identifier = { "name" : k1 , "name.pretty" : v1, "host_id" : self.host.host_id }
-           vars_dict.update(identifier)
-           ups_list.append(vars_dict)
+            vars_dict = self.client.get_dict_vars(k1)
+            identifier = { "name" : k1 , "name.pretty" : v1 }
+            if isinstance(self.host.host_id, int):
+                identifier['host_id'] = self.host.host_id
+            else:
+                identifier['host_id'] = 'None'
+            vars_dict.update(identifier)
+            ups_list.append(vars_dict)
         return ups_list
 
 class HostServices(GObject.Object):
