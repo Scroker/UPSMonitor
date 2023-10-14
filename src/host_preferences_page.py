@@ -16,14 +16,6 @@ class HostPreferencesPage(Adw.NavigationPage):
     overlay = Gtk.Template.Child()
     authentication_switch = Gtk.Template.Child()
 
-    @GObject.Signal
-    def host_saved(self):
-        pass
-
-    @GObject.Signal
-    def host_deleated(self):
-        pass
-
     def __init__(self, **kwargs):
         host_data = kwargs.get("host_data", None)
         real_parent = kwargs.get("real_parent", None)
@@ -60,7 +52,6 @@ class HostPreferencesPage(Adw.NavigationPage):
         saved_notification.set_title("Host modification saved!")
         saved_notification.set_timeout(2)
         self.overlay.add_toast(saved_notification)
-        self.emit("host_saved")
 
 
     def on_delete_host(self, widget):
@@ -78,7 +69,6 @@ class HostPreferencesPage(Adw.NavigationPage):
     def _delete_host(self, widget, response):
         if response == Gtk.ResponseType.OK:
             UPSMonitorClient().delete_host(self.host_data.host_id)
-            self.emit("host_deleated")
         elif response == Gtk.ResponseType.CANCEL:
             pass
         widget.destroy()

@@ -98,7 +98,7 @@ class ConversionUtil(GObject.Object):
 
 class UPSMonitorService(dbus.service.Object):
 
-    _already_connected = False
+    _connected_flag = False
     _offline_ups_notified = []
     _low_battery_ups_notified = []
     _ups_saved_host_connections = []
@@ -114,7 +114,7 @@ class UPSMonitorService(dbus.service.Object):
         self._ups_host_services = HostServices()
 
     def _check_routine(self):
-        if not self._already_connected :
+        if not self._connected_flag :
             self._start_connection()
         try:
             for host_dict in self.get_all_ups():
@@ -126,11 +126,11 @@ class UPSMonitorService(dbus.service.Object):
                     self._notify("", 0, "battery-empty-symbolic", host_dict['name.pretty'] + " have low battery!", "Charge at " + host_dict['battery.charge'] + "%", [], {"urgency": 1}, 3000)
         except PyNUT3Error as e:
             print("Error, try reset connections!")
-            self._ups_saved_host_connections = []
-            self._start_connection()
+            self._connected_flag = False
         return True
 
     def _start_connection(self):
+        self._ups_saved_host_connections = []
         host_list = self._ups_host_services.get_all_hosts()
         host_list += self._temporary_host_list
         for host in host_list:
@@ -142,23 +142,27 @@ class UPSMonitorService(dbus.service.Object):
                 self._ups_saved_host_connections.append(ups_services)
             except PyNUT3Error as e:
                 pass
-        self._already_connected = True
+        self._connected_flag = True
         self.connection_initialized()
 
     def run(self):
         GObject.timeout_add_seconds(5, self._check_routine)
         self._loop = GLib.MainLoop()
-        print("UPS Monitor Service started")
+        print("UPS Monitor Service: started")
         self._loop.run()
-        print("UPS Monitor Service stopped")
+        print("UPS Monitor Service: stopped")
 
     @dbus.service.signal("org.gdramis.UPSMonitorService")
     def connection_initialized(self):
-        print("connection initialized")
+        print("UPS Monitor Service: connection initialized")
 
     @dbus.service.signal("org.gdramis.UPSMonitorService.Host")
-    def hosts_updated(self):
-        print("host updated")
+    def host_updated(self):
+        print("UPS Monitor Service: host updated")
+
+    @dbus.service.signal("org.gdramis.UPSMonitorService.Host")
+    def host_deleated(self):
+        print("UPS Monitor Service: host deleated")
 
     @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='', out_signature='aa{sv}')
     def get_all_ups(self):
@@ -202,17 +206,21 @@ class UPSMonitorService(dbus.service.Object):
     def save_host(self, host_dict:dict):
         host_dict = ConversionUtil.string_to_python(host_dict)
         self._ups_host_services.save_host(Host(host_dict=host_dict))
+        self.host_updated()
+        self._connected_flag = False
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='a{sv}', out_signature='')
     def update_host(self, host_dict:dict):
         host_dict = ConversionUtil.string_to_python(host_dict)
         self._ups_host_services.update_host(Host(host_dict=host_dict))
+        self.host_updated()
+        self._connected_flag = False
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='i', out_signature='')
     def delete_host(self, id):
         self._ups_host_services.delete_host(id)
-        self._ups_saved_host_connections = []
-        self._start_connection()
+        self.host_deleated()
+        self._connected_flag = False
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Quit", in_signature='', out_signature='')
     def quit(self):
@@ -229,7 +237,7 @@ class UPSMonitorService(dbus.service.Object):
             else:
                 self._temporary_host_list.append(host_dict)
                 self._ups_saved_host_connections.append(ups_services)
-            self.hosts_updated()
+            self.connection_initialized()
             return True
         except PyNUT3Error as error:
             print("Error during connection with Host: ", error.args[0])
@@ -280,7 +288,6 @@ class UPSMonitorClient(GObject.Object):
 
     def save_host(self, host:Host):
         host_dict = ConversionUtil.object_to_string(host)
-        print(host_dict)
         self._save_host_dbus(host_dict)
 
     def update_host(self, host:Host):

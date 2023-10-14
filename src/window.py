@@ -58,7 +58,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             try:
                 self.dbus_client = UPSMonitorClient()
                 self.dbus_client.connect_to_signal('connection_initialized', self.refresh_ups_data)
-                self.dbus_client.connect_to_signal('hosts_updated', self.refresh_ups_data)
                 dbus_ready = True
             except dbus.exceptions.DBusException as e:
                 print('DBus daemo not ready: ', e)

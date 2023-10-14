@@ -64,10 +64,9 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         if self.dbus_client == None :
             while not dbus_ready and dbus_counter < 10:
                 try:
-                    client = UPSMonitorClient()
-                    self.dbus_client = client
-                    self.dbus_client.connect_to_signal('connection_initialized', self.update_profiles)
-                    self.dbus_client.connect_to_signal('hosts_updated', self.update_profiles)
+                    self.dbus_client = UPSMonitorClient()
+                    self.dbus_client.connect_to_signal('host_updated', self.update_profiles)
+                    self.dbus_client.connect_to_signal('host_deleated', self.delete_profile)
                     dbus_ready = True
                 except dbus.exceptions.DBusException as e:
                     print('DBus daemo not ready: ', e)
@@ -124,11 +123,9 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
 
     def on_clicked(self, widget):
         new_page = HostPreferencesPage(host_data=widget.host, real_parent=self)
-        new_page.connect("host_saved", self.update_profiles)
-        new_page.connect("host_deleated", self.delete_profile)
         self.push_subpage(new_page)
 
-    def delete_profile(self, widget):
+    def delete_profile(self):
         self.pop_subpage()
         self.update_profiles()
 
