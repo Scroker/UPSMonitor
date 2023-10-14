@@ -17,7 +17,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import sqlite3
 import threading
 import dbus
 import time
@@ -49,7 +48,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
         self.welcome_connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.add_server_box = AddNewServerBox()
-        self.add_server_box.connect("connection_ok", self.on_connection)
         thread = threading.Thread(target=self.start_dbus_connection, daemon = True)
         thread.start()
 
@@ -66,10 +64,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                 print('DBus daemo not ready: ', e)
                 dbus_counter += 1
                 time.sleep(1)
-
-    def on_connection(self, widget, host):
-        thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
-        thread.start()
 
     def refresh_ups_data(self):
         self.ups_list = []

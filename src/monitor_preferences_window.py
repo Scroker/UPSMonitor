@@ -22,6 +22,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     first_connect_button = Gtk.Template.Child()
     no_host_connection = Gtk.Template.Child()
     no_dbus_connection = Gtk.Template.Child()
+    dbus_client = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -30,8 +31,6 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.add_server_box.set_modal(True)
         self.connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.first_connect_button.connect("clicked", self.on_add_server_button_clicked)
-        self.add_server_box.connect("connection_ok", self.update_profiles)
-        self.add_server_box.connect("host_changed", self.update_profiles)
         setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
         setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
         thread = threading.Thread(target=self.update_profiles, daemon = True)
@@ -62,20 +61,26 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def start_dbus_connection(self):
         dbus_ready = False
         dbus_counter = 0
-        while not dbus_ready and dbus_counter < 10:
-            try:
-                self.ups_monitor_client = UPSMonitorClient()
-                dbus_ready = True
-            except dbus.exceptions.DBusException as e:
-                print('DBus daemo not ready: ', e)
-                dbus_counter += 1
-                time.sleep(1)
-        return dbus_ready
+        if self.dbus_client == None :
+            while not dbus_ready and dbus_counter < 10:
+                try:
+                    client = UPSMonitorClient()
+                    self.dbus_client = client
+                    self.dbus_client.connect_to_signal('connection_initialized', self.update_profiles)
+                    self.dbus_client.connect_to_signal('hosts_updated', self.update_profiles)
+                    dbus_ready = True
+                except dbus.exceptions.DBusException as e:
+                    print('DBus daemo not ready: ', e)
+                    dbus_counter += 1
+                    time.sleep(1)
+            return dbus_ready
+        else:
+            return True
 
     def update_temporary_profiles(self, widget = None, host_var = None):
         while self.temporary_profiles_list.get_last_child() != None:
             self.temporary_profiles_list.remove(self.temporary_profiles_list.get_last_child())
-        host_list = self.ups_monitor_client.get_all_temporary_hosts()
+        host_list = self.dbus_client.get_all_temporary_hosts()
         if len(host_list) > 0:
             self.temporary_profiles_group.set_visible(True)
             self.no_host_connection.set_visible(False)
@@ -88,7 +93,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def update_saved_profiles(self, widget = None, host_var = None):
         while self.saved_profiles_list.get_last_child() != None:
             self.saved_profiles_list.remove(self.saved_profiles_list.get_last_child())
-        host_list = self.ups_monitor_client.get_all_hosts()
+        host_list = self.dbus_client.get_all_hosts()
         if len(host_list) > 0:
             self.saved_profiles_group.set_visible(True)
             self.no_host_connection.set_visible(False)

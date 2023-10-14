@@ -297,8 +297,8 @@ class UPSMonitorClient(GObject.Object):
     def get_host(self, id):
         return ConversionUtil.list_to_object_host(ConversionUtil.dbus_to_python(self._get_host_dbus(id)))
 
-    def get_host_by_name(self, name):
-        return ConversionUtil.list_to_object_host(ConversionUtil.dbus_to_python(self._get_host_by_name_dbus(name)))
+    def get_host_by_name(self, host_name):
+        return ConversionUtil.list_to_object_host(ConversionUtil.dbus_to_python(self._get_host_by_name_dbus(host_name)))
 
     def quit_service_dbus(self):
         self._quit_service_dbus()

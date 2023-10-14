@@ -25,18 +25,6 @@ class AddNewServerBox(Adw.Window):
     save_profile_switch = Gtk.Template.Child()
     authentication_switch = Gtk.Template.Child()
 
-    @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
-                    arg_types=(object,),
-                    accumulator=GObject.signal_accumulator_true_handled)
-    def connection_ok(self, *host):
-        pass
-
-    @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
-                    arg_types=(object,),
-                    accumulator=GObject.signal_accumulator_true_handled)
-    def host_changed(self, *host):
-        pass
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.connect_button.connect("clicked", self.do_connect)
@@ -101,7 +89,9 @@ class AddNewServerBox(Adw.Window):
                 else:
                     host.profile_name = profile_name
                 ups_monitor_client.save_host(host)
-                host = ups_monitor_client.get_host_by_name(host)
+                print("Prima")
+                host = ups_monitor_client.get_host_by_name(profile_name)
+                print("Dopo")
                 self.hide()
                 self.emit("host_changed", host)
             except Exception as e:
@@ -118,6 +108,5 @@ class AddNewServerBox(Adw.Window):
             thread = threading.Thread(target=self.close_banner, daemon = True)
             thread.start()
             return
-        self.emit("connection_ok", host)
         self.progress.set_visible(False)
         self.hide()
