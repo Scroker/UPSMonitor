@@ -1,3 +1,7 @@
+import threading
+import dbus
+import time
+
 from gi.repository import Adw, Gtk, Gio, GObject
 
 from .data_model import Host
@@ -17,29 +21,21 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     temporary_profiles_group = Gtk.Template.Child()
     first_connect_button = Gtk.Template.Child()
     no_host_connection = Gtk.Template.Child()
+    no_dbus_connection = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.add_server_box = AddNewServerBox()
         self.add_server_box.set_transient_for(self)
         self.add_server_box.set_modal(True)
-        self.ups_monitor_client = UPSMonitorClient()
-        self.update_profiles()
         self.connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.first_connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.add_server_box.connect("connection_ok", self.update_profiles)
-        self.add_server_box.connect("connection_ok", self.call_connection_ok)
+        self.add_server_box.connect("host_changed", self.update_profiles)
         setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
         setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
-
-    @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
-                    arg_types=(object,),
-                    accumulator=GObject.signal_accumulator_true_handled)
-    def connection_ok(self, *host):
-        pass
-
-    def call_connection_ok(self, widget, host):
-        self.emit("connection_ok", host)
+        thread = threading.Thread(target=self.update_profiles, daemon = True)
+        thread.start()
 
     def on_add_server_button_clicked(self, widget):
         max_width = 600
@@ -56,9 +52,25 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.add_server_box.present()
 
     def update_profiles(self, widget = None, host_var = None):
-        self.update_temporary_profiles(widget, host_var)
-        self.update_saved_profiles(widget, host_var)
-        self.emit("connection_ok", host_var)
+        if self.start_dbus_connection():
+            self.update_temporary_profiles(widget, host_var)
+            self.update_saved_profiles(widget, host_var)
+        else:
+            self.no_dbus_connection.set_visible(True)
+            self.no_host_connection.set_visible(False)
+
+    def start_dbus_connection(self):
+        dbus_ready = False
+        dbus_counter = 0
+        while not dbus_ready and dbus_counter < 10:
+            try:
+                self.ups_monitor_client = UPSMonitorClient()
+                dbus_ready = True
+            except dbus.exceptions.DBusException as e:
+                print('DBus daemo not ready: ', e)
+                dbus_counter += 1
+                time.sleep(1)
+        return dbus_ready
 
     def update_temporary_profiles(self, widget = None, host_var = None):
         while self.temporary_profiles_list.get_last_child() != None:

@@ -3,7 +3,6 @@
   <gresource prefix="/org/ponderorg/UPSMonitor">
     <file preprocess="xml-stripblanks">ui/window.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_action_row.ui</file>
-    <file preprocess="xml-stripblanks">ui/host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_preferences_page.ui</file>
     <file preprocess="xml-stripblanks">ui/host_preferences_page.ui</file>
     <file preprocess="xml-stripblanks">ui/monitor_preferences_window.ui</file>

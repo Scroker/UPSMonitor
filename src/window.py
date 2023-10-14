@@ -28,7 +28,6 @@ from gi.repository import Adw, Gtk
 
 from .data_model import UPS
 from .ups_action_row import UpsActionRow
-from .host_action_row import HostActionRow
 from .ups_monitor_daemon import UPSMonitorClient
 from .ups_preferences_page import UpsPreferencesPage
 from .host_preferences_page import HostPreferencesPage
@@ -51,16 +50,22 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.welcome_connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.add_server_box = AddNewServerBox()
         self.add_server_box.connect("connection_ok", self.on_connection)
+        thread = threading.Thread(target=self.start_dbus_connection, daemon = True)
+        thread.start()
+
+    def start_dbus_connection(self):
         dbus_ready = False
-        while not dbus_ready:
+        dbus_counter = 0
+        while not dbus_ready and dbus_counter < 10:
             try:
                 self.dbus_client = UPSMonitorClient()
+                self.dbus_client.connect_to_signal('connection_initialized', self.refresh_ups_data)
+                self.dbus_client.connect_to_signal('hosts_updated', self.refresh_ups_data)
                 dbus_ready = True
             except dbus.exceptions.DBusException as e:
                 print('DBus daemo not ready: ', e)
+                dbus_counter += 1
                 time.sleep(1)
-        thread = threading.Thread(target=self.refresh_ups_data, daemon=True)
-        thread.start()
 
     def on_connection(self, widget, host):
         thread = threading.Thread(target=self.refresh_ups_data, daemon = True)
@@ -100,10 +105,3 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.content_window_title.set_subtitle(widget.get_subtitle())
         self.split_view.set_show_content(True)
         self.toolbar_view.set_content(UpsPreferencesPage(ups_data=widget.ups_data))
-
-    def on_host_row_selected(self, widget):
-        self.content_window_title.set_title(widget.get_title())
-        self.content_window_title.set_subtitle(widget.get_subtitle())
-        self.split_view.set_show_content(True)
-        self.toolbar_view.set_content(HostPreferencesPage(host_data=widget.host_data))
-

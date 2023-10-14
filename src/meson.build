@@ -23,7 +23,6 @@ upsmonitor_sources = [
   'main.py',
   'window.py',
   'ups_action_row.py',
-  'host_action_row.py',
   'ups_preferences_page.py',
   'host_preferences_page.py',
   'ups_monitor_daemon.py',

@@ -31,6 +31,12 @@ class AddNewServerBox(Adw.Window):
     def connection_ok(self, *host):
         pass
 
+    @GObject.Signal(flags=GObject.SignalFlags.RUN_LAST, return_type=bool,
+                    arg_types=(object,),
+                    accumulator=GObject.signal_accumulator_true_handled)
+    def host_changed(self, *host):
+        pass
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.connect_button.connect("clicked", self.do_connect)
@@ -88,13 +94,6 @@ class AddNewServerBox(Adw.Window):
             host = Host(host_id=None, ip_address=ip_address, port=port, username=username, password=password)
         else:
             host = Host(host_id=None, ip_address=ip_address, port=port)
-        if not ups_monitor_client.host_connection(host):
-            self.banner.set_title(_("Ops! Connection error, please retry.."))
-            self.banner.set_revealed(True)
-            self.progress.set_visible(False)
-            thread = threading.Thread(target=self.close_banner, daemon = True)
-            thread.start()
-            return
         if self.save_profile_switch.get_active():
             try:
                 if profile_name == "" or profile_name == None:
@@ -102,14 +101,23 @@ class AddNewServerBox(Adw.Window):
                 else:
                     host.profile_name = profile_name
                 ups_monitor_client.save_host(host)
-                host = ups_monitor_client.get_host_by_name(host.profile_name)
-            except Exception:
+                host = ups_monitor_client.get_host_by_name(host)
+                self.hide()
+                self.emit("host_changed", host)
+            except Exception as e:
                 self.banner.set_title(_("Profile name already exist"))
                 self.banner.set_revealed(True)
                 self.progress.set_visible(False)
                 thread = threading.Thread(target=self.close_banner, daemon = True)
                 thread.start()
                 return
+        if not ups_monitor_client.host_connection(host):
+            self.banner.set_title(_("Ops! Connection error, please retry.."))
+            self.banner.set_revealed(True)
+            self.progress.set_visible(False)
+            thread = threading.Thread(target=self.close_banner, daemon = True)
+            thread.start()
+            return
         self.emit("connection_ok", host)
         self.progress.set_visible(False)
         self.hide()

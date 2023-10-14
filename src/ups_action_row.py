@@ -15,16 +15,10 @@ class UpsActionRow(Adw.ActionRow):
         super().__init__(**kwargs)
         self.ups_data = ups_data
         self.set_title(self.ups_data.ups_name)
-        self.ups_monitor_client = UPSMonitorClient()
-        if self.ups_data.host_id != None:
-            host = self.ups_monitor_client.get_host(self.ups_data.host_id)
-            print(host)
-            print(vars(host))
-            self.set_subtitle(host.profile_name)
-        else:
-            self.set_subtitle("Temporary")
         image_name = "battery-full-symbolic"
+        print(self.ups_data.host_id)
         if self.ups_data.ups["status"] == "OB":
+            self.set_subtitle("Offline")
             if int(self.ups_data.battery["charge"]) >= 90:
                 image_name = "battery-full-symbolic"
             elif int(self.ups_data.battery["charge"]) >= 80:
@@ -46,6 +40,7 @@ class UpsActionRow(Adw.ActionRow):
             else:
                 image_name = "battery-level-0-symbolic"
         elif self.ups_data.ups["status"] == "OL":
+            self.set_subtitle("Online")
             if int(self.ups_data.battery["charge"]) >= 90:
                 image_name = "battery-full-charging-symbolic"
             elif int(self.ups_data.battery["charge"]) >= 80:
