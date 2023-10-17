@@ -16,11 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-import sys
-import gi
-import time
-import dbus
-
+import sys, gi, time, dbus, os
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -30,10 +26,13 @@ from gi.repository import Gtk, Gio, Adw
 from .ups_monitor_daemon import UPSMonitorServiceStarter, UPSMonitorClient
 from .monitor_preferences_window import MonitorPreferencesWindow
 
+APPLICATION_ID = 'org.ponderorg.UPSMonitor'
+STARTUP_FILE = ".var/app/org.ponderorg.UPSMonitor/.config/autostart/com.ponderorg.UPSMonitor.desktop"
+
 class UpsmonitorApplication(Adw.Application):
+
     def __init__(self):
-        super().__init__(application_id='org.ponderorg.UPSMonitor',
-                         flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
+        super().__init__(application_id=APPLICATION_ID, flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
@@ -74,12 +73,18 @@ class UpsmonitorApplication(Adw.Application):
         if not settings.get_value('run-in-background'):
             UPSMonitorClient().quit_service_dbus()
 
-def main(version):
+def help_menu():
+    return "UPS Monitor command list:\n\t--background, -b\trun the DBus daemon directly in backgound without starting GUI\n\t--help, -h\tshow the help menu"
+
+def main(version, args):
+    result = 0
+    if "--help" in args or "-h" in args:
+        help_menu()
+        return result
     daemon_process = UPSMonitorServiceStarter()
     daemon_process.start()
-    app = UpsmonitorApplication()
-    result = app.run(sys.argv)
+    if not "--background" in args and not "-b" in args :
+        app = UpsmonitorApplication()
+        result = app.run()
     daemon_process.join()
     return result
-
-

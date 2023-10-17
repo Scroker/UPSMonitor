@@ -43,4 +43,4 @@ if __name__ == '__main__':
     resource._register()
 
     from upsmonitor import main
-    sys.exit(main.main(VERSION))
+    sys.exit(main.main(VERSION, sys.argv))

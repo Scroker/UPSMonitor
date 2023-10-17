@@ -12,18 +12,18 @@
         <child>
           <object class="AdwPreferencesGroup">
             <property name="title" translatable="yes">Startup configurations</property>
-            <!--
             <child>
-              <object class="AdwSwitchRow">
+              <object class="AdwSwitchRow" id="run_at_boot">
                 <property name="title">Start on boot</property>
                 <property name="subtitle">Enable to start when user login</property>
+                <signal name="notify::active" handler="autostart_switch_selected"/>
               </object>
             </child>
-            -->
             <child>
               <object class="AdwSwitchRow" id="run_in_background">
                 <property name="title">Run in background</property>
                 <property name="subtitle">Enable to start at boot in background</property>
+                <signal name="notify::active" handler="run_background_switch_selected"/>
               </object>
             </child>
           </object>
@@ -56,6 +56,7 @@
                 <child>
                   <object class="GtkButton" id="first_connect_button">
                     <property name="label">New NUT-Server connection</property>
+                    <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                     <style>
                       <class name="pill"/>
                       <class name="suggested-action"/>
@@ -99,6 +100,7 @@
               <object class="GtkButton" id="connect_button">
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
+                <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                 <property name="child">
                   <object class="AdwButtonContent">
                     <property name="icon-name">plus-symbolic</property>

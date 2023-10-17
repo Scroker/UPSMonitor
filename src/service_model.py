@@ -36,9 +36,7 @@ class HostServices(GObject.Object):
 
     def __init__(self):
         super().__init__()
-        if not os.path.exists("./.ups_monitor"):
-            os.mkdir("./.ups_monitor")
-        self.conn = sqlite3.connect('./.ups_monitor/ups_monitor.db')
+        self.conn = sqlite3.connect('.var/app/org.ponderorg.UPSMonitor/data/ups_monitor.db')
         cursor = self.conn.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS hosts
                              (id             INTEGER     PRIMARY KEY    AUTOINCREMENT,

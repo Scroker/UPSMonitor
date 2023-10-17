@@ -16,7 +16,6 @@ class UpsActionRow(Adw.ActionRow):
         self.ups_data = ups_data
         self.set_title(self.ups_data.ups_name)
         image_name = "battery-full-symbolic"
-        print(self.ups_data.host_id)
         if self.ups_data.ups["status"] == "OB":
             self.set_subtitle("Offline")
             if int(self.ups_data.battery["charge"]) >= 90:

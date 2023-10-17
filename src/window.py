@@ -45,31 +45,32 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.add_server_button.connect("clicked", self.on_add_server_button_clicked)
-        self.welcome_connect_button.connect("clicked", self.on_add_server_button_clicked)
         self.add_server_box = AddNewServerBox()
         thread = threading.Thread(target=self.start_dbus_connection, daemon = True)
         thread.start()
 
     def start_dbus_connection(self):
-        dbus_ready = False
         dbus_counter = 0
-        while not dbus_ready and dbus_counter < 10:
+        while dbus_counter < 10:
             try:
                 self.dbus_client = UPSMonitorClient()
                 self.dbus_client.connect_to_signal('connection_initialized', self.refresh_ups_data)
-                dbus_ready = True
+                break
             except dbus.exceptions.DBusException as e:
                 print('DBus daemo not ready: ', e)
                 dbus_counter += 1
                 time.sleep(1)
+        self.refresh_ups_data()
 
     def refresh_ups_data(self):
         self.ups_list = []
-        try:
-            self.ups_list.extend(self.dbus_client.get_all_ups())
-        except Exception as instance:
-            print(instance.args)
+        dbus_counter = 0
+        while dbus_counter < 10:
+            try:
+                self.ups_list.extend(self.dbus_client.get_all_ups())
+                break
+            except Exception as instance:
+                time.sleep(1)
         while self.ups_list_box.get_last_child() != None:
             self.ups_list_box.remove(self.ups_list_box.get_last_child())
         for ups in self.ups_list:
@@ -77,6 +78,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             ups_action_row.connect("activated", self.on_ups_row_selected)
             self.ups_list_box.insert(ups_action_row, -1)
 
+    @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):
         max_width = 600
         max_height = 680

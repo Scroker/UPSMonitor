@@ -1,13 +1,13 @@
-import threading
-import dbus
-import time
+import threading, dbus, time, os
 
-from gi.repository import Adw, Gtk, Gio, GObject
+from gi.repository import Adw, Gtk, Gio, GObject, GLib
 
 from .data_model import Host
 from .add_new_server_box import AddNewServerBox
 from .ups_monitor_daemon import UPSMonitorClient
 from .host_preferences_page import HostPreferencesPage
+
+APPLICATION_ID = 'org.ponderorg.UPSMonitor'
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/monitor_preferences_window.ui')
 class MonitorPreferencesWindow(Adw.PreferencesWindow):
@@ -17,6 +17,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     connect_button = Gtk.Template.Child()
     saved_profiles_group = Gtk.Template.Child()
     run_in_background = Gtk.Template.Child()
+    run_at_boot = Gtk.Template.Child()
     temporary_profiles_list = Gtk.Template.Child()
     temporary_profiles_group = Gtk.Template.Child()
     first_connect_button = Gtk.Template.Child()
@@ -29,13 +30,13 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.add_server_box = AddNewServerBox()
         self.add_server_box.set_transient_for(self)
         self.add_server_box.set_modal(True)
-        self.connect_button.connect("clicked", self.on_add_server_button_clicked)
-        self.first_connect_button.connect("clicked", self.on_add_server_button_clicked)
-        setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
-        setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
+        self.setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
+        self.setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
+        self.setting.bind("run-at-boot", self.run_at_boot, "active", Gio.SettingsBindFlags.DEFAULT)
         thread = threading.Thread(target=self.update_profiles, daemon = True)
         thread.start()
 
+    @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):
         max_width = 600
         max_height = 680
@@ -129,3 +130,12 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.pop_subpage()
         self.update_profiles()
 
+    @Gtk.Template.Callback()
+    def run_background_switch_selected(self, widget, args):
+        if self.setting.get_value("run-in-background") :
+            self.run_at_boot.set_active(False)
+
+    @Gtk.Template.Callback()
+    def autostart_switch_selected(self, widget, args):
+        if not self.setting.get_value("run-at-boot") :
+            self.run_in_background.set_active(True)

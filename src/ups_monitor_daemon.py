@@ -3,8 +3,7 @@ import dbus.service
 import multiprocessing
 import dbus.mainloop.glib
 
-from gi.repository import GLib
-from gi.repository import GObject
+from gi.repository import Gio, GLib, GObject
 from pynut3.nut3 import PyNUT3Error
 
 from .data_model import Host, UPS
@@ -103,15 +102,30 @@ class UPSMonitorService(dbus.service.Object):
     _low_battery_ups_notified = []
     _ups_saved_host_connections = []
     _temporary_host_list = []
+    _service_name = 'org.gdramis.UPSMonitorService'
+    _object_path = '/org/gdramis/UPSMonitorService'
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
         session_bus = dbus.SessionBus()
-        bus_name = dbus.service.BusName("org.gdramis.UPSMonitorService")
-        dbus.service.Object.__init__(self, bus_name, "/org/gdramis/UPSMonitorService")
-        notification_service = session_bus.get_object('org.freedesktop.Notifications', "/org/freedesktop/Notifications")
-        self._notify = notification_service.get_dbus_method('Notify', 'org.freedesktop.Notifications')
+        self._setting = Gio.Settings.new('org.ponderorg.UPSMonitor')
+        self._setting.connect('changed', self.on_settings_property_change)
+        bus_name = dbus.service.BusName('org.gdramis.UPSMonitorService')
+        dbus.service.Object.__init__(self, bus_name, '/org/gdramis/UPSMonitorService')
+
+        # Freedesktop Portals
+        portal_service = session_bus.get_object('org.freedesktop.portal.Desktop', '/org/freedesktop/portal/desktop')
+        self._add_notification = portal_service.get_dbus_method('AddNotification', 'org.freedesktop.portal.Notification')
+        self._request_background = portal_service.get_dbus_method('RequestBackground', 'org.freedesktop.portal.Background')
         self._ups_host_services = HostServices()
+
+    def on_settings_property_change(self, widget, args):
+        if self._setting.get_value("run-at-boot"):
+            self._request_background('org.gdramis.UPSMonitorService', {'background':True, 'autostart':True, 'commandline':['upsmonitor','-b']})
+        if self._setting.get_value("run-in-background") and not self._setting.get_value("run-at-boot"):
+            self._request_background('org.gdramis.UPSMonitorService', {'background':True, 'autostart':False})
+        if not self._setting.get_value("run-in-background"):
+            self._request_background('org.gdramis.UPSMonitorService', {'background':False, 'autostart':False, 'commandline':['upsmonitor','-b']})
 
     def _check_routine(self):
         if not self._connected_flag :
@@ -120,10 +134,12 @@ class UPSMonitorService(dbus.service.Object):
             for host_dict in self.get_all_ups():
                 if host_dict['ups.status'] != 'OL' and host_dict['name'] not in self._offline_ups_notified :
                     self._offline_ups_notified.append(host_dict['name'])
-                    self._notify("", 0, "battery-caution-symbolic", host_dict['name.pretty'] + " is now offline!", "Charge at " + host_dict['battery.charge'] + "%", [], {"urgency": 1}, 3000)
+                    message = 'Charge at ' + host_dict['battery.charge'] + '%',
+                    self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-caution-symbolic','title':host_dict['name.pretty'], 'body': message, 'priority':'urgent'})
                 if host_dict['ups.status'] != 'OL' and int(host_dict['battery.charge']) <= 20 and host_dict['name'] not in self._low_battery_ups_notified :
                     self._offline_ups_notified.append(host_dict['name'])
-                    self._notify("", 0, "battery-empty-symbolic", host_dict['name.pretty'] + " have low battery!", "Charge at " + host_dict['battery.charge'] + "%", [], {"urgency": 1}, 3000)
+                    message = 'Charge at ' + host_dict['battery.charge'] + '%',
+                    self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':host_dict['name.pretty'], 'body': message, 'priority':'urgent'})
         except PyNUT3Error as e:
             print("Error, try reset connections!")
             self._connected_flag = False
