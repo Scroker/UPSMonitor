@@ -129,15 +129,16 @@ class UPSMonitorService(dbus.service.Object):
         if not self._connected_flag :
             self._start_connection()
         try:
-            for host_dict in self.get_all_ups():
-                if host_dict['ups.status'] != 'OL' and host_dict['name'] not in self._offline_ups_notified :
-                    self._offline_ups_notified.append(host_dict['name'])
-                    message = 'Charge at ' + host_dict['battery.charge'] + '%',
-                    self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-caution-symbolic','title':host_dict['name.pretty'], 'body': message, 'priority':'urgent'})
-                if host_dict['ups.status'] != 'OL' and int(host_dict['battery.charge']) <= 20 and host_dict['name'] not in self._low_battery_ups_notified :
-                    self._offline_ups_notified.append(host_dict['name'])
-                    message = 'Charge at ' + host_dict['battery.charge'] + '%',
-                    self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':host_dict['name.pretty'], 'body': message, 'priority':'urgent'})
+            for ups_dict in self.get_all_ups():
+                notification_types = self._ups_host_services.get_ups_notification_type(ups_dict['host_id'], ups_dict['name'])
+                if ups_dict['ups.status'] != 'OL' and ups_dict['name'] not in self._offline_ups_notified and 2 in notification_types :
+                    self._offline_ups_notified.append(ups_dict['name'])
+                    message = 'Charge at ' + ups_dict['battery.charge'] + '%',
+                    self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-caution-symbolic','title':ups_dict['name.pretty'], 'body': message, 'priority':'urgent'})
+                if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 20 and ups_dict['name'] not in self._low_battery_ups_notified and 1 in notification_types :
+                    self._offline_ups_notified.append(ups_dict['name'])
+                    message = 'Charge at ' + ups_dict['battery.charge'] + '%',
+                    self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':ups_dict['name.pretty'], 'body': message, 'priority':'urgent'})
         except PyNUT3Error as e:
             logging.exception("UPS Monitor Service: error, try reset connections!")
             self._connected_flag = False
@@ -159,10 +160,10 @@ class UPSMonitorService(dbus.service.Object):
 
     def run(self):
         try:
-            result = self._ups_host_services.get_host_by_name("Pippo")
-            self._ups_host_services.set_ups_notification_type('greencell', '12', NotificationType.LOW_BATTERY, False)
-            self._ups_host_services.get_ups_notification_type('greencell', '12')
+            result = self._ups_host_services.get_host_by_name("Anthon")
+            self._ups_host_services.set_ups_notification_type(result['host_id'], 'greencell', NotificationType.LOW_BATTERY, True)
         except:
+            logging.exception("UPS Monitor Service")
             pass
         GObject.timeout_add_seconds(5, self._check_routine)
         self._loop = GLib.MainLoop()
@@ -190,6 +191,12 @@ class UPSMonitorService(dbus.service.Object):
             UPSs += connection.get_all_hosts_ups()
         logging.info("get_all_ups ended")
         return UPSs
+
+    @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='', out_signature='a{sv}')
+    def set_ups_notification_type(self, notify_dict:dict):
+        logging.info("set_ups_notification_type started")
+        self._ups_host_services.set_ups_notification_type(nofity_dict['host_id'], nofity_dict['name'], notify_dict['type'], notify_dict['active'])
+        logging.info("set_ups_notification_type ended")
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='', out_signature='aa{sv}')
     def get_all_temporary_hosts(self):

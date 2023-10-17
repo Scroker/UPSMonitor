@@ -78,20 +78,24 @@ class HostServices(GObject.Object):
 
     def get_ups_notification_type(self, host_id:int, ups_name:str) -> []:
         cursor = self.conn.cursor()
-        notification_types = {}
-        result = cursor.execute("SELECT * FROM notifications WHERE name=? AND host_id=?", (ups_name, host_id,))
-        for notification in result:
-            print(notification)
+        notification_types = []
+        result = cursor.execute("SELECT type FROM notifications WHERE name=? AND host_id=?", (ups_name, host_id,))
+        for notification_type in result:
+            notification_types.append(notification_type[0])
+        return notification_types
+
 
     def set_ups_notification_type(self, host_id:int, ups_name:str, notification_type:int, active:bool = True) -> []:
         cursor = self.conn.cursor()
         notification_types = {}
-        result = cursor.execute("SELECT * FROM hosts WHERE id=?", (host_id,))
+        cursor.execute("SELECT * FROM hosts WHERE id=?", (host_id,))
         if cursor.fetchone() is not None:
-            if active :
+            cursor.execute("SELECT * FROM notifications WHERE name=? AND host_id=? AND type=?", (ups_name, host_id, int(notification_type)))
+            if active and cursor.fetchone() is None:
                 result = cursor.execute("INSERT INTO notifications (name, host_id, type) VALUES (?,?,?)", (ups_name, host_id, int(notification_type)))
             elif not active :
                 result = cursor.execute("DELETE FROM notifications WHERE name=? AND host_id=? AND type=?", (ups_name, host_id, int(notification_type)))
+            self.conn.commit()
         else:
             pass
 
