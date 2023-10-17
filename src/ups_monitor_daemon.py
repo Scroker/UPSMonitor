@@ -1,4 +1,4 @@
-import dbus
+import dbus, logging
 import dbus.service
 import multiprocessing
 import dbus.mainloop.glib
@@ -6,7 +6,7 @@ import dbus.mainloop.glib
 from gi.repository import Gio, GLib, GObject
 from pynut3.nut3 import PyNUT3Error
 
-from .data_model import Host, UPS
+from .data_model import Host, UPS, NotificationType
 from .service_model import HostServices, UPServices
 
 class ConversionUtil(GObject.Object):
@@ -15,9 +15,7 @@ class ConversionUtil(GObject.Object):
 
     @staticmethod
     def object_to_string(host:Host) -> dict:
-        print(host)
         host_dict = vars(host)
-        print(host_dict)
         return ConversionUtil.python_to_string(host_dict)
 
     @staticmethod
@@ -141,7 +139,7 @@ class UPSMonitorService(dbus.service.Object):
                     message = 'Charge at ' + host_dict['battery.charge'] + '%',
                     self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':host_dict['name.pretty'], 'body': message, 'priority':'urgent'})
         except PyNUT3Error as e:
-            print("Error, try reset connections!")
+            logging.exception("UPS Monitor Service: error, try reset connections!")
             self._connected_flag = False
         return True
 
@@ -149,19 +147,23 @@ class UPSMonitorService(dbus.service.Object):
         self._ups_saved_host_connections = []
         host_list = self._ups_host_services.get_all_hosts()
         host_list += self._temporary_host_list
-        for host in host_list:
+        for host_dict in host_list:
             try:
-                if isinstance(host, Host):
-                    ups_services = UPServices(host)
-                else:
-                    ups_services = UPServices(Host(host_dict=host))
+                ups_services = UPServices(host_dict)
                 self._ups_saved_host_connections.append(ups_services)
             except PyNUT3Error as e:
+                logging.exception("UPS Monitor Service: error during connection with host " + host_dict['ip_address'])
                 pass
         self._connected_flag = True
         self.connection_initialized()
 
     def run(self):
+        try:
+            result = self._ups_host_services.get_host_by_name("Pippo")
+            self._ups_host_services.set_ups_notification_type('greencell', '12', NotificationType.LOW_BATTERY, False)
+            self._ups_host_services.get_ups_notification_type('greencell', '12')
+        except:
+            pass
         GObject.timeout_add_seconds(5, self._check_routine)
         self._loop = GLib.MainLoop()
         print("UPS Monitor Service: started")
@@ -182,61 +184,77 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='', out_signature='aa{sv}')
     def get_all_ups(self):
+        logging.info("get_all_ups started")
         UPSs = []
         for connection in self._ups_saved_host_connections:
             UPSs += connection.get_all_hosts_ups()
+        logging.info("get_all_ups ended")
         return UPSs
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='', out_signature='aa{sv}')
     def get_all_temporary_hosts(self):
+        logging.info("get_all_temporary_hosts started")
         host_list = []
         for host in self._temporary_host_list:
             host_list.append(ConversionUtil.python_to_string(host))
+        logging.info("get_all_temporary_hosts ended")
         return host_list
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='', out_signature='aa{sv}')
     def get_all_hosts(self):
+        logging.info("get_all_hosts started")
         hosts = []
         for host in self._ups_host_services.get_all_hosts():
-            host_dict = ConversionUtil.python_to_string(vars(host))
+            host_dict = ConversionUtil.python_to_string(host)
             hosts.append(host_dict)
+        logging.info("get_all_hosts ended")
         return hosts
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='i', out_signature='a{sv}')
     def get_host(self, id):
+        logging.info("get_host started")
         host_dict = {}
         host = self._ups_host_services.get_host(id)
         if host != None:
-            host_dict = ConversionUtil.python_to_string(vars(host))
+            host_dict = ConversionUtil.python_to_string(host)
+        logging.info("get_host ended")
         return host_dict
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='s', out_signature='a{sv}')
     def get_host_by_name(self, name):
+        logging.info("get_host_by_name started")
         host_dict = {}
         host = self._ups_host_services.get_host_by_name(name)
         if host != None:
-            host_dict = ConversionUtil.python_to_string(vars(host))
+            host_dict = ConversionUtil.python_to_string(host)
+        logging.info("get_host_by_name ended")
         return host_dict
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='a{sv}', out_signature='')
     def save_host(self, host_dict:dict):
-        host_dict = ConversionUtil.string_to_python(host_dict)
-        self._ups_host_services.save_host(Host(host_dict=host_dict))
+        logging.info("save_host started")
+        host_dict = ConversionUtil.string_to_python(ConversionUtil.dbus_to_python(host_dict))
+        self._ups_host_services.save_host(host_dict)
         self.host_updated()
         self._connected_flag = False
+        logging.info("save_host ended")
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='a{sv}', out_signature='')
     def update_host(self, host_dict:dict):
+        logging.info("update_host started")
         host_dict = ConversionUtil.string_to_python(host_dict)
-        self._ups_host_services.update_host(Host(host_dict=host_dict))
+        self._ups_host_services.update_host(host_dict)
         self.host_updated()
         self._connected_flag = False
+        logging.info("update_host ended")
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='i', out_signature='')
     def delete_host(self, id):
+        logging.info("delete_host started")
         self._ups_host_services.delete_host(id)
         self.host_deleated()
         self._connected_flag = False
+        logging.info("delete_host ended")
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Quit", in_signature='', out_signature='')
     def quit(self):
@@ -245,18 +263,20 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='a{sv}', out_signature='b')
     def host_connection(self, host_dict:dict):
+        logging.info("host_connection started")
         host_dict = ConversionUtil.string_to_python(ConversionUtil.dbus_to_python(host_dict))
         try:
-            ups_services = UPServices(Host(host_dict=host_dict))
+            ups_services = UPServices(host_dict)
             if host_dict['profile_name'] != None:
                 self._ups_saved_host_connections.append(ups_services)
             else:
                 self._temporary_host_list.append(host_dict)
                 self._ups_saved_host_connections.append(ups_services)
             self.connection_initialized()
+            logging.info("host_connection ended")
             return True
         except PyNUT3Error as error:
-            print("Error during connection with Host: ", error.args[0])
+            logging.exception("UPS Monitor Service: error during connection with host ", host_dict['ip_address'])
             return False
 
 class UPSMonitorClient(GObject.Object):

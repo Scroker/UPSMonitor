@@ -89,9 +89,7 @@ class AddNewServerBox(Adw.Window):
                 else:
                     host.profile_name = profile_name
                 ups_monitor_client.save_host(host)
-                print("Prima")
                 host = ups_monitor_client.get_host_by_name(profile_name)
-                print("Dopo")
                 self.hide()
                 self.emit("host_changed", host)
             except Exception as e:

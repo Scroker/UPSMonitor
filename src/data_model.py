@@ -1,3 +1,5 @@
+import enum
+
 from gi.repository import GObject
 
 class Host(GObject.Object):
@@ -40,11 +42,6 @@ class Host(GObject.Object):
         else:
             raise Exception('Missing minimum host parameters in the constructor')
 
-class HostAlreadyExist(Exception):
-
-    def __init__(self):
-        super().__init__()
-
 class UPS(GObject.Object):
     __gtype_name__ = 'UPS'
 
@@ -58,4 +55,19 @@ class UPS(GObject.Object):
         self.input = {}
         self.output = {}
         self.ups = {}
+        self.notification_types = {}
         self.host_id = host_id
+
+class NotificationType(enum.Enum):
+
+    LOW_BATTERY = 1, 'LOW BATTERY'
+    IS_OFFLINE = 2, 'IS OFFLINE'
+
+    def __new__(cls, value, name):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.fullname = name
+        return member
+
+    def __int__(self):
+        return self.value
