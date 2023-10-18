@@ -14,6 +14,15 @@ class UpsActionRow(Adw.ActionRow):
             kwargs.pop("ups_data")
         super().__init__(**kwargs)
         self.ups_data = ups_data
+        self._dbus_client = UPSMonitorClient()
+        self._dbus_client.connect_to_signal("ups_updated", self.update_self)
+        self.update_self()
+
+    def update_self(self):
+        try:
+            self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+        except Exception:
+            return
         self.set_title(self.ups_data.ups_name)
         image_name = "battery-full-symbolic"
         if self.ups_data.ups["status"] == "OB":

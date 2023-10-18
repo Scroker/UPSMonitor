@@ -25,6 +25,9 @@ class UpsPreferencesPage(Adw.PreferencesPage):
             self.low_battery_notify_switch.set_active(True)
         if int(NotificationType.IS_OFFLINE) in notifications:
             self.offline_notify_switch.set_active(True)
+        self.update_self()
+
+    def update_self(self):
         if self.ups_data != None:
             self.set_title(self.ups_data.ups_name)
             for k2 in self.ups_data.battery:
@@ -60,6 +63,12 @@ class UpsPreferencesPage(Adw.PreferencesPage):
                 action_row = self.create_action_row(k2,v2)
                 self.ups_group.add(action_row)
 
+    def create_action_row(self, title:str, value:str):
+        action_row = Adw.ActionRow()
+        action_row.set_title(_(title))
+        action_row.add_suffix(Gtk.Label(label=value))
+        return action_row
+
     @Gtk.Template.Callback()
     def low_battery_notify_switch_selected(self, widget, args):
         if self.low_battery_notify_switch.get_active():
@@ -74,8 +83,7 @@ class UpsPreferencesPage(Adw.PreferencesPage):
         elif not self.offline_notify_switch.get_active():
             self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.IS_OFFLINE, False)
 
-    def create_action_row(self, title:str, value:str):
-        action_row = Adw.ActionRow()
-        action_row.set_title(_(title))
-        action_row.add_suffix(Gtk.Label(label=value))
-        return action_row
+    #@Gtk.Template.Callback()
+    def shutdown_low_battery_switch_selected(self, widget, args):
+        print("Implement shutdown service")
+        return

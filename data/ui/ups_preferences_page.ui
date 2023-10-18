@@ -5,7 +5,16 @@
   <template class="UpsPreferencesPage" parent="AdwPreferencesPage">
     <child>
       <object class="AdwPreferencesGroup">
-        <property name="title">Notifications</property>
+        <property name="title">Options</property>
+        <!--
+        <child>
+          <object class="AdwSwitchRow" id="shutdown_low_battery_switch">
+            <property name="title">Low battery shutdown</property>
+            <property name="subtitle">Enable the shutdown of this host when the battery level is low</property>
+            <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/>
+          </object>
+        </child>
+        -->
         <child>
           <object class="AdwSwitchRow" id="offline_notify_switch">
             <property name="title">UPS offline notifications</property>
