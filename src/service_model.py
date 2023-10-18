@@ -25,7 +25,7 @@ class UPServices(GObject.Object):
         for k1, v1 in ups_dict.items():
             vars_dict = self.client.get_dict_vars(k1)
             identifier = { "name" : k1 , "name.pretty" : v1 }
-            if isinstance(self.host.host_id, int):
+            if isinstance(self.host['host_id'], int):
                 identifier['host_id'] = self.host['host_id']
             else:
                 identifier['host_id'] = 'None'
@@ -76,15 +76,6 @@ class HostServices(GObject.Object):
            return {'ip_address':row[2], 'port':row[3], 'profile_name':row[1], 'host_id':row[0], 'username':row[3], 'password':row[4]}
         return None
 
-    def get_ups_notification_type(self, host_id:int, ups_name:str) -> []:
-        cursor = self.conn.cursor()
-        notification_types = []
-        result = cursor.execute("SELECT type FROM notifications WHERE name=? AND host_id=?", (ups_name, host_id,))
-        for notification_type in result:
-            notification_types.append(notification_type[0])
-        return notification_types
-
-
     def set_ups_notification_type(self, host_id:int, ups_name:str, notification_type:int, active:bool = True) -> []:
         cursor = self.conn.cursor()
         notification_types = {}
@@ -98,6 +89,14 @@ class HostServices(GObject.Object):
             self.conn.commit()
         else:
             pass
+
+    def get_all_ups_notifications(self, host_id:int, ups_name:str) -> []:
+        cursor = self.conn.cursor()
+        notification_types = []
+        result = cursor.execute("SELECT type FROM notifications WHERE name=? AND host_id=?", (ups_name, host_id,))
+        for notification_type in result:
+            notification_types.append(notification_type[0])
+        return notification_types
 
     def save_host(self, host:dict):
         cursor = self.conn.cursor()
