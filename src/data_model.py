@@ -60,8 +60,9 @@ class UPS(GObject.Object):
 
 class NotificationType(enum.Enum):
 
-    LOW_BATTERY = 1, 'LOW BATTERY'
-    IS_OFFLINE = 2, 'IS OFFLINE'
+    IS_OFFLINE = 1, 'IS OFFLINE'
+    LOW_BATTERY = 2, 'LOW BATTERY'
+    AUTO_SHUTDOWN = 3, 'AUTO BATTERY'
 
     def __new__(cls, value, name):
         member = object.__new__(cls)

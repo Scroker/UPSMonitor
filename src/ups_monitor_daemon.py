@@ -126,16 +126,17 @@ class UPSMonitorService(dbus.service.Object):
 
     def __init__(self):
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+        system_bus = dbus.SystemBus()
         session_bus = dbus.SessionBus()
         self._setting = Gio.Settings.new('org.ponderorg.UPSMonitor')
         self._setting.connect('changed', self.on_settings_property_change)
         bus_name = dbus.service.BusName('org.gdramis.UPSMonitorService')
         dbus.service.Object.__init__(self, bus_name, '/org/gdramis/UPSMonitorService')
         # FreeDesktop Login1
-        login1_service = session_bus.get_object('org.freedesktop.portal.Desktop', '/org/freedesktop/portal/desktop')
+        login1_service = system_bus.get_object('org.freedesktop.login1', '/org/freedesktop/login1')
         self._power_off = login1_service.get_dbus_method('PowerOff', 'org.freedesktop.login1.Manager')
         # FreeDesktop Portals
-        portal_service = session_bus.get_object('org.freedesktop.login1', '/org/freedesktop/login1')
+        portal_service = session_bus.get_object('org.freedesktop.portal.Desktop', '/org/freedesktop/portal/desktop')
         self._add_notification = portal_service.get_dbus_method('AddNotification', 'org.freedesktop.portal.Notification')
         self._request_background = portal_service.get_dbus_method('RequestBackground', 'org.freedesktop.portal.Background')
         self._ups_host_services = HostServices()
@@ -158,14 +159,16 @@ class UPSMonitorService(dbus.service.Object):
         self.ups_updated()
         for ups_dict in self._ups_data:
             notification_types = self._ups_host_services.get_all_ups_notifications(ups_dict['host_id'], ups_dict['name'])
-            if ups_dict['ups.status'] != 'OL' and ups_dict['name'] not in self._offline_ups_notified and 2 in notification_types :
+            if ups_dict['ups.status'] != 'OL' and ups_dict['name'] not in self._offline_ups_notified and int(NotificationType.IS_OFFLINE) in notification_types :
                 self._offline_ups_notified.append(ups_dict['name'])
                 message = 'Charge at ' + ups_dict['battery.charge'] + '%'
                 self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-caution-symbolic','title':ups_dict['name.pretty'], 'body': message, 'priority':'urgent'})
-            if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 20 and ups_dict['name'] not in self._low_battery_ups_notified and 1 in notification_types :
+            if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 20 and ups_dict['name'] not in self._low_battery_ups_notified and int(NotificationType.LOW_BATTERY) in notification_types :
                 self._offline_ups_notified.append(ups_dict['name'])
                 message = 'Charge at ' + ups_dict['battery.charge'] + '%'
                 self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':ups_dict['name.pretty'], 'body': message, 'priority':'urgent'})
+            if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 20 and ups_dict['name'] not in self._low_battery_ups_notified and int(NotificationType.AUTO_SHUTDOWN) in notification_types :
+                self._power_off(True)
         return True
 
     def _start_connection(self):
