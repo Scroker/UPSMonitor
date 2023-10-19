@@ -131,9 +131,11 @@ class UPSMonitorService(dbus.service.Object):
         self._setting.connect('changed', self.on_settings_property_change)
         bus_name = dbus.service.BusName('org.gdramis.UPSMonitorService')
         dbus.service.Object.__init__(self, bus_name, '/org/gdramis/UPSMonitorService')
-
-        # Freedesktop Portals
-        portal_service = session_bus.get_object('org.freedesktop.portal.Desktop', '/org/freedesktop/portal/desktop')
+        # FreeDesktop Login1
+        login1_service = session_bus.get_object('org.freedesktop.portal.Desktop', '/org/freedesktop/portal/desktop')
+        self._power_off = login1_service.get_dbus_method('PowerOff', 'org.freedesktop.login1.Manager')
+        # FreeDesktop Portals
+        portal_service = session_bus.get_object('org.freedesktop.login1', '/org/freedesktop/login1')
         self._add_notification = portal_service.get_dbus_method('AddNotification', 'org.freedesktop.portal.Notification')
         self._request_background = portal_service.get_dbus_method('RequestBackground', 'org.freedesktop.portal.Background')
         self._ups_host_services = HostServices()
