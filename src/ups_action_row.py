@@ -21,10 +21,12 @@ class UpsActionRow(Adw.ActionRow):
         self.update_self(ups_data)
 
     def update_self(self, ups_data:UPS=None):
-        if ups_data == None:
+        if ups_data != None:
+            self.ups_data = ups_data
+        elif ups_data == None  and self.ups_data.host_id != None:
             self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
         else:
-            self.ups_data = ups_data
+            return
         self.set_title(self.ups_data.ups_name)
         image_name = "battery-full-symbolic"
         if self.ups_data.ups["status"] == "OB":

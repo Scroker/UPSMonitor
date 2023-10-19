@@ -167,7 +167,7 @@ class UPSMonitorService(dbus.service.Object):
                 self._offline_ups_notified.append(ups_dict['name'])
                 message = 'Charge at ' + ups_dict['battery.charge'] + '%'
                 self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':ups_dict['name.pretty'], 'body': message, 'priority':'urgent'})
-            if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 20 and ups_dict['name'] not in self._low_battery_ups_notified and int(NotificationType.AUTO_SHUTDOWN) in notification_types :
+            if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 15 and int(NotificationType.AUTO_SHUTDOWN) in notification_types :
                 self._power_off(True)
         return True
 
