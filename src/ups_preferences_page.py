@@ -1,4 +1,6 @@
 from gi.repository import Adw, Gtk
+
+from .data_model import UPS
 from .ups_monitor_daemon import UPSMonitorClient, NotificationType
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_preferences_page.ui')
@@ -25,43 +27,48 @@ class UpsPreferencesPage(Adw.PreferencesPage):
             self.low_battery_notify_switch.set_active(True)
         if int(NotificationType.IS_OFFLINE) in notifications:
             self.offline_notify_switch.set_active(True)
-        self.update_self()
+        self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_self)
+        self.connect("destroy", self.on_destroy)
+        self.update_self(ups_data)
 
-    def update_self(self):
-        if self.ups_data != None:
-            self.set_title(self.ups_data.ups_name)
-            for k2 in self.ups_data.battery:
-                v2 = self.ups_data.battery[k2]
-                action_row = Adw.ActionRow()
-                action_row.set_title(_(k2))
-                if "charge" in k2:
-                    action_row.set_subtitle(v2+"%")
-                    progress = Gtk.ProgressBar(fraction=int(v2)/100)
-                    progress.set_margin_top(20)
-                    action_row.add_suffix(progress)
-                else:
-                    action_row.add_suffix(Gtk.Label(label=v2))
-                self.bettery_group.add(action_row)
-            for k2 in self.ups_data.device:
-                v2 = self.ups_data.device[k2]
-                action_row = self.create_action_row(k2,v2)
-                self.device_group.add(action_row)
-            for k2 in self.ups_data.driver:
-                v2 = self.ups_data.driver[k2]
-                action_row = self.create_action_row(k2,v2)
-                self.driver_group.add(action_row)
-            for k2 in self.ups_data.input:
-                v2 = self.ups_data.input[k2]
-                action_row = self.create_action_row(k2,v2)
-                self.input_group.add(action_row)
-            for k2 in self.ups_data.output:
-                v2 = self.ups_data.output[k2]
-                action_row = self.create_action_row(k2,v2)
-                self.output_group.add(action_row)
-            for k2 in self.ups_data.ups:
-                v2 = self.ups_data.ups[k2]
-                action_row = self.create_action_row(k2,v2)
-                self.ups_group.add(action_row)
+    def update_self(self, ups_data:UPS=None):
+        if self.ups_data == None:
+            self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+        else:
+            self.ups_data = ups_data
+        self.set_title(self.ups_data.ups_name)
+        for k2 in self.ups_data.battery:
+            v2 = self.ups_data.battery[k2]
+            action_row = Adw.ActionRow()
+            action_row.set_title(_(k2))
+            if "charge" in k2:
+                action_row.set_subtitle(v2+"%")
+                progress = Gtk.ProgressBar(fraction=int(v2)/100)
+                progress.set_margin_top(20)
+                action_row.add_suffix(progress)
+            else:
+                action_row.add_suffix(Gtk.Label(label=v2))
+            self.bettery_group.add(action_row)
+        for k2 in self.ups_data.device:
+            v2 = self.ups_data.device[k2]
+            action_row = self.create_action_row(k2,v2)
+            self.device_group.add(action_row)
+        for k2 in self.ups_data.driver:
+            v2 = self.ups_data.driver[k2]
+            action_row = self.create_action_row(k2,v2)
+            self.driver_group.add(action_row)
+        for k2 in self.ups_data.input:
+            v2 = self.ups_data.input[k2]
+            action_row = self.create_action_row(k2,v2)
+            self.input_group.add(action_row)
+        for k2 in self.ups_data.output:
+            v2 = self.ups_data.output[k2]
+            action_row = self.create_action_row(k2,v2)
+            self.output_group.add(action_row)
+        for k2 in self.ups_data.ups:
+            v2 = self.ups_data.ups[k2]
+            action_row = self.create_action_row(k2,v2)
+            self.ups_group.add(action_row)
 
     def create_action_row(self, title:str, value:str):
         action_row = Adw.ActionRow()
@@ -87,3 +94,6 @@ class UpsPreferencesPage(Adw.PreferencesPage):
     def shutdown_low_battery_switch_selected(self, widget, args):
         print("Implement shutdown service")
         return
+
+    def on_destroy(self, widget):
+        self._dbus_signal_handler.remove()

@@ -362,7 +362,7 @@ class UPSMonitorClient(GObject.Object):
         self._host_connection_dbus = self._service.get_dbus_method('host_connection', 'org.gdramis.UPSMonitorService.Host')
 
     def connect_to_signal(self, signal_name, callback_func):
-        self._service.connect_to_signal(signal_name, callback_func)
+        return self._service.connect_to_signal(signal_name, callback_func)
 
     def introspect(self):
         return self._introspect_dbus()

@@ -17,9 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import threading
-import dbus
-import time
+import threading, dbus, time, logging
 
 from pynut3.nut3 import PyNUT3Error
 
@@ -46,6 +44,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.add_server_box = AddNewServerBox()
+        self.connect("destroy", self.on_destroy)
         thread = threading.Thread(target=self.start_dbus_connection, daemon = True)
         thread.start()
 
@@ -53,8 +52,8 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         dbus_counter = 0
         while dbus_counter < 10:
             try:
-                self.dbus_client = UPSMonitorClient()
-                self.dbus_client.connect_to_signal("ups_changed", self.refresh_ups_data)
+                self._dbus_client = UPSMonitorClient()
+                self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_changed", self.refresh_ups_data)
                 self.refresh_ups_data()
                 break
             except dbus.exceptions.DBusException as e:
@@ -63,12 +62,12 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
                 time.sleep(1)
 
     def refresh_ups_data(self):
-        print("refresh")
         self.ups_list = []
-        self.ups_list.extend(self.dbus_client.get_all_ups())
+        self.ups_list.extend(self._dbus_client.get_all_ups())
         while self.ups_list_box.get_last_child() != None:
             child = self.ups_list_box.get_last_child()
             self.ups_list_box.remove(child)
+            child.run_dispose()
         for ups in self.ups_list:
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_ups_row_selected)
@@ -96,4 +95,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.content_window_title.set_subtitle(widget.get_subtitle())
         self.split_view.set_show_content(True)
         self.toolbar_view.set_content(UpsPreferencesPage(ups_data=widget.ups_data))
+
+    def on_destroy(self, widget):
+        self._dbus_signal_handler.remove()
 

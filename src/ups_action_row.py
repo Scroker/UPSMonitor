@@ -1,5 +1,7 @@
 from gi.repository import Adw
 from gi.repository import Gtk
+
+from .data_model import UPS
 from .ups_monitor_daemon import UPSMonitorClient
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_action_row.ui')
@@ -13,16 +15,16 @@ class UpsActionRow(Adw.ActionRow):
         if ups_data != None:
             kwargs.pop("ups_data")
         super().__init__(**kwargs)
-        self.ups_data = ups_data
         self._dbus_client = UPSMonitorClient()
-        self._dbus_client.connect_to_signal("ups_updated", self.update_self)
-        self.update_self()
+        self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_self)
+        self.connect("destroy", self.on_destroy)
+        self.update_self(ups_data)
 
-    def update_self(self):
-        try:
+    def update_self(self, ups_data:UPS=None):
+        if ups_data == None:
             self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
-        except Exception:
-            return
+        else:
+            self.ups_data = ups_data
         self.set_title(self.ups_data.ups_name)
         image_name = "battery-full-symbolic"
         if self.ups_data.ups["status"] == "OB":
@@ -70,3 +72,6 @@ class UpsActionRow(Adw.ActionRow):
             else:
                 image_name = "battery-level-0-charging-symbolic"
         self.row_image.set_from_icon_name(image_name)
+
+    def on_destroy(self, widget):
+        self._dbus_signal_handler.remove()
