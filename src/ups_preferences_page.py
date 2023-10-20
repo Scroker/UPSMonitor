@@ -119,7 +119,7 @@ class UpsPreferencesPage(Adw.PreferencesPage):
     def shutdown_low_battery_switch_selected(self, widget, args):
         if self.shutdown_low_battery_switch.get_active():
             self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.AUTO_SHUTDOWN, True)
-        elif not self.offline_notify_switch.get_active():
+        elif not self.shutdown_low_battery_switch.get_active():
             self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.AUTO_SHUTDOWN, False)
 
     def on_destroy(self, widget):

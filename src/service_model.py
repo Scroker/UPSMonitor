@@ -3,7 +3,12 @@ from pynut3 import nut3
 from gi.repository import GObject
 from .data_model import UPS, Host
 
-class HostAlreadyExist(Exception):
+class HostNameAlreadyExist(Exception):
+
+    def __init__(self):
+        super().__init__()
+
+class HostAddressAlreadyExist(Exception):
 
     def __init__(self):
         super().__init__()
@@ -102,7 +107,10 @@ class HostServices(GObject.Object):
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM hosts WHERE profile_name=?", (host['profile_name'],))
         if cursor.fetchone() is not None:
-            raise HostAlreadyExist
+            raise HostNameAlreadyExist
+        cursor.execute("SELECT * FROM hosts WHERE ip_address=?", (host['ip_address'],))
+        if cursor.fetchone() is not None:
+            raise HostAddressAlreadyExist
         if host['username'] != None or host['username'] != None:
             cursor.execute("INSERT INTO hosts (profile_name, ip_address, port,username, password) VALUES (?,?,?,?,?)", (host['profile_name'], host['ip_address'], host['port'], host['username'], host['password']))
         else:

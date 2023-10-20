@@ -7,7 +7,7 @@ from gi.repository import Gio, GLib, GObject
 from pynut3.nut3 import PyNUT3Error
 
 from .data_model import Host, UPS, NotificationType
-from .service_model import HostServices, UPServices
+from .service_model import HostServices, UPServices, HostNameAlreadyExist, HostAddressAlreadyExist
 
 class ConversionUtil(GObject.Object):
     __gtype_name__ = 'ConversionUtil'
@@ -190,9 +190,9 @@ class UPSMonitorService(dbus.service.Object):
             try:
                 self._ups_data += connection.get_all_hosts_ups()
             except PyNUT3Error as e:
+                host_dict = self._ups_host_services.get_host(connection.host['host_id'])
                 logging.exception("UPS Monitor Service: error during connection with host " + host_dict['ip_address'])
                 self._ups_saved_host_connections.remove(connection)
-                host_dict = self._ups_host_services.get_host(connection.host['host_id'])
                 self._ups_retry_host_connections.append(host_dict)
 
     def run(self):
@@ -247,9 +247,9 @@ class UPSMonitorService(dbus.service.Object):
         return host_dict
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='s', out_signature='a{sv}')
-    def get_host_by_name(self, name):
+    def get_host_by_name(self, ups_name):
         host_dict = {}
-        host = self._ups_host_services.get_host_by_name(name)
+        host = self._ups_host_services.get_host_by_name(ups_name)
         if host != None:
             host_dict = ConversionUtil.python_to_string(host)
         return host_dict
@@ -306,6 +306,7 @@ class UPSMonitorService(dbus.service.Object):
                 self._ups_saved_host_connections.append(ups_services)
             else:
                 self._temporary_host_list.append(host_dict)
+                self.host_updated()
                 self._ups_saved_host_connections.append(ups_services)
             self.connection_initialized()
             return True
@@ -414,7 +415,15 @@ class UPSMonitorClient(GObject.Object):
 
     def save_host(self, host:Host):
         host_dict = ConversionUtil.object_to_string(host)
-        self._save_host_dbus(host_dict)
+        try:
+            self._save_host_dbus(host_dict)
+        except Exception as e:
+            if 'HostNameAlreadyExist' in str(e):
+                raise HostNameAlreadyExist
+            elif 'HostAddressAlreadyExist' in str(e):
+                raise HostAddressAlreadyExist
+            else:
+                raise e
 
     def update_host(self, host:Host):
         host_dict = ConversionUtil.object_to_string(host)

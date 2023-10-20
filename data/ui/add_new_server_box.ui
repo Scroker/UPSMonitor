@@ -60,6 +60,7 @@
             </child>
             <child>
               <object class="AdwPreferencesPage">
+                <!--
                 <child>
                   <object class="AdwPreferencesGroup">
                     <child>
@@ -77,6 +78,7 @@
                       </child>
                   </object>
                 </child>
+                -->
                 <child>
                   <object class="AdwPreferencesGroup">
                     <property name="title">Connection</property>

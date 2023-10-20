@@ -5,8 +5,8 @@
   <template class="UpsmonitorWindow" parent="AdwApplicationWindow">
     <property name="width-request">300</property>
     <property name="height-request">600</property>
-    <property name="default-width">800</property>
-    <property name="default-height">600</property>
+    <property name="default-width">1200</property>
+    <property name="default-height">800</property>
     <child>
       <object class="AdwBreakpoint">
         <condition>max-width: 600sp</condition>

@@ -1,13 +1,12 @@
-import threading
-import time
+import threading, time
 
 from pynut3 import nut3
 
 from gi.repository import Adw, Gtk, GLib, GObject
 
 from .data_model import Host
+from .service_model import HostNameAlreadyExist, HostAddressAlreadyExist
 from .ups_monitor_daemon import UPSMonitorClient
-from .service_model import UPServices
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/add_new_server_box.ui')
 class AddNewServerBox(Adw.Window):
@@ -92,8 +91,23 @@ class AddNewServerBox(Adw.Window):
                 host = ups_monitor_client.get_host_by_name(profile_name)
                 self.hide()
                 self.emit("host_changed", host)
-            except Exception as e:
+            except HostNameAlreadyExist :
                 self.banner.set_title(_("Profile name already exist"))
+                self.banner.set_revealed(True)
+                self.progress.set_visible(False)
+                thread = threading.Thread(target=self.close_banner, daemon = True)
+                thread.start()
+                return
+            except HostAddressAlreadyExist :
+                self.banner.set_title(_("Host address name already exist"))
+                self.banner.set_revealed(True)
+                self.progress.set_visible(False)
+                thread = threading.Thread(target=self.close_banner, daemon = True)
+                thread.start()
+                return
+            except Exception as e :
+                print(e)
+                self.banner.set_title(_("Unexpected error!"))
                 self.banner.set_revealed(True)
                 self.progress.set_visible(False)
                 thread = threading.Thread(target=self.close_banner, daemon = True)

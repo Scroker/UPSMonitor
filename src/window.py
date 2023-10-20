@@ -76,7 +76,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):
         max_width = 600
-        max_height = 680
+        max_height = 600
         allocation = self.get_allocation()
         self.add_server_box.set_transient_for(self)
         self.add_server_box.set_modal(True)
