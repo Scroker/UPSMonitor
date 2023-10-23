@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="TemporaryHostActionRow" parent="AdwActionRow">
+    <property name="activatable">true</property>
+    <child type="prefix">
+      <object class="GtkImage">
+        <property name="icon-name">preferences-desktop-remote-desktop-symbolic</property>
+      </object>
+    </child>
+    <child type="suffix">
+      <object class="GtkBox">
+        <child>
+          <object class="GtkButton" id="delete_button">
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">user-trash-symbolic</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

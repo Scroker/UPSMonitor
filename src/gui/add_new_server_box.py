@@ -5,7 +5,7 @@ from pynut3 import nut3
 from gi.repository import Adw, Gtk, GLib, GObject
 
 from .data_model import Host
-from .service_model import HostNameAlreadyExist, HostAddressAlreadyExist
+from .exception_model import HostNameAlreadyExist, HostAddressAlreadyExist
 from .ups_monitor_daemon import UPSMonitorClient
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/add_new_server_box.ui')
@@ -90,7 +90,6 @@ class AddNewServerBox(Adw.Window):
                 ups_monitor_client.save_host(host)
                 host = ups_monitor_client.get_host_by_name(profile_name)
                 self.hide()
-                self.emit("host_changed", host)
             except HostNameAlreadyExist :
                 self.banner.set_title(_("Profile name already exist"))
                 self.banner.set_revealed(True)
@@ -122,3 +121,4 @@ class AddNewServerBox(Adw.Window):
             return
         self.progress.set_visible(False)
         self.hide()
+

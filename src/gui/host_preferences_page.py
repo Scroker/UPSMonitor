@@ -17,24 +17,22 @@ class HostPreferencesPage(Adw.NavigationPage):
     authentication_switch = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
-        host_data = kwargs.get("host_data", None)
-        real_parent = kwargs.get("real_parent", None)
-        self.real_parent = real_parent
-        self.host_data = host_data
-        if host_data != None:
+        self.real_parent = kwargs.get("real_parent", None)
+        self.host_data = kwargs.get("host_data", None)
+        if self.host_data != None:
             kwargs.pop("host_data")
-        if real_parent != None:
+        if self.real_parent != None:
             kwargs.pop("real_parent")
         super().__init__(**kwargs)
         self.save_button.connect("clicked", self.on_save_host)
         self.delete_button.connect("clicked",self.on_delete_host)
-        if host_data != None:
-            self.port_row.set_text(str(host_data.port))
-            if host_data.password != None and host_data.username != None:
-                self.username_row.set_text(host_data.username)
-                self.password_row.set_text(host_data.password)
-            self.server_name_row.set_text(host_data.profile_name)
-            self.ip_address_row.set_text(host_data.ip_address)
+        if self.host_data != None:
+            self.port_row.set_text(str(self.host_data.port))
+            if self.host_data.password != None and self.host_data.username != None:
+                self.username_row.set_text(self.host_data.username)
+                self.password_row.set_text(self.host_data.password)
+            self.server_name_row.set_text(self.host_data.profile_name)
+            self.ip_address_row.set_text(self.host_data.ip_address)
 
     def on_save_host(self, widget):
         host = self.host_data
@@ -72,3 +70,4 @@ class HostPreferencesPage(Adw.NavigationPage):
         elif response == Gtk.ResponseType.CANCEL:
             pass
         widget.destroy()
+

@@ -35,8 +35,32 @@
         <property name="title" translatable="yes">Connections</property>
         <property name="icon-name">network-server-symbolic</property>
         <child>
+          <object class="AdwStatusPage" id="no_dbus_connection">
+            <property name="title">No DBus connections</property>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">1</property>
+                <property name="valign">3</property>
+                <property name="halign">3</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="name">logo</property>
+                    <property name="icon-name">computer-fail-symbolic</property>
+                    <property name="pixel-size">120</property>
+                    <property name="margin-bottom">30</property>
+                    <style>
+                      <class name="icon-dropshadow"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
           <object class="AdwStatusPage" id="no_host_connection">
             <property name="title">No host connections</property>
+            <property name="visible">false</property>
             <child>
               <object class="GtkBox">
                 <property name="orientation">1</property>
@@ -60,30 +84,6 @@
                     <style>
                       <class name="pill"/>
                       <class name="suggested-action"/>
-                    </style>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-        <child>
-          <object class="AdwStatusPage" id="no_dbus_connection">
-            <property name="title">No DBus connections</property>
-            <property name="visible">false</property>
-            <child>
-              <object class="GtkBox">
-                <property name="orientation">1</property>
-                <property name="valign">3</property>
-                <property name="halign">3</property>
-                <child>
-                  <object class="GtkImage">
-                    <property name="name">logo</property>
-                    <property name="icon-name">computer-fail-symbolic</property>
-                    <property name="pixel-size">120</property>
-                    <property name="margin-bottom">30</property>
-                    <style>
-                      <class name="icon-dropshadow"/>
                     </style>
                   </object>
                 </child>

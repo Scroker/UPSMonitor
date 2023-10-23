@@ -21,15 +21,15 @@ configure_file(
 upsmonitor_sources = [
   '__init__.py',
   'main.py',
-  'window.py',
-  'ups_action_row.py',
-  'ups_preferences_page.py',
-  'host_preferences_page.py',
-  'ups_monitor_daemon.py',
-  'monitor_preferences_window.py',
-  'service_model.py',
-  'data_model.py',
-  'add_new_server_box.py',
+  'gui/window.py',
+  'gui/add_new_server_box.py',
+  'gui/ups_preferences_page.py',
+  'gui/host_preferences_page.py',
+  'gui/monitor_preferences_window.py',
+  'service/ups_monitor_daemon.py',
+  'service/data_service.py',
+  'model/data_model.py',
+  'model/exception_model.py',
 ]
 
 install_data(upsmonitor_sources, install_dir: moduledir)

@@ -3,16 +3,6 @@ from pynut3 import nut3
 from gi.repository import GObject
 from .data_model import UPS, Host
 
-class HostNameAlreadyExist(Exception):
-
-    def __init__(self):
-        super().__init__()
-
-class HostAddressAlreadyExist(Exception):
-
-    def __init__(self):
-        super().__init__()
-
 class UPServices(GObject.Object):
     ___gtype_name__ = 'UPServices'
 

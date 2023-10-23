@@ -38,26 +38,14 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
 
     @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):
-        max_width = 600
-        max_height = 680
         allocation = self.get_allocation()
-        if allocation.width < max_width and allocation.height < max_height :
-            self.add_server_box.set_default_size(allocation.width, allocation.height)
-        elif allocation.width < max_width :
-            self.add_server_box.set_default_size(allocation.width, max_height)
-        elif allocation.height < max_height :
-            self.add_server_box.set_default_size(max_width, allocation.height)
-        else:
-            self.add_server_box.set_default_size(max_width, max_height)
         self.add_server_box.present()
 
     def update_profiles(self, widget = None, host_var = None):
         if self.start_dbus_connection():
+            self.no_dbus_connection.set_visible(False)
             self.update_temporary_profiles(widget, host_var)
             self.update_saved_profiles(widget, host_var)
-        else:
-            self.no_dbus_connection.set_visible(True)
-            self.no_host_connection.set_visible(False)
 
     def start_dbus_connection(self):
         dbus_ready = False
@@ -78,6 +66,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             return True
 
     def update_temporary_profiles(self, widget = None, host_var = None):
+        self.no_host_connection.set_visible(True)
         while self.temporary_profiles_list.get_last_child() != None:
             self.temporary_profiles_list.remove(self.temporary_profiles_list.get_last_child())
         host_list = self.dbus_client.get_all_temporary_hosts()
@@ -87,10 +76,11 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         else:
             self.temporary_profiles_group.set_visible(False)
         for host in host_list:
-            action_row = self.create_action_row(host)
-            self.temporary_profiles_list.append(action_row)
+            temporary_host_row = TemporaryHostActionRow(host_data=host, real_parent=self)
+            self.temporary_profiles_list.append(temporary_host_row)
 
     def update_saved_profiles(self, widget = None, host_var = None):
+        self.no_host_connection.set_visible(True)
         while self.saved_profiles_list.get_last_child() != None:
             self.saved_profiles_list.remove(self.saved_profiles_list.get_last_child())
         host_list = self.dbus_client.get_all_hosts()
@@ -100,29 +90,16 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         else:
             self.saved_profiles_group.set_visible(False)
         for host in host_list:
-            action_row = self.create_action_row(host)
-            self.saved_profiles_list.append(action_row)
-
-    def create_action_row(self, host:Host) -> Adw.ActionRow:
-        action_row = Adw.ActionRow()
-        if host.profile_name != None:
-            action_row.set_title(host.profile_name)
-            action_row.host = host
-            action_row.set_subtitle(host.ip_address)
-            next_image = Gtk.Image.new_from_icon_name("go-next-symbolic")
-            action_row.add_suffix(next_image)
-            action_row.set_activatable(True)
-            action_row.connect("activated", self.on_clicked)
-        else:
-            action_row.set_title(host.ip_address)
-        return action_row
+            saved_host_row = SavedHostActionRow(host_data=host)
+            saved_host_row.connect("activated", self.on_saved_row_clicked)
+            self.saved_profiles_list.append(saved_host_row)
 
     def cancel_row(self, widget):
         host_services = HostServices()
         host_services.delete_host(widget.host_data.host_id)
         self.update_profiles()
 
-    def on_clicked(self, widget):
+    def on_saved_row_clicked(self, widget):
         new_page = HostPreferencesPage(host_data=widget.host, real_parent=self)
         self.push_subpage(new_page)
 
@@ -139,3 +116,55 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def autostart_switch_selected(self, widget, args):
         if not self.setting.get_value("run-at-boot") :
             self.run_in_background.set_active(True)
+
+
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/saved_host_action_row.ui')
+class SavedHostActionRow(Adw.ActionRow):
+    __gtype_name__ = 'SavedHostActionRow'
+
+    def __init__(self, **kwargs):
+        self.host =  kwargs.get("host_data", None)
+        if self.host != None:
+            kwargs.pop("host_data")
+        super().__init__(**kwargs)
+        self.set_title(self.host.profile_name)
+        self.set_subtitle(self.host.ip_address)
+        self.set_activatable(True)
+
+
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/temporary_host_action_row.ui')
+class TemporaryHostActionRow(Adw.ActionRow):
+    __gtype_name__ = 'TemporaryHostActionRow'
+
+    delete_button = Gtk.Template.Child()
+
+    def __init__(self, **kwargs):
+        self.real_parent = kwargs.get("real_parent", None)
+        self.host = kwargs.get("host_data", None)
+        if self.host != None:
+            kwargs.pop("host_data")
+        if self.real_parent != None:
+            kwargs.pop("real_parent")
+        super().__init__(**kwargs)
+        self.set_title(self.host.ip_address)
+        self.delete_button.connect("clicked",self.on_delete_host)
+
+    def on_delete_host(self, widget):
+        dialog = Gtk.MessageDialog(
+            transient_for=self.real_parent,
+            message_type=Gtk.MessageType.WARNING,
+            buttons=Gtk.ButtonsType.OK_CANCEL,
+            text="Deleating Host",
+            secondary_text="Are you sure to delete this Host?"
+        )
+        dialog.set_modal(True)
+        dialog.connect("response", self._delete_host)
+        dialog.present()
+
+    def _delete_host(self, widget, response):
+        if response == Gtk.ResponseType.OK:
+            UPSMonitorClient().delete_temporary_host(self.host.ip_address)
+        elif response == Gtk.ResponseType.CANCEL:
+            pass
+        widget.destroy()
+        

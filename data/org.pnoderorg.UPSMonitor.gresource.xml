@@ -5,6 +5,8 @@
     <file preprocess="xml-stripblanks">ui/ups_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_preferences_page.ui</file>
     <file preprocess="xml-stripblanks">ui/host_preferences_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/saved_host_action_row.ui</file>
+    <file preprocess="xml-stripblanks">ui/temporary_host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/monitor_preferences_window.ui</file>
     <file preprocess="xml-stripblanks">ui/add_new_server_box.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/help-overlay.ui</file>

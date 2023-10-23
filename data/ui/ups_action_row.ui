@@ -4,8 +4,9 @@
   <requires lib="Adw" version="1.0"/>
   <template class="UpsActionRow" parent="AdwActionRow">
     <property name="activatable">true</property>
-    <child>
+    <child type="prefix">
       <object class="GtkImage" id="row_image">
+        <property name="margin-end">5</property>
       </object>
     </child>
   </template>
