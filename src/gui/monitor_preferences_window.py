@@ -14,13 +14,11 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     __gtype_name__ = 'MonitorPreferencesWindow'
 
     saved_profiles_list = Gtk.Template.Child()
-    connect_button = Gtk.Template.Child()
     saved_profiles_group = Gtk.Template.Child()
     run_in_background = Gtk.Template.Child()
     run_at_boot = Gtk.Template.Child()
     temporary_profiles_list = Gtk.Template.Child()
     temporary_profiles_group = Gtk.Template.Child()
-    first_connect_button = Gtk.Template.Child()
     no_host_connection = Gtk.Template.Child()
     no_dbus_connection = Gtk.Template.Child()
     dbus_client = None
@@ -44,6 +42,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def update_profiles(self, widget = None, host_var = None):
         if self.start_dbus_connection():
             self.no_dbus_connection.set_visible(False)
+            self.no_host_connection.set_visible(True)
             self.update_temporary_profiles(widget, host_var)
             self.update_saved_profiles(widget, host_var)
 
@@ -66,7 +65,6 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             return True
 
     def update_temporary_profiles(self, widget = None, host_var = None):
-        self.no_host_connection.set_visible(True)
         while self.temporary_profiles_list.get_last_child() != None:
             self.temporary_profiles_list.remove(self.temporary_profiles_list.get_last_child())
         host_list = self.dbus_client.get_all_temporary_hosts()
@@ -80,7 +78,6 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             self.temporary_profiles_list.append(temporary_host_row)
 
     def update_saved_profiles(self, widget = None, host_var = None):
-        self.no_host_connection.set_visible(True)
         while self.saved_profiles_list.get_last_child() != None:
             self.saved_profiles_list.remove(self.saved_profiles_list.get_last_child())
         host_list = self.dbus_client.get_all_hosts()

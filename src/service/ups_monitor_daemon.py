@@ -121,6 +121,7 @@ class UPSMonitorService(dbus.service.Object):
     _ups_retry_host_connections = []
     _temporary_host_list = []
     _ups_data = []
+    _check_interval = 5.0
     _ups_connected_number = 0
     _service_name = 'org.gdramis.UPSMonitorService'
     _object_path = '/org/gdramis/UPSMonitorService'
@@ -151,19 +152,12 @@ class UPSMonitorService(dbus.service.Object):
         if not self._setting.get_value("run-in-background"):
             self._request_background('org.gdramis.UPSMonitorService', {'background':False, 'autostart':False, 'commandline':['upsmonitor','-b']})
 
-    def _start_check_thread(self):
-        thread = threading.Thread(target=self._check_routine, daemon = True)
-        thread.start()
-
     def _check_routine(self):
-        self._start_connection()
-        self._update_all_ups()
-        if self._ups_connected_number != len(self._ups_data):
-            self._ups_connected_number = len(self._ups_data)
-            self.ups_changed()
-        self.ups_updated()
+        ups_host_services = HostServices()
+        self._update_all_host()
+        self._update_all_ups(ups_host_services)
         for ups_dict in self._ups_data:
-            notification_types = self._ups_host_services.get_all_ups_notifications(ups_dict['host_id'], ups_dict['name'])
+            notification_types = ups_host_services.get_all_ups_notifications(ups_dict['host_id'], ups_dict['name'])
             if ups_dict['ups.status'] != 'OL' and ups_dict['name'] not in self._offline_ups_notified and int(NotificationType.IS_OFFLINE) in notification_types :
                 self._offline_ups_notified.append(ups_dict['name'])
                 message = 'Charge at ' + ups_dict['battery.charge'] + '%'
@@ -174,9 +168,11 @@ class UPSMonitorService(dbus.service.Object):
                 self._add_notification('org.gdramis.UPSMonitorService', {'icon':'battery-empty-symbolic','title':ups_dict['name.pretty'], 'body': message, 'priority':'urgent'})
             if ups_dict['ups.status'] != 'OL' and int(ups_dict['battery.charge']) <= 15 and int(NotificationType.AUTO_SHUTDOWN) in notification_types :
                 self._power_off(True)
+        thread = threading.Timer(self._check_interval, self._check_routine)
+        thread.start()
         return True
 
-    def _start_connection(self):
+    def _update_all_host(self):
         connected_host = []
         for host_dict in self._ups_retry_host_connections:
             try:
@@ -188,19 +184,25 @@ class UPSMonitorService(dbus.service.Object):
         for host_dict in connected_host:
             self._ups_retry_host_connections.remove(host_dict)
 
-    def _update_all_ups(self):
+
+    def _update_all_ups(self, ups_host_services):
         self._ups_data = []
         for connection in self._ups_saved_host_connections:
             try:
                 self._ups_data += connection.get_all_hosts_ups()
             except PyNUT3Error as e:
-                host_dict = self._ups_host_services.get_host(connection.host['host_id'])
+                host_dict = ups_host_services.get_host(connection.host['host_id'])
                 logging.exception("UPS Monitor Service: error during connection with host " + host_dict['ip_address'])
                 self._ups_saved_host_connections.remove(connection)
                 self._ups_retry_host_connections.append(host_dict)
+        if self._ups_connected_number != len(self._ups_data):
+            self._ups_connected_number = len(self._ups_data)
+            self.ups_changed()
+        self.ups_updated()
 
     def run(self):
-        GObject.timeout_add_seconds(5, self._start_check_thread)
+        thread = threading.Thread(target=self._check_routine, daemon = True)
+        thread.start()
         self._loop = GLib.MainLoop()
         logging.info("UPS Monitor Service: started")
         self._loop.run()
@@ -217,12 +219,10 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.signal("org.gdramis.UPSMonitorService.Host")
     def host_updated(self):
-        print("UPS Monitor Service: host updated")
         logging.info("UPS Monitor Service: host updated")
 
     @dbus.service.signal("org.gdramis.UPSMonitorService.Host")
     def host_deleated(self):
-        print("UPS Monitor Service: host updated")
         logging.info("UPS Monitor Service: host deleated")
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='', out_signature='aa{sv}')
@@ -282,7 +282,6 @@ class UPSMonitorService(dbus.service.Object):
     def save_host(self, host_dict:dict):
         host_dict = ConversionUtil.string_to_python(ConversionUtil.dbus_to_python(host_dict))
         self._ups_host_services.save_host(host_dict)
-        self._ups_retry_host_connections.append(host_dict)
         self.host_updated()
 
     @dbus.service.method("org.gdramis.UPSMonitorService.Host", in_signature='a{sv}', out_signature='')

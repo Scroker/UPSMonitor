@@ -63,7 +63,7 @@
         <property name="content">
           <object class="AdwNavigationPage">
             <property name="title" translatable="true">Welcome</property>
-            <property name="tag">welcomw</property>
+            <property name="tag">welcome</property>
             <property name="child">
               <object class="AdwToolbarView" id="toolbar_view">
                 <child type="top">
@@ -100,6 +100,15 @@
                             <style>
                               <class name="pill"/>
                               <class name="suggested-action"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="welcome_message">
+                            <property name="visible">false</property>
+                            <property name="label" translatable="true">Select an UPS to show infos</property>
+                            <style>
+                              <class name="title-3"/>
                             </style>
                           </object>
                         </child>

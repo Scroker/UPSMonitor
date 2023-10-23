@@ -35,6 +35,7 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     ups_list_box = Gtk.Template.Child()
     welcome_connect_button = Gtk.Template.Child()
+    welcome_message = Gtk.Template.Child()
     content_window_title = Gtk.Template.Child()
     add_server_button = Gtk.Template.Child()
     split_view = Gtk.Template.Child()
@@ -71,6 +72,9 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_ups_row_selected)
             self.ups_list_box.insert(ups_action_row, -1)
+        if self.ups_list_box.get_last_child() != None:
+            self.welcome_message.set_visible(True)
+            self.welcome_connect_button.set_visible(False)
 
     @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):

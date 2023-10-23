@@ -78,7 +78,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkButton" id="first_connect_button">
+                  <object class="GtkButton">
                     <property name="label">New NUT-Server connection</property>
                     <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                     <style>
@@ -97,7 +97,7 @@
             <property name="visible">false</property>
             <property name="description" translatable="yes">In this section you can manage saved profiles</property>
             <property name="header-suffix">
-              <object class="GtkButton" id="connect_button">
+              <object class="GtkButton">
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
                 <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
@@ -127,6 +127,23 @@
             <property name="title" translatable="yes">Temporary profiles</property>
             <property name="visible">false</property>
             <property name="description" translatable="yes">In this section you can manage temporary profiles</property>
+            <property name="header-suffix">
+              <object class="GtkButton">
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
+                <property name="child">
+                  <object class="AdwButtonContent">
+                    <property name="icon-name">plus-symbolic</property>
+                    <property name="label" translatable="yes">_Add new</property>
+                    <property name="use-underline">True</property>
+                  </object>
+                </property>
+                <style>
+                  <class name="suggested-action"/>
+                </style>
+              </object>
+            </property>
             <child>
               <object class="GtkListBox" id="temporary_profiles_list">
                 <style>
