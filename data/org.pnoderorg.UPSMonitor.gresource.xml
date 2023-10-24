@@ -14,7 +14,8 @@
   </gresource>
   <gresource prefix="/org/ponderorg/UPSMonitor/icons/scalable/actions/">
     <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">icons/hicolor/scalable/actions/plus-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" alias="ups-symbolic.svg">icons/hicolor/scalable/actions/ups-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="charge-symbolic.svg">icons/hicolor/scalable/actions/charge-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="camera-flash-symbolic.svg">icons/hicolor/scalable/actions/camera-flash-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="org.gnome.Settings-notifications-symbolic.svg">icons/hicolor/scalable/actions/org.gnome.Settings-notifications-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="info-symbolic.svg">icons/hicolor/scalable/actions/info-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="update-symbolic.svg">icons/hicolor/scalable/actions/update-symbolic.svg</file>

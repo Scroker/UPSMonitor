@@ -3,6 +3,7 @@
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
   <template class="UpsPreferencesPage" parent="AdwPreferencesPage">
+    <property name="width-request">300</property>
     <child>
       <object class="AdwPreferencesGroup">
         <child>
@@ -12,27 +13,24 @@
               <class name="boxed-list"/>
             </style>
             <child>
-              <object class="AdwActionRow">
+              <object class="AdwActionRow" id="battery_row">
                 <property name="title">Battery</property>
-                <property name="subtitle">100%</property>
                 <child type="prefix">
-                  <object class="GtkImage">
-                    <property name="name">logo</property>
-                    <property name="icon-name">battery-level-70-charging-symbolic</property>
+                  <object class="GtkImage" id="battery_image">
                     <style>
                       <class name="icon-dropshadow"/>
                     </style>
                   </object>
                 </child>
                 <child type="suffix">
-                  <object class="GtkLevelBar">
+                  <object class="GtkLevelBar" id="battery_level_bar">
                     <property name="margin-top">20</property>
                     <property name="margin-bottom">20</property>
                     <property name="hexpand">true</property>
                     <property name="vexpand">true</property>
                     <property name="max-value">100</property>
                     <property name="min-value">0</property>
-                    <property name="value">49</property>
+                    <property name="value">0</property>
                   </object>
                 </child>
               </object>
@@ -42,16 +40,14 @@
                 <property name="title">Voltage</property>
                 <child type="prefix">
                   <object class="GtkImage">
-                    <property name="name">logo</property>
-                    <property name="icon-name">power-profile-performance-symbolic</property>
+                    <property name="icon-name">camera-flash-symbolic</property>
                     <style>
                       <class name="icon-dropshadow"/>
                     </style>
                   </object>
                 </child>
                 <child type="suffix">
-                  <object class="GtkLabel">
-                    <property name="label">230 V</property>
+                  <object class="GtkLabel" id="voltage_label">
                     <style>
                       <class name="heading"/>
                     </style>
@@ -61,8 +57,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Input voltage</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
-                        <property name="label">230 V</property>
+                      <object class="GtkLabel" id="input_voltage_label">
                         <style>
                           <class name="heading"/>
                         </style>
@@ -74,8 +69,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Output voltage</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
-                        <property name="label">230 V</property>
+                      <object class="GtkLabel" id="output_voltage_label">
                         <style>
                           <class name="heading"/>
                         </style>
@@ -87,7 +81,72 @@
             </child>
             <child>
               <object class="AdwActionRow">
+                <property name="title">Frequency</property>
+                <child type="prefix">
+                  <object class="GtkImage">
+                    <property name="icon-name">charge-symbolic</property>
+                    <style>
+                      <class name="icon-dropshadow"/>
+                    </style>
+                  </object>
+                </child>
+                <child type="suffix">
+                  <object class="GtkLabel" id="frequency_label">
+                    <style>
+                      <class name="heading"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">Current</property>
+                <child type="prefix">
+                  <object class="GtkImage">
+                    <property name="icon-name">power-profile-performance-symbolic</property>
+                    <style>
+                      <class name="icon-dropshadow"/>
+                    </style>
+                  </object>
+                </child>
+                <child type="suffix">
+                  <object class="GtkLabel" id="current_label">
+                    <style>
+                      <class name="heading"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwActionRow">
+                <property name="title">Host</property>
+                <child type="prefix">
+                  <object class="GtkImage" id="host_image">
+                    <style>
+                      <class name="icon-dropshadow"/>
+                    </style>
+                  </object>
+                </child>
+                <child type="suffix">
+                  <object class="GtkLabel" id="host_label">
+                    <style>
+                      <class name="heading"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="margin-top">10</property>
+            <child>
+              <object class="AdwActionRow">
                 <property name="title">Notifications</property>
+                <property name="activatable">true</property>
                 <child type="prefix">
                   <object class="GtkImage">
                     <property name="name">logo</property>
@@ -99,11 +158,7 @@
                 </child>
                 <child type="suffix">
                   <object class="GtkImage">
-                    <property name="name">logo</property>
                     <property name="icon-name">go-next-symbolic</property>
-                    <style>
-                      <class name="icon-dropshadow"/>
-                    </style>
                   </object>
                 </child>
               </object>
@@ -111,9 +166,9 @@
             <child>
               <object class="AdwActionRow">
                 <property name="title">Info</property>
+                <property name="activatable">true</property>
                 <child type="prefix">
                   <object class="GtkImage">
-                    <property name="name">logo</property>
                     <property name="icon-name">info-symbolic</property>
                     <style>
                       <class name="icon-dropshadow"/>
@@ -122,11 +177,7 @@
                 </child>
                 <child type="suffix">
                   <object class="GtkImage">
-                    <property name="name">logo</property>
                     <property name="icon-name">go-next-symbolic</property>
-                    <style>
-                      <class name="icon-dropshadow"/>
-                    </style>
                   </object>
                 </child>
               </object>
@@ -134,9 +185,9 @@
             <child>
               <object class="AdwActionRow">
                 <property name="title">Settings</property>
+                <property name="activatable">true</property>
                 <child type="prefix">
                   <object class="GtkImage">
-                    <property name="name">logo</property>
                     <property name="icon-name">settings-symbolic</property>
                     <style>
                       <class name="icon-dropshadow"/>
@@ -145,11 +196,7 @@
                 </child>
                 <child type="suffix">
                   <object class="GtkImage">
-                    <property name="name">logo</property>
                     <property name="icon-name">go-next-symbolic</property>
-                    <style>
-                      <class name="icon-dropshadow"/>
-                    </style>
                   </object>
                 </child>
               </object>
