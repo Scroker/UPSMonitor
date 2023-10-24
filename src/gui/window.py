@@ -25,7 +25,7 @@ from gi.repository import Adw, Gtk, GObject
 
 from .data_model import UPS
 from .ups_monitor_daemon import UPSMonitorClient
-from .ups_preferences_page import UpsPreferencesPage
+from .ups_preferences_page_new import UpsPreferencesPage
 from .host_preferences_page import HostPreferencesPage
 from .add_new_server_box import AddNewServerBox
 
@@ -75,6 +75,9 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         if self.ups_list_box.get_last_child() != None:
             self.welcome_message.set_visible(True)
             self.welcome_connect_button.set_visible(False)
+        else :
+            self.welcome_message.set_visible(False)
+            self.welcome_connect_button.set_visible(True)
 
     @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):
@@ -116,8 +119,9 @@ class UpsActionRow(Adw.ActionRow):
         else:
             return
         self.set_title(self.ups_data.ups_name)
-        image_name = "battery-full-symbolic"
-        if self.ups_data.ups["status"] == "OB":
+        if 'status'not in self.ups_data.ups.keys():
+            image_name = "battery-action-symbolic"
+        elif self.ups_data.ups["status"] == "OB":
             self.set_subtitle("Offline")
             if int(self.ups_data.battery["charge"]) >= 90:
                 image_name = "battery-full-symbolic"

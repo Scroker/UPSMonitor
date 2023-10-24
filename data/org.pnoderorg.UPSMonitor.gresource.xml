@@ -5,6 +5,7 @@
     <file preprocess="xml-stripblanks">ui/ups_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_preferences_page.ui</file>
     <file preprocess="xml-stripblanks">ui/host_preferences_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/ups_preferences_page_new.ui</file>
     <file preprocess="xml-stripblanks">ui/saved_host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/temporary_host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/monitor_preferences_window.ui</file>
@@ -13,6 +14,9 @@
   </gresource>
   <gresource prefix="/org/ponderorg/UPSMonitor/icons/scalable/actions/">
     <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">icons/hicolor/scalable/actions/plus-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="ups-symbolic.svg">icons/hicolor/scalable/actions/ups-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="org.gnome.Settings-notifications-symbolic.svg">icons/hicolor/scalable/actions/org.gnome.Settings-notifications-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="info-symbolic.svg">icons/hicolor/scalable/actions/info-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="update-symbolic.svg">icons/hicolor/scalable/actions/update-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="settings-symbolic.svg">icons/hicolor/scalable/actions/settings-symbolic.svg</file>
   </gresource>

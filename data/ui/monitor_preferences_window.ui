@@ -128,7 +128,7 @@
             <property name="visible">false</property>
             <property name="description" translatable="yes">In this section you can manage temporary profiles</property>
             <property name="header-suffix">
-              <object class="GtkButton">
+              <object class="GtkButton" id="add_temp_button">
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
                 <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>

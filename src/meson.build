@@ -23,7 +23,7 @@ upsmonitor_sources = [
   'main.py',
   'gui/window.py',
   'gui/add_new_server_box.py',
-  'gui/ups_preferences_page.py',
+  'gui/ups_preferences_page_new.py',
   'gui/host_preferences_page.py',
   'gui/monitor_preferences_window.py',
   'service/ups_monitor_daemon.py',

@@ -21,6 +21,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     temporary_profiles_group = Gtk.Template.Child()
     no_host_connection = Gtk.Template.Child()
     no_dbus_connection = Gtk.Template.Child()
+    add_temp_button = Gtk.Template.Child()
     dbus_client = None
 
     def __init__(self, **kwargs):
@@ -43,6 +44,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         if self.start_dbus_connection():
             self.no_dbus_connection.set_visible(False)
             self.no_host_connection.set_visible(True)
+            self.add_temp_button.set_visible(True)
             self.update_temporary_profiles(widget, host_var)
             self.update_saved_profiles(widget, host_var)
 
@@ -82,6 +84,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             self.saved_profiles_list.remove(self.saved_profiles_list.get_last_child())
         host_list = self.dbus_client.get_all_hosts()
         if len(host_list) > 0:
+            self.add_temp_button.set_visible(False)
             self.saved_profiles_group.set_visible(True)
             self.no_host_connection.set_visible(False)
         else:

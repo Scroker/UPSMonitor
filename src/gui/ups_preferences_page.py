@@ -38,7 +38,7 @@ class UpsPreferencesPage(Adw.PreferencesPage):
             v2 = self.ups_data.battery[k2]
             if "charge" in k2:
                 self.charge_action_row.set_subtitle(v2+"%")
-                self.progress.set_fraction(int(v2)/100)
+                self.progress.set_value(int(v2))
 
     def update_start(self, ups_data:UPS=None):
         self.ups_data = ups_data
@@ -64,8 +64,12 @@ class UpsPreferencesPage(Adw.PreferencesPage):
                 self.charge_action_row = Adw.ActionRow()
                 self.charge_action_row.set_title(_(k2))
                 self.charge_action_row.set_subtitle(v2+"%")
-                self.progress = Gtk.ProgressBar()
-                self.progress.set_fraction(int(v2)/100)
+                self.progress = Gtk.LevelBar()
+                self.progress.set_value(int(v2))
+                self.progress.set_vexpand(True)
+                self.progress.set_hexpand(True)
+                self.progress.set_min_value(0)
+                self.progress.set_max_value(100)
                 self.progress.set_margin_top(20)
                 self.charge_action_row.add_suffix(self.progress)
                 self.bettery_group.add(self.charge_action_row)
