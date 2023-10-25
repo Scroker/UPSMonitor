@@ -10,7 +10,9 @@
         <child type="top">
           <object class="AdwHeaderBar">
             <property name="title-widget">
-              <object class="AdwWindowTitle" id="page_title"/>
+              <object class="AdwWindowTitle" id="window_title">
+                <property name="subtitle">General</property>
+              </object>
             </property>
           </object>
         </child>
@@ -110,11 +112,6 @@
                     <child>
                       <object class="AdwActionRow">
                         <property name="title">Input voltage</property>
-                        <child type="prefix">
-                          <object class="GtkImage">
-                            <property name="icon-name">arrow4-left-symbolic</property>
-                          </object>
-                        </child>
                         <child type="suffix">
                           <object class="GtkLabel" id="input_voltage_label">
                             <style>
@@ -127,13 +124,32 @@
                     <child>
                       <object class="AdwActionRow">
                         <property name="title">Output voltage</property>
-                        <child type="prefix">
-                          <object class="GtkImage">
-                            <property name="icon-name">arrow4-right-symbolic</property>
-                          </object>
-                        </child>
                         <child type="suffix">
                           <object class="GtkLabel" id="output_voltage_label">
+                            <style>
+                              <class name="heading"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title">Nominal voltage</property>
+                        <child type="suffix">
+                          <object class="GtkLabel" id="nominal_voltage_label">
+                            <style>
+                              <class name="heading"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title">Fault voltage</property>
+                        <child type="suffix">
+                          <object class="GtkLabel" id="fault_voltage_label">
                             <style>
                               <class name="heading"/>
                             </style>
@@ -264,7 +280,7 @@
                 </child>
                 <child>
                   <object class="AdwActionRow" id="info_row">
-                    <property name="title">Info</property>
+                    <property name="title">Informations</property>
                     <property name="activatable">true</property>
                     <child type="prefix">
                       <object class="GtkImage">

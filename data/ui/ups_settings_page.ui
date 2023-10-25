@@ -10,7 +10,9 @@
         <child type="top">
           <object class="AdwHeaderBar">
             <property name="title-widget">
-              <object class="AdwWindowTitle"/>
+              <object class="AdwWindowTitle" id="window_title">
+                <property name="subtitle">Settings</property>
+              </object>
             </property>
           </object>
         </child>

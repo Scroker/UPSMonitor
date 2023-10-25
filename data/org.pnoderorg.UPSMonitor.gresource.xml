@@ -20,8 +20,6 @@
     <file preprocess="xml-stripblanks" alias="timer-symbolic.svg">icons/hicolor/scalable/actions/timer-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="check-round-outline-whole-symbolic.svg">icons/hicolor/scalable/actions/check-round-outline-whole-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="computer-chip-symbolic.svg">icons/hicolor/scalable/actions/computer-chip-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" alias="arrow4-left-symbolic.svg">icons/hicolor/scalable/actions/arrow4-left-symbolic.svg</file>
-    <file preprocess="xml-stripblanks" alias="arrow4-right-symbolic.svg">icons/hicolor/scalable/actions/arrow4-right-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">icons/hicolor/scalable/actions/plus-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="charge-symbolic.svg">icons/hicolor/scalable/actions/charge-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="ups-symbolic.svg">icons/hicolor/scalable/actions/ups-symbolic.svg</file>
