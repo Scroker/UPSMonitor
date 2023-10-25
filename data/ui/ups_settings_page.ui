@@ -15,31 +15,33 @@
           </object>
         </child>
         <child>
-          <object class="AdwStatusPage">
-            <property name="title" translatable="true">Welcome to UPSMonitor</property>
+           <object class="GtkBox">
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox">
-                <property name="orientation">1</property>
-                <property name="valign">3</property>
-                <property name="halign">3</property>
+              <object class="AdwClamp">
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="margin-start">15</property>
+                <property name="margin-end">15</property>
                 <child>
-                  <object class="GtkImage">
-                    <property name="name">logo</property>
-                    <property name="icon-name">org.ponderorg.UPSMonitor</property>
-                    <property name="pixel-size">154</property>
-                    <property name="margin-bottom">30</property>
+                  <object class="GtkListBox">
                     <style>
-                      <class name="icon-dropshadow"/>
+                      <class name="boxed-list"/>
                     </style>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">false</property>
-                    <property name="label" translatable="true">A simple interface to manage your UPS</property>
-                    <style>
-                      <class name="title-3"/>
-                    </style>
+                    <child>
+                      <object class="AdwSwitchRow" id="shutdown_low_battery_switch">
+                        <property name="title">Low battery shutdown</property>
+                        <property name="subtitle">Enable the shutdown of this host when the battery level is low</property>
+                        <!-- <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/> -->
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwSwitchRow" id="beeper_enabled_switch">
+                        <property name="title">Beeper Enabled</property>
+                        <property name="subtitle">Enable/Disable the UPS's beeper</property>
+                        <!-- <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/> -->
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>

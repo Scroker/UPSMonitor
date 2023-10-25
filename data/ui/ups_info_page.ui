@@ -15,31 +15,119 @@
           </object>
         </child>
         <child>
-          <object class="AdwStatusPage">
-            <property name="title" translatable="true">Welcome to UPSMonitor</property>
-            <child>
-              <object class="GtkBox">
-                <property name="orientation">1</property>
-                <property name="valign">3</property>
-                <property name="halign">3</property>
+           <object class="AdwPreferencesPage">
+             <child>
+              <object class="AdwPreferencesGroup">
+                <property name="title">Device</property>
+                <property name="description">List of device infos</property>
                 <child>
-                  <object class="GtkImage">
-                    <property name="name">logo</property>
-                    <property name="icon-name">org.ponderorg.UPSMonitor</property>
-                    <property name="pixel-size">154</property>
-                    <property name="margin-bottom">30</property>
-                    <style>
-                      <class name="icon-dropshadow"/>
-                    </style>
+                  <object class="AdwActionRow">
+                    <property name="title">Firmware</property>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="firmware_label">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkLabel">
-                    <property name="visible">false</property>
-                    <property name="label" translatable="true">A simple interface to manage your UPS</property>
-                    <style>
-                      <class name="title-3"/>
-                    </style>
+                  <object class="AdwActionRow">
+                    <property name="title">Model</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Type</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Version USB</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="AdwPreferencesGroup">
+                <property name="title">Driver</property>
+                <property name="description">List of driver infos</property>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Name</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Version</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Version Internal</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Version USB</property>
+                    <child type="suffix">
+                      <object class="GtkLabel">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>

@@ -35,7 +35,6 @@
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="visible">false</property>
                     <property name="label" translatable="true">A simple interface to manage your UPS</property>
                     <style>
                       <class name="title-3"/>

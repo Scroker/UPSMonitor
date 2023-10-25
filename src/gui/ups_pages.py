@@ -31,6 +31,12 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_self)
         self.connect("destroy", self.on_destroy)
         self.update_self(ups_data)
+        print(self.ups_data.battery)
+        print(self.ups_data.device)
+        print(self.ups_data.driver)
+        print(self.ups_data.input)
+        print(self.ups_data.output)
+        print(self.ups_data.ups)
 
     def update_self(self, ups_data:UPS=None):
         if ups_data != None:
