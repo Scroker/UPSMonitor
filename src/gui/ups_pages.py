@@ -13,8 +13,8 @@ class UpsPreferencesPage(Adw.NavigationPage):
     voltage_label = Gtk.Template.Child()
     input_voltage_label = Gtk.Template.Child()
     output_voltage_label = Gtk.Template.Child()
-    host_image = Gtk.Template.Child()
-    host_label = Gtk.Template.Child()
+    status_image = Gtk.Template.Child()
+    status_label = Gtk.Template.Child()
     current_label = Gtk.Template.Child()
     frequency_label = Gtk.Template.Child()
     page_title = Gtk.Template.Child()
@@ -49,6 +49,8 @@ class UpsPreferencesPage(Adw.NavigationPage):
         if 'status' not in self.ups_data.ups.keys():
             image_name = "battery-action-symbolic"
         elif self.ups_data.ups["status"] == "OB":
+            self.status_image.set_from_icon_name('error-symbolic')
+            self.status_label.set_label('Offline')
             if charge >= 90:
                 image_name = "battery-full-symbolic"
             elif charge >= 80:
@@ -70,6 +72,8 @@ class UpsPreferencesPage(Adw.NavigationPage):
             else:
                 image_name = "battery-level-0-symbolic"
         elif self.ups_data.ups["status"] == "OL":
+            self.status_image.set_from_icon_name('check-round-outline-whole-symbolic')
+            self.status_label.set_label('Online')
             if charge >= 90:
                 image_name = "battery-full-charging-symbolic"
             elif charge >= 80:
@@ -95,18 +99,14 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self.battery_row.set_subtitle(str(charge) + " %")
         self.voltage_label.set_label(self.ups_data.output['voltage'] + " V")
         self.input_voltage_label.set_label(self.ups_data.input['voltage'] + " V")
-        self.output_voltage_label.set_label(self.ups_data.input['voltage'] + " V")
+        self.output_voltage_label.set_label(self.ups_data.output['voltage'] + " V")
         self.current_label.set_label(self.ups_data.input['current.nominal'] + " A")
-        self.host_image.set_from_icon_name('preferences-desktop-remote-desktop-symbolic')
         self.page_title.set_title(self.ups_data.ups_name)
         self.page_title.set_title(self.ups_data.ups_name)
         self.frequency_label.set_label(self.ups_data.input['frequency.nominal'] + " Hz")
         if self.ups_data.host_id != None:
             host = self._dbus_client.get_host(self.ups_data.host_id)
-            self.host_label.set_label(host.profile_name)
             self.page_title.set_subtitle(host.profile_name)
-        else:
-            self.host_label.set_label("Orphan")
 
     def on_destroy(self, widget):
         self._dbus_signal_handler.remove()
