@@ -24,8 +24,9 @@ from pynut3.nut3 import PyNUT3Error
 from gi.repository import Adw, Gtk, GObject
 
 from .data_model import UPS
+from .home_page import HomePage
+from .ups_pages import UpsInfoPage, UpsSettingsPage, UpsNotificationsPage, UpsPreferencesPage
 from .ups_monitor_daemon import UPSMonitorClient
-from .ups_preferences_page_new import UpsPreferencesPage
 from .host_preferences_page import HostPreferencesPage
 from .add_new_server_box import AddNewServerBox
 
@@ -34,17 +35,15 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'UpsmonitorWindow'
 
     ups_list_box = Gtk.Template.Child()
-    welcome_connect_button = Gtk.Template.Child()
-    welcome_message = Gtk.Template.Child()
-    content_window_title = Gtk.Template.Child()
     add_server_button = Gtk.Template.Child()
     split_view = Gtk.Template.Child()
-    toolbar_view = Gtk.Template.Child()
+    navigation_view = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.add_server_box = AddNewServerBox()
         self.connect("destroy", self.on_destroy)
+        self.navigation_view.push(HomePage())
         thread = threading.Thread(target=self.start_dbus_connection, daemon = True)
         thread.start()
 
@@ -72,12 +71,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_ups_row_selected)
             self.ups_list_box.insert(ups_action_row, -1)
-        if self.ups_list_box.get_last_child() != None:
-            self.welcome_message.set_visible(True)
-            self.welcome_connect_button.set_visible(False)
-        else :
-            self.welcome_message.set_visible(False)
-            self.welcome_connect_button.set_visible(True)
 
     @Gtk.Template.Callback()
     def on_add_server_button_clicked(self, widget):
@@ -86,10 +79,22 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.add_server_box.present()
 
     def on_ups_row_selected(self, widget):
-        self.content_window_title.set_title(widget.get_title())
-        self.content_window_title.set_subtitle(widget.get_subtitle())
         self.split_view.set_show_content(True)
-        self.toolbar_view.set_content(UpsPreferencesPage(ups_data=widget.ups_data))
+        ups_preferences_page = UpsPreferencesPage(ups_data=widget.ups_data)
+        ups_preferences_page.info_row.connect('activated', self.on_info_selected, widget.ups_data)
+        ups_preferences_page.settings_row.connect('activated', self.on_settings_selected, widget.ups_data)
+        ups_preferences_page.notifications_row.connect('activated', self.on_notifications_selected, widget.ups_data)
+        self.navigation_view.replace([ups_preferences_page])
+        self.navigation_view.pop_to_tag('ups_page')
+
+    def on_info_selected(self, widget, ups_data):
+        self.navigation_view.push(UpsInfoPage(ups_data=ups_data))
+
+    def on_settings_selected(self, widget, ups_data):
+        self.navigation_view.push(UpsSettingsPage(ups_data=ups_data))
+
+    def on_notifications_selected(self, widget, ups_data):
+        self.navigation_view.push(UpsNotificationsPage(ups_data=ups_data))
 
     def on_destroy(self, widget):
         self._dbus_signal_handler.remove()

@@ -3,7 +3,7 @@ from gi.repository import Adw, Gtk
 from .data_model import UPS
 from .ups_monitor_daemon import UPSMonitorClient, NotificationType
 
-@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_preferences_page_new.ui')
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_preferences_page.ui')
 class UpsPreferencesPage(Adw.NavigationPage):
     __gtype_name__ = 'UpsPreferencesPage'
 
@@ -18,6 +18,9 @@ class UpsPreferencesPage(Adw.NavigationPage):
     current_label = Gtk.Template.Child()
     frequency_label = Gtk.Template.Child()
     page_title = Gtk.Template.Child()
+    info_row = Gtk.Template.Child()
+    settings_row = Gtk.Template.Child()
+    notifications_row = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         ups_data = kwargs.get("ups_data", None)
@@ -27,7 +30,7 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self._dbus_client = UPSMonitorClient()
         self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_self)
         self.connect("destroy", self.on_destroy)
-        self.update_start(ups_data)
+        self.update_self(ups_data)
 
     def update_self(self, ups_data:UPS=None):
         if ups_data != None:
@@ -36,18 +39,6 @@ class UpsPreferencesPage(Adw.NavigationPage):
             self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
         else:
             return
-        self.update_battery_row()
-
-    def update_start(self, ups_data:UPS=None):
-        if ups_data != None:
-            self.ups_data = ups_data
-        elif ups_data == None  and self.ups_data.host_id != None:
-            self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
-        else:
-            return
-        self.update_battery_row()
-
-    def update_battery_row(self):
         charge = int(self.ups_data.battery["charge"])
         if 'status' not in self.ups_data.ups.keys():
             image_name = "battery-action-symbolic"
@@ -113,3 +104,48 @@ class UpsPreferencesPage(Adw.NavigationPage):
 
     def on_destroy(self, widget):
         self._dbus_signal_handler.remove()
+
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_info_page.ui')
+class UpsInfoPage(Adw.NavigationPage):
+    __gtype_name__ = 'UpsInfoPage'
+
+    def __init__(self, **kwargs):
+        self.ups_data = kwargs.get("ups_data", None)
+        if self.ups_data != None:
+            kwargs.pop("ups_data")
+        super().__init__(**kwargs)
+        self._dbus_client = UPSMonitorClient()
+        self.update_self()
+
+    def update_self(self):
+        pass
+
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_notifications_page.ui')
+class UpsNotificationsPage(Adw.NavigationPage):
+    __gtype_name__ = 'UpsNotificationsPage'
+
+    def __init__(self, **kwargs):
+        self.ups_data = kwargs.get("ups_data", None)
+        if self.ups_data != None:
+            kwargs.pop("ups_data")
+        super().__init__(**kwargs)
+        self._dbus_client = UPSMonitorClient()
+        self.update_self()
+
+    def update_self(self):
+        pass
+
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_settings_page.ui')
+class UpsSettingsPage(Adw.NavigationPage):
+    __gtype_name__ = 'UpsSettingsPage'
+
+    def __init__(self, **kwargs):
+        self.ups_data = kwargs.get("ups_data", None)
+        if self.ups_data != None:
+            kwargs.pop("ups_data")
+        super().__init__(**kwargs)
+        self._dbus_client = UPSMonitorClient()
+        self.update_self()
+
+    def update_self(self):
+        pass

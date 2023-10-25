@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.4"/>
+  <template class="UpsNotificationsPage" parent="AdwNavigationPage">
+    <property name="title" translatable="yes">UPS Info Page</property>
+    <property name="tag">ups_notifications_page</property>
+    <property name="child">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <property name="title-widget">
+              <object class="AdwWindowTitle"/>
+            </property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="AdwClamp">
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">10</property>
+                <property name="margin-start">15</property>
+                <property name="margin-end">15</property>
+                <child>
+                  <object class="GtkListBox">
+                    <style>
+                      <class name="boxed-list"/>
+                    </style>
+                    <child>
+                      <object class="AdwSwitchRow" id="shutdown_low_battery_switch">
+                        <property name="title">Low battery shutdown</property>
+                        <property name="subtitle">Enable the shutdown of this host when the battery level is low</property>
+                        <!-- <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/> -->
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwSwitchRow" id="offline_notify_switch">
+                        <property name="title">UPS offline notifications</property>
+                        <property name="subtitle">Enable notifications when UPS go offline</property>
+                        <!-- <signal name="notify::active" handler="offline_notify_switch_selected"/> -->
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwSwitchRow" id="low_battery_notify_switch">
+                        <property name="title">Low battery notifications</property>
+                        <property name="subtitle">Enable notifications when UPS have low battery</property>
+                        <!-- <signal name="notify::active" handler="low_battery_notify_switch_selected"/> -->
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
