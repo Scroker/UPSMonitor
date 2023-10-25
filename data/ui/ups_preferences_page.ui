@@ -206,7 +206,7 @@
                       <object class="GtkImage">
                         <property name="icon-name">timer-symbolic</property>
                         <style>
-                          <class name="heading"/>
+                          <class name="icon-dropshadow"/>
                         </style>
                       </object>
                     </child>
@@ -226,7 +226,7 @@
                       <object class="GtkImage">
                         <property name="icon-name">timer-symbolic</property>
                         <style>
-                          <class name="heading"/>
+                          <class name="icon-dropshadow"/>
                         </style>
                       </object>
                     </child>
@@ -243,7 +243,11 @@
                   <object class="AdwActionRow">
                     <property name="title">Status</property>
                     <child type="prefix">
-                      <object class="GtkImage" id="status_image"/>
+                      <object class="GtkImage" id="status_image">
+                        <style>
+                          <class name="icon-dropshadow"/>
+                        </style>
+                      </object>
                     </child>
                     <child type="suffix">
                       <object class="GtkLabel" id="status_label">

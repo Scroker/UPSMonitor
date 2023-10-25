@@ -24,16 +24,18 @@
                   <object class="AdwSwitchRow" id="shutdown_low_battery_switch">
                     <property name="title">Low battery shutdown</property>
                     <property name="subtitle">Enable the shutdown of this host when the battery level is low</property>
-                    <!-- <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/> -->
+                    <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/>
                   </object>
                 </child>
+                <!--
                 <child>
                   <object class="AdwSwitchRow" id="beeper_enabled_switch">
                     <property name="title">Beeper Enabled</property>
                     <property name="subtitle">Enable/Disable the UPS's beeper</property>
-                    <!-- <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/> -->
+                     <signal name="notify::active" handler="shutdown_low_battery_switch_selected"/>
                   </object>
                 </child>
+                -->
               </object>
             </child>
           </object>

@@ -42,7 +42,9 @@ class UpsPreferencesPage(Adw.NavigationPage):
 
     def update_self(self):
         if self.ups_data != None and self.ups_data.host_id != None:
-            self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+            ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+            if ups_data != None:
+                self.ups_data = ups_data
         charge = int(self.ups_data.battery["charge"])
         if 'status' not in self.ups_data.ups.keys():
             image_name = "battery-action-symbolic"
@@ -98,7 +100,7 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self.battery_nominal_voltage_label.set_label(self.ups_data.battery['voltage.nominal'] + " V")
         self.battery_image.set_from_icon_name(image_name)
         self.battery_level_bar.set_value(charge)
-        self.battery_row.set_subtitle(str(charge) + " %")
+        self.battery_row.set_subtitle(str(charge) + "%")
         self.voltage_label.set_label(self.ups_data.output['voltage'] + " V")
         self.input_voltage_label.set_label(self.ups_data.input['voltage'] + " V")
         self.nominal_voltage_label.set_label(self.ups_data.input['voltage.nominal'] + " V")
@@ -143,7 +145,9 @@ class UpsInfoPage(Adw.NavigationPage):
 
     def update_self(self):
         if self.ups_data != None and self.ups_data.host_id != None:
-            self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+            ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+            if ups_data != None:
+                self.ups_data = ups_data
         # Device group
         if self.ups_data.ups['firmware'] != '':
             self.firmware_label.set_label(self.ups_data.ups['firmware'])
@@ -176,6 +180,8 @@ class UpsNotificationsPage(Adw.NavigationPage):
     __gtype_name__ = 'UpsNotificationsPage'
 
     window_title = Gtk.Template.Child()
+    offline_notify_switch = Gtk.Template.Child()
+    low_battery_notify_switch = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         self.ups_data = kwargs.get("ups_data", None)
@@ -184,16 +190,41 @@ class UpsNotificationsPage(Adw.NavigationPage):
         super().__init__(**kwargs)
         self._dbus_client = UPSMonitorClient()
         self.window_title.set_title(self.ups_data.ups_name)
-        self.update_self()
+        self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+        if NotificationType.IS_OFFLINE in self.notifications:
+            self.offline_notify_switch.set_active(True)
+        else:
+            self.offline_notify_switch.set_active(False)
+        if NotificationType.LOW_BATTERY in self.notifications:
+            self.low_battery_notify_switch.set_active(True)
+        else:
+            self.low_battery_notify_switch.set_active(False)
 
-    def update_self(self):
-        pass
+    @Gtk.Template.Callback()
+    def offline_notify_switch_selected(self, widget, args):
+        if self.offline_notify_switch.get_active() and NotificationType.IS_OFFLINE not in self.notifications:
+            self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.IS_OFFLINE, True)
+            self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+        elif not self.offline_notify_switch.get_active() and NotificationType.IS_OFFLINE in self.notifications:
+            self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.IS_OFFLINE, False)
+            self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+
+    @Gtk.Template.Callback()
+    def low_battery_notify_switch_selected(self, widget, args):
+        if self.low_battery_notify_switch.get_active() and NotificationType.LOW_BATTERY not in self.notifications:
+            self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.LOW_BATTERY, True)
+            self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+        elif not self.low_battery_notify_switch.get_active() and NotificationType.LOW_BATTERY in self.notifications:
+            self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.LOW_BATTERY, False)
+            self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_settings_page.ui')
 class UpsSettingsPage(Adw.NavigationPage):
     __gtype_name__ = 'UpsSettingsPage'
 
     window_title = Gtk.Template.Child()
+    shutdown_low_battery_switch = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         self.ups_data = kwargs.get("ups_data", None)
@@ -202,7 +233,17 @@ class UpsSettingsPage(Adw.NavigationPage):
         super().__init__(**kwargs)
         self._dbus_client = UPSMonitorClient()
         self.window_title.set_title(self.ups_data.ups_name)
-        self.update_self()
+        self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+        if NotificationType.AUTO_SHUTDOWN in self.notifications:
+            self.shutdown_low_battery_switch.set_active(True)
+        else:
+            self.shutdown_low_battery_switch.set_active(False)
 
-    def update_self(self):
-        pass
+    @Gtk.Template.Callback()
+    def shutdown_low_battery_switch_selected(self, widget, args):
+        if self.shutdown_low_battery_switch.get_active() and NotificationType.AUTO_SHUTDOWN not in self.notifications:
+            self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.AUTO_SHUTDOWN, True)
+            self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+        elif not self.shutdown_low_battery_switch.get_active() and NotificationType.AUTO_SHUTDOWN in self.notifications:
+            self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.AUTO_SHUTDOWN, False)
+            self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)

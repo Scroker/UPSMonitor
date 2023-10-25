@@ -437,9 +437,12 @@ class UPSMonitorClient(GObject.Object):
 
     def get_all_ups_notifications(self, ups:UPS):
         notify_dict = {}
+        notify_result = []
         notify_dict['host_id'] = ups.host_id
         notify_dict['name'] = ups.key
-        return self._get_all_ups_notifications(ConversionUtil.python_to_dbus(notify_dict))
+        for notification_value in self._get_all_ups_notifications(ConversionUtil.python_to_dbus(notify_dict)):
+            notify_result.append(NotificationType(notification_value))
+        return notify_result
 
     def save_host(self, host:Host):
         host_dict = ConversionUtil.object_to_string(host)

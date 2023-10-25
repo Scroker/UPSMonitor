@@ -24,14 +24,14 @@
                   <object class="AdwSwitchRow" id="offline_notify_switch">
                     <property name="title">UPS offline notifications</property>
                     <property name="subtitle">Enable notifications when UPS go offline</property>
-                    <!-- <signal name="notify::active" handler="offline_notify_switch_selected"/> -->
+                    <signal name="notify::active" handler="offline_notify_switch_selected"/>
                   </object>
                 </child>
                 <child>
                   <object class="AdwSwitchRow" id="low_battery_notify_switch">
                     <property name="title">Low battery notifications</property>
                     <property name="subtitle">Enable notifications when UPS have low battery</property>
-                    <!-- <signal name="notify::active" handler="low_battery_notify_switch_selected"/> -->
+                    <signal name="notify::active" handler="low_battery_notify_switch_selected"/>
                   </object>
                 </child>
               </object>
