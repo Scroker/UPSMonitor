@@ -4,7 +4,7 @@ from .data_model import UPS
 from .ups_monitor_daemon import UPSMonitorClient, NotificationType
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_preferences_page_new.ui')
-class UpsPreferencesPage(Adw.PreferencesPage):
+class UpsPreferencesPage(Adw.NavigationPage):
     __gtype_name__ = 'UpsPreferencesPage'
 
     battery_row = Gtk.Template.Child()
@@ -17,6 +17,7 @@ class UpsPreferencesPage(Adw.PreferencesPage):
     host_label = Gtk.Template.Child()
     current_label = Gtk.Template.Child()
     frequency_label = Gtk.Template.Child()
+    page_title = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         ups_data = kwargs.get("ups_data", None)
@@ -100,12 +101,15 @@ class UpsPreferencesPage(Adw.PreferencesPage):
         self.output_voltage_label.set_label(self.ups_data.input['voltage'] + " V")
         self.current_label.set_label(self.ups_data.input['current.nominal'] + " A")
         self.host_image.set_from_icon_name('preferences-desktop-remote-desktop-symbolic')
+        self.page_title.set_title(self.ups_data.ups_name)
+        self.page_title.set_title(self.ups_data.ups_name)
         self.frequency_label.set_label(self.ups_data.input['frequency.nominal'] + " Hz")
-        host = self._dbus_client.get_host(self.ups_data.host_id)
         if self.ups_data.host_id != None:
+            host = self._dbus_client.get_host(self.ups_data.host_id)
             self.host_label.set_label(host.profile_name)
+            self.page_title.set_subtitle(host.profile_name)
         else:
-            self.host_label.set_label("N/A")
+            self.host_label.set_label("Orphan")
 
     def on_destroy(self, widget):
         self._dbus_signal_handler.remove()

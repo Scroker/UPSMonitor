@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.4"/>
+  <template class="HomePage" parent="AdwNavigationPage">
+    <property name="title" translatable="yes">Content</property>
+    <property name="child">
+      <object class="AdwToolbarView" id="toolbar_view">
+        <property name="content">
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Page 1</property>
+            <property name="tag">page-1</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="title-widget">
+                      <object class="AdwWindowTitle" id="content_window_title"/>
+                    </property>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwStatusPage">
+                    <property name="title" translatable="true">Welcome to UPSMonitor</property>
+                    <child>
+                      <object class="GtkBox" id="welcome">
+                        <property name="orientation">1</property>
+                        <property name="valign">3</property>
+                        <property name="halign">3</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="name">logo</property>
+                            <property name="icon-name">org.ponderorg.UPSMonitor</property>
+                            <property name="pixel-size">154</property>
+                            <property name="margin-bottom">30</property>
+                            <style>
+                              <class name="icon-dropshadow"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="welcome_connect_button">
+                            <property name="label" translatable="true">New NUT-Server connection</property>
+                            <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
+                            <style>
+                              <class name="pill"/>
+                              <class name="suggested-action"/>
+                            </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="welcome_message">
+                            <property name="visible">false</property>
+                            <property name="label" translatable="true">Select an UPS to show infos</property>
+                            <style>
+                              <class name="title-3"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+        </property>
+      </object>
+    </property>
+  </object>
+  </template>
+</interface>

@@ -13,6 +13,8 @@
     <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/help-overlay.ui</file>
   </gresource>
   <gresource prefix="/org/ponderorg/UPSMonitor/icons/scalable/actions/">
+    <file preprocess="xml-stripblanks" alias="arrow4-left-symbolic.svg">icons/hicolor/scalable/actions/arrow4-left-symbolic.svg</file>
+    <file preprocess="xml-stripblanks" alias="arrow4-right-symbolic.svg">icons/hicolor/scalable/actions/arrow4-right-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="plus-symbolic.svg">icons/hicolor/scalable/actions/plus-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="charge-symbolic.svg">icons/hicolor/scalable/actions/charge-symbolic.svg</file>
     <file preprocess="xml-stripblanks" alias="camera-flash-symbolic.svg">icons/hicolor/scalable/actions/camera-flash-symbolic.svg</file>
