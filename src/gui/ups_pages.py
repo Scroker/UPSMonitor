@@ -21,6 +21,12 @@ class UpsPreferencesPage(Adw.NavigationPage):
     info_row = Gtk.Template.Child()
     settings_row = Gtk.Template.Child()
     notifications_row = Gtk.Template.Child()
+    battery_voltage_label = Gtk.Template.Child()
+    battery_low_voltage_label = Gtk.Template.Child()
+    battery_high_voltage_label = Gtk.Template.Child()
+    battery_nominal_voltage_label = Gtk.Template.Child()
+    start_delay_label = Gtk.Template.Child()
+    shutdown_delay_label = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         ups_data = kwargs.get("ups_data", None)
@@ -31,12 +37,6 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_self)
         self.connect("destroy", self.on_destroy)
         self.update_self(ups_data)
-        print(self.ups_data.battery)
-        print(self.ups_data.device)
-        print(self.ups_data.driver)
-        print(self.ups_data.input)
-        print(self.ups_data.output)
-        print(self.ups_data.ups)
 
     def update_self(self, ups_data:UPS=None):
         if ups_data != None:
@@ -94,6 +94,10 @@ class UpsPreferencesPage(Adw.NavigationPage):
                 image_name = "battery-level-10-charging-symbolic"
             else:
                 image_name = "battery-level-0-charging-symbolic"
+        self.battery_voltage_label.set_label(self.ups_data.battery['voltage'] + " V")
+        self.battery_low_voltage_label.set_label(self.ups_data.battery['voltage.low'] + " V")
+        self.battery_high_voltage_label.set_label(self.ups_data.battery['voltage.high'] + " V")
+        self.battery_nominal_voltage_label.set_label(self.ups_data.battery['voltage.nominal'] + " V")
         self.battery_image.set_from_icon_name(image_name)
         self.battery_level_bar.set_value(charge)
         self.battery_row.set_subtitle(str(charge) + " %")
@@ -103,6 +107,8 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self.current_label.set_label(self.ups_data.input['current.nominal'] + " A")
         self.page_title.set_title(self.ups_data.ups_name)
         self.page_title.set_title(self.ups_data.ups_name)
+        self.start_delay_label.set_label(self.ups_data.ups['delay.start'] + " ms")
+        self.shutdown_delay_label.set_label(self.ups_data.ups['delay.shutdown'] + " ms")
         self.frequency_label.set_label(self.ups_data.input['frequency.nominal'] + " Hz")
         if self.ups_data.host_id != None:
             host = self._dbus_client.get_host(self.ups_data.host_id)
@@ -115,6 +121,19 @@ class UpsPreferencesPage(Adw.NavigationPage):
 class UpsInfoPage(Adw.NavigationPage):
     __gtype_name__ = 'UpsInfoPage'
 
+    firmware_label = Gtk.Template.Child()
+    model_label = Gtk.Template.Child()
+    productid_label = Gtk.Template.Child()
+    vendorid_label = Gtk.Template.Child()
+    type_label = Gtk.Template.Child()
+    driver_version_usb_label = Gtk.Template.Child()
+    driver_vesion_internal_label = Gtk.Template.Child()
+    driver_name_label = Gtk.Template.Child()
+    driver_version_label = Gtk.Template.Child()
+    driver_port_label = Gtk.Template.Child()
+    driver_syncronous_label = Gtk.Template.Child()
+    driver_polling_interval_label = Gtk.Template.Child()
+
     def __init__(self, **kwargs):
         self.ups_data = kwargs.get("ups_data", None)
         if self.ups_data != None:
@@ -123,8 +142,42 @@ class UpsInfoPage(Adw.NavigationPage):
         self._dbus_client = UPSMonitorClient()
         self.update_self()
 
-    def update_self(self):
+    def update_self(self, ups_data:UPS=None):
+        if ups_data != None:
+            self.ups_data = ups_data
+        elif ups_data == None  and self.ups_data.host_id != None:
+            self.ups_data = self._dbus_client.get_ups_by_name_and_host(self.ups_data.host_id, self.ups_data.key)
+        else:
+            return
         pass
+        # Device group
+        if self.ups_data.ups['firmware'] != '':
+            self.firmware_label.set_label(self.ups_data.ups['firmware'])
+        if self.ups_data.ups['model'] != '':
+            self.model_label.set_label(self.ups_data.ups['model'])
+        if self.ups_data.ups['productid'] != '':
+            self.productid_label.set_label(self.ups_data.ups['productid'])
+        if self.ups_data.ups['vendorid'] != '':
+            self.vendorid_label.set_label(self.ups_data.ups['vendorid'])
+        if self.ups_data.ups['type'] != '':
+            self.type_label.set_label(self.ups_data.ups['type'])
+        # Driver group
+        if self.ups_data.driver['name'] != '':
+            self.driver_name_label.set_label(self.ups_data.driver['name'])
+        if self.ups_data.driver['version'] != '':
+            self.driver_version_label.set_label(self.ups_data.driver['version'])
+        if self.ups_data.driver['version.internal'] != '':
+            self.driver_vesion_internal_label.set_label(self.ups_data.driver['version.internal'])
+        if self.ups_data.driver['version.usb'] != '':
+            self.driver_version_usb_label.set_label(self.ups_data.driver['version.usb'])
+        if self.ups_data.driver['parameter.pollinterval'] != '':
+            self.driver_polling_interval_label.set_label(self.ups_data.driver['parameter.pollinterval'])
+        if self.ups_data.driver['parameter.synchronous'] != '':
+            self.driver_syncronous_label.set_label(self.ups_data.driver['parameter.synchronous'])
+        if self.ups_data.driver['parameter.port'] != '':
+            self.driver_port_label.set_label(self.ups_data.driver['parameter.port'])
+        print(self.ups_data.driver)
+        print(self.ups_data.ups)
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_notifications_page.ui')
 class UpsNotificationsPage(Adw.NavigationPage):

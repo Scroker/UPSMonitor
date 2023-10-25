@@ -19,7 +19,7 @@
             <child>
               <object class="AdwPreferencesGroup">
                 <child>
-                  <object class="AdwActionRow" id="battery_row">
+                  <object class="AdwExpanderRow" id="battery_row">
                     <property name="title">Battery</property>
                     <child type="prefix">
                       <object class="GtkImage" id="battery_image">
@@ -39,6 +39,54 @@
                         <property name="value">0</property>
                       </object>
                     </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title">Voltage</property>
+                        <child type="suffix">
+                          <object class="GtkLabel" id="battery_voltage_label">
+                            <style>
+                              <class name="heading"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title">Low voltage</property>
+                        <child type="suffix">
+                          <object class="GtkLabel" id="battery_low_voltage_label">
+                            <style>
+                              <class name="heading"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title">High voltage</property>
+                        <child type="suffix">
+                          <object class="GtkLabel" id="battery_high_voltage_label">
+                            <style>
+                              <class name="heading"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwActionRow">
+                        <property name="title">Nominal voltage</property>
+                        <child type="suffix">
+                          <object class="GtkLabel" id="battery_nominal_voltage_label">
+                            <style>
+                              <class name="heading"/>
+                            </style>
+                          </object>
+                        </child>
+                      </object>
+                    </child>"
                   </object>
                 </child>
                 <child>
@@ -137,13 +185,49 @@
                 </child>
                 <child>
                   <object class="AdwActionRow">
-                    <property name="title">Status</property>
+                    <property name="title">Shutdown delay</property>
                     <child type="prefix">
-                      <object class="GtkImage" id="status_image">
+                      <object class="GtkImage">
+                        <property name="icon-name">timer-symbolic</property>
                         <style>
-                          <class name="icon-dropshadow"/>
+                          <class name="heading"/>
                         </style>
                       </object>
+                    </child>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="shutdown_delay_label">
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Start delay</property>
+                    <child type="prefix">
+                      <object class="GtkImage">
+                        <property name="icon-name">timer-symbolic</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="start_delay_label">
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Status</property>
+                    <child type="prefix">
+                      <object class="GtkImage" id="status_image"/>
                     </child>
                     <child type="suffix">
                       <object class="GtkLabel" id="status_label">

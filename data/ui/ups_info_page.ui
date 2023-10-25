@@ -37,7 +37,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Model</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="model_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -50,7 +50,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Type</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="type_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -61,9 +61,22 @@
                 </child>
                 <child>
                   <object class="AdwActionRow">
-                    <property name="title">Version USB</property>
+                    <property name="title">Product ID</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="productid_label">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Vendor ID</property>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="vendorid_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -82,7 +95,46 @@
                   <object class="AdwActionRow">
                     <property name="title">Name</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="driver_name_label">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Port</property>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="driver_port_label">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Syncronous</property>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="driver_syncronous_label">
+                        <property name="label">Not present</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title">Polling interval</property>
+                    <child type="suffix">
+                      <object class="GtkLabel" id="driver_polling_interval_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -95,7 +147,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Version</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="driver_version_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -108,7 +160,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Version Internal</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="driver_vesion_internal_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -119,9 +171,9 @@
                 </child>
                 <child>
                   <object class="AdwActionRow">
-                    <property name="title">Version USB</property>
+                    <property name="title">USB library version</property>
                     <child type="suffix">
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="driver_version_usb_label">
                         <property name="label">Not present</property>
                         <style>
                           <class name="heading"/>
@@ -129,7 +181,7 @@
                       </object>
                     </child>
                   </object>
-                </child>
+                </child>"
               </object>
             </child>
           </object>

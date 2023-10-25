@@ -423,7 +423,7 @@ class UPSMonitorClient(GObject.Object):
     def get_ups_by_name_and_host(self, host_id:int, ups_name:str):
         ups_dict = self._get_ups_by_name_and_host(host_id,ups_name)
         if len(ups_dict) > 0 :
-            return ConversionUtil.transform_ups_dict(ups_dict)
+            return ConversionUtil.transform_ups_dict(ConversionUtil.dbus_to_python(ups_dict))
         else:
             return None
 
