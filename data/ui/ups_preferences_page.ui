@@ -24,11 +24,7 @@
                   <object class="AdwExpanderRow" id="battery_row">
                     <property name="title">Battery</property>
                     <child type="prefix">
-                      <object class="GtkImage" id="battery_image">
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
-                      </object>
+                      <object class="GtkImage" id="battery_image"/>
                     </child>
                     <child type="suffix">
                       <object class="GtkLevelBar" id="battery_level_bar">
@@ -97,9 +93,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">camera-flash-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -165,9 +158,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">charge-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -185,9 +175,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">power-profile-performance-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -205,9 +192,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">timer-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -225,9 +209,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">timer-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -243,11 +224,7 @@
                   <object class="AdwActionRow">
                     <property name="title">Status</property>
                     <child type="prefix">
-                      <object class="GtkImage" id="status_image">
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
-                      </object>
+                      <object class="GtkImage" id="status_image"/>
                     </child>
                     <child type="suffix">
                       <object class="GtkLabel" id="status_label">
@@ -270,9 +247,6 @@
                       <object class="GtkImage">
                         <property name="name">logo</property>
                         <property name="icon-name">org.gnome.Settings-notifications-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -289,9 +263,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">info-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
@@ -308,9 +279,6 @@
                     <child type="prefix">
                       <object class="GtkImage">
                         <property name="icon-name">settings-symbolic</property>
-                        <style>
-                          <class name="icon-dropshadow"/>
-                        </style>
                       </object>
                     </child>
                     <child type="suffix">
