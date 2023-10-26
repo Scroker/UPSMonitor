@@ -257,7 +257,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="AdwActionRow" id="info_row">
+                  <object class="AdwActionRow" id="informations_row">
                     <property name="title">Informations</property>
                     <property name="activatable">true</property>
                     <child type="prefix">

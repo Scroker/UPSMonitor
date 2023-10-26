@@ -2,9 +2,8 @@
 <interface>
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
-  <template class="HostPreferencesPage" parent="AdwNavigationPage">
-  <property name="title" translatable="yes">Modify host connection</property>
-      <property name="tag">modify_host_connection</property>
+  <template class="HostSettingsPage" parent="AdwNavigationPage">
+      <property name="tag">host_settings_page</property>
       <property name="child">
         <object class="AdwToolbarView">
           <child type="top">
@@ -14,17 +13,6 @@
             <object class="AdwToastOverlay" id="overlay">
               <child>
                 <object class="AdwPreferencesPage">
-                  <child>
-                    <object class="AdwPreferencesGroup">
-                      <property name="title">Profile</property>
-                      <property name="description">Save host profile</property>
-                      <child>
-                        <object class="AdwEntryRow" id="server_name_row">
-                          <property name="title">Server name</property>
-                        </object>
-                      </child>
-                    </object>
-                  </child>
                   <child>
                     <object class="AdwPreferencesGroup">
                       <property name="title">Connection</property>
@@ -89,20 +77,6 @@
                   </child>
                   <style>
                     <class name="suggested-action"/>
-                  </style>
-                </object>
-              </child>
-              <child type="end">
-                <object class="GtkButton" id="delete_button">
-                  <child>
-                    <object class="AdwButtonContent">
-                      <property name="icon-name">user-trash-symbolic</property>
-                      <property name="label" translatable="yes">_Delete</property>
-                      <property name="use-underline">True</property>
-                    </object>
-                  </child>
-                  <style>
-                    <class name="destructive-action"/>
                   </style>
                 </object>
               </child>

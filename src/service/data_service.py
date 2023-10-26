@@ -54,21 +54,21 @@ class HostServices(GObject.Object):
         result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts")
         host_list = []
         for row in result:
-            host_list.append({'ip_address':row[2], 'port':row[3], 'profile_name':row[1], 'host_id':row[0], 'username':row[3], 'password':row[4]})
+            host_list.append({'host_id':row[0], 'profile_name':row[1], 'ip_address':row[2], 'port':row[3], 'username':row[4], 'password':row[5]})
         return host_list
 
     def get_host(self, host_id:int) -> []:
         cursor = self.conn.cursor()
         result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE id=?", (host_id,))
         for row in result:
-           return {'ip_address':row[2], 'port':row[3], 'profile_name':row[1], 'host_id':row[0], 'username':row[3], 'password':row[4]}
+           return {'host_id':row[0], 'profile_name':row[1], 'ip_address':row[2], 'port':row[3], 'username':row[4], 'password':row[5]}
         return None
 
     def get_host_by_name(self, host_name:str) -> []:
         cursor = self.conn.cursor()
         result = cursor.execute("SELECT id, profile_name, ip_address, port, username, password FROM hosts WHERE profile_name=?", (host_name,))
         for row in result:
-           return {'ip_address':row[2], 'port':row[3], 'profile_name':row[1], 'host_id':row[0], 'username':row[3], 'password':row[4]}
+            return {'host_id':row[0], 'profile_name':row[1], 'ip_address':row[2], 'port':row[3], 'username':row[4], 'password':row[5]}
         return None
 
     def set_ups_notification_type(self, host_id:int, ups_name:str, notification_type:int, active:bool = True) -> []:
@@ -101,6 +101,7 @@ class HostServices(GObject.Object):
         cursor.execute("SELECT * FROM hosts WHERE ip_address=?", (host['ip_address'],))
         if cursor.fetchone() is not None:
             raise HostAddressAlreadyExist
+        print(host)
         if host['username'] != None or host['username'] != None:
             cursor.execute("INSERT INTO hosts (profile_name, ip_address, port,username, password) VALUES (?,?,?,?,?)", (host['profile_name'], host['ip_address'], host['port'], host['username'], host['password']))
         else:

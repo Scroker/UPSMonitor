@@ -5,7 +5,7 @@ from gi.repository import Adw, Gtk, Gio, GObject, GLib
 from .data_model import Host
 from .add_new_server_box import AddNewServerBox
 from .ups_monitor_daemon import UPSMonitorClient
-from .host_preferences_page import HostPreferencesPage
+from .host_pages import HostSettingsPage, HostInformationsPage
 
 APPLICATION_ID = 'org.ponderorg.UPSMonitor'
 
@@ -91,16 +91,16 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             self.saved_profiles_group.set_visible(False)
         for host in host_list:
             saved_host_row = SavedHostActionRow(host_data=host)
-            saved_host_row.connect("activated", self.on_saved_row_clicked)
+            saved_host_row.connect("activated", self.on_saved_row_clicked, host)
             self.saved_profiles_list.append(saved_host_row)
 
-    def cancel_row(self, widget):
-        host_services = HostServices()
-        host_services.delete_host(widget.host_data.host_id)
-        self.update_profiles()
+    def on_saved_row_clicked(self, widget, args):
+        new_page = HostInformationsPage(host_data=args)
+        new_page.connection_settings_row.connect("activated", self.on_connection_row_clicked, args)
+        self.push_subpage(new_page)
 
-    def on_saved_row_clicked(self, widget):
-        new_page = HostPreferencesPage(host_data=widget.host, real_parent=self)
+    def on_connection_row_clicked(self, widget, args):
+        new_page = HostSettingsPage(host_data=args)
         self.push_subpage(new_page)
 
     def delete_profile(self):

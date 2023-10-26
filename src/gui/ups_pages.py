@@ -18,7 +18,7 @@ class UpsPreferencesPage(Adw.NavigationPage):
     current_label = Gtk.Template.Child()
     frequency_label = Gtk.Template.Child()
     window_title = Gtk.Template.Child()
-    info_row = Gtk.Template.Child()
+    informations_row = Gtk.Template.Child()
     settings_row = Gtk.Template.Child()
     notifications_row = Gtk.Template.Child()
     battery_voltage_label = Gtk.Template.Child()
@@ -38,6 +38,9 @@ class UpsPreferencesPage(Adw.NavigationPage):
         self._dbus_client = UPSMonitorClient()
         self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_self)
         self.connect("destroy", self.on_destroy)
+        if self.ups_data.host_id == None:
+            self.settings_row.set_visible(False)
+            self.notifications_row.set_visible(False)
         self.update_self()
 
     def update_self(self):
@@ -116,7 +119,7 @@ class UpsPreferencesPage(Adw.NavigationPage):
     def on_destroy(self, widget):
         self._dbus_signal_handler.remove()
 
-@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_info_page.ui')
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/ups_informations_page.ui')
 class UpsInfoPage(Adw.NavigationPage):
     __gtype_name__ = 'UpsInfoPage'
 
@@ -247,3 +250,10 @@ class UpsSettingsPage(Adw.NavigationPage):
         elif not self.shutdown_low_battery_switch.get_active() and NotificationType.AUTO_SHUTDOWN in self.notifications:
             self._dbus_client.set_ups_notification_type(self.ups_data, NotificationType.AUTO_SHUTDOWN, False)
             self.notifications = self._dbus_client.get_all_ups_notifications(self.ups_data)
+
+@Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/home_page.ui')
+class HomePage(Adw.NavigationPage):
+    __gtype_name__ = 'HomePage'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

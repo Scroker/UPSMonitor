@@ -3,12 +3,13 @@
   <gresource prefix="/org/ponderorg/UPSMonitor">
     <file preprocess="xml-stripblanks">ui/window.ui</file>
     <file preprocess="xml-stripblanks">ui/home_page.ui</file>
-    <file preprocess="xml-stripblanks">ui/ups_info_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/ups_informations_page.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_settings_page.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_notifications_page.ui</file>
-    <file preprocess="xml-stripblanks">ui/host_preferences_page.ui</file>
     <file preprocess="xml-stripblanks">ui/ups_preferences_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/host_settings_page.ui</file>
+    <file preprocess="xml-stripblanks">ui/host_informations_page.ui</file>
     <file preprocess="xml-stripblanks">ui/saved_host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/temporary_host_action_row.ui</file>
     <file preprocess="xml-stripblanks">ui/monitor_preferences_window.ui</file>

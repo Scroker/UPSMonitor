@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="Adw" version="1.0"/>
+  <template class="HostInformationsPage" parent="AdwNavigationPage">
+      <property name="tag">host_informations_page</property>
+      <property name="child">
+        <object class="AdwToolbarView">
+          <child type="top">
+            <object class="AdwHeaderBar"/>
+          </child>
+          <property name="content">
+            <object class="AdwToastOverlay" id="overlay">
+              <child>
+                <object class="AdwPreferencesPage">
+                  <child>
+                    <object class="AdwPreferencesGroup">
+                      <property name="title">Profile Settings</property>
+                      <property name="description">Change host profile</property>
+                      <child>
+                        <object class="AdwEntryRow" id="server_name_row">
+                          <property name="title">Server name</property>
+                        </object>
+                      </child>
+                      <child>
+                        <object class="AdwActionRow" id="connection_settings_row">
+                          <property name="title">Connection settings</property>
+                          <property name="activatable">true</property>
+                          <child type="prefix">
+                            <object class="GtkImage">
+                              <property name="icon-name">network-receive-symbolic</property>
+                            </object>
+                          </child>
+                          <child type="suffix">
+                            <object class="GtkImage">
+                              <property name="icon-name">go-next-symbolic</property>
+                            </object>
+                          </child>
+                        </object>
+                      </child>
+                    </object>
+                  </child>
+                  <child>
+                    <object class="AdwPreferencesGroup" id="devices_group">
+                      <property name="title">Devices connected</property>
+                      <property name="description">Devices managed by thi server</property>
+                    </object>
+                  </child>
+                </object>
+              </child>
+            </object>
+          </property>
+          <child type="bottom">
+            <object class="GtkActionBar">
+              <child type="start">
+                <object class="GtkButton" id="save_button">
+                  <child>
+                    <object class="AdwButtonContent">
+                      <property name="icon-name">document-save-symbolic</property>
+                      <property name="label" translatable="yes">_Save</property>
+                      <property name="use-underline">True</property>
+                    </object>
+                  </child>
+                  <style>
+                    <class name="suggested-action"/>
+                  </style>
+                </object>
+              </child>
+              <child type="end">
+                <object class="GtkButton" id="delete_button">
+                  <child>
+                    <object class="AdwButtonContent">
+                      <property name="icon-name">user-trash-symbolic</property>
+                      <property name="label" translatable="yes">_Delete</property>
+                      <property name="use-underline">True</property>
+                    </object>
+                  </child>
+                  <style>
+                    <class name="destructive-action"/>
+                  </style>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </property>
+  </template>
+</interface>
+

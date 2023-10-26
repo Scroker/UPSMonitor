@@ -33,7 +33,7 @@
     <child>
       <object class="AdwPreferencesPage">
         <property name="title" translatable="yes">Connections</property>
-        <property name="icon-name">network-server-symbolic</property>
+        <property name="icon-name">network-wired-symbolic</property>
         <child>
           <object class="AdwStatusPage" id="no_dbus_connection">
             <property name="title">No DBus connections</property>

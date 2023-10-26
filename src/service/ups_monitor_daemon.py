@@ -1,7 +1,4 @@
-import dbus, logging
-import dbus.service
-import multiprocessing, threading
-import dbus.mainloop.glib
+import dbus, logging, dbus.service, multiprocessing, threading, dbus.mainloop.glib, copy
 
 from gi.repository import Gio, GLib, GObject
 from pynut3.nut3 import PyNUT3Error
@@ -17,7 +14,7 @@ class ConversionUtil(GObject.Object):
     @staticmethod
     def object_to_string(host:Host) -> dict:
         host_dict = vars(host)
-        return ConversionUtil.python_to_string(host_dict)
+        return ConversionUtil.python_to_string(copy.deepcopy(host_dict))
 
     @staticmethod
     def python_to_string(host_dict:dict) -> dict:
@@ -86,7 +83,7 @@ class ConversionUtil(GObject.Object):
     @staticmethod
     def list_to_object_host(host_dict:dict) -> Host:
         if 'host_id' in host_dict.keys():
-            return Host(host_dict=host_dict)
+            return Host(host_dict=ConversionUtil.string_to_python(host_dict))
         else:
             return None
 
@@ -212,7 +209,7 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService", in_signature='', out_signature='')
     def quit(self):
-        print("  shutting down")
+        logging.info("UPS Monitor Service: shutting down")
         self._loop.quit()
 
     # Host method and signals
@@ -364,6 +361,14 @@ class UPSMonitorService(dbus.service.Object):
         result = self._ups_host_services.get_all_ups_notifications(notify_dict['host_id'], notify_dict['name'])
         return result
 
+    @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='i', out_signature='aa{sv}')
+    def get_ups_by_host(self, host_id:int):
+        hosts_ups = []
+        for ups_dict in self._ups_data:
+            if ups_dict['host_id'] == host_id:
+                hosts_ups.append(ups_dict)
+        return hosts_ups
+
     @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='is', out_signature='a{sv}')
     def get_ups_by_name_and_host(self, host_id:int, ups_name:str):
         for ups_dict in self._ups_data:
@@ -384,6 +389,7 @@ class UPSMonitorClient(GObject.Object):
         self._set_ups_notification_type = self._service.get_dbus_method('set_ups_notification_type', 'org.gdramis.UPSMonitorService.UPS')
         self._get_all_ups_notifications = self._service.get_dbus_method('get_all_ups_notifications', 'org.gdramis.UPSMonitorService.UPS')
         self._get_ups_by_name_and_host = self._service.get_dbus_method('get_ups_by_name_and_host', 'org.gdramis.UPSMonitorService.UPS')
+        self._get_ups_by_host = self._service.get_dbus_method('get_ups_by_host', 'org.gdramis.UPSMonitorService.UPS')
 
         self._get_all_hosts_dbus = self._service.get_dbus_method('get_all_hosts', 'org.gdramis.UPSMonitorService.Host')
         self._get_all_temporary_hosts_dbus = self._service.get_dbus_method('get_all_temporary_hosts', 'org.gdramis.UPSMonitorService.Host')
@@ -426,6 +432,13 @@ class UPSMonitorClient(GObject.Object):
             return ConversionUtil.transform_ups_dict(ConversionUtil.dbus_to_python(ups_dict))
         else:
             return None
+
+    def get_ups_by_host(self, host_id:int):
+        host_ups = []
+        host_ups_dict = self._get_ups_by_host(host_id)
+        for ups_dict in ConversionUtil.dbus_to_python(host_ups_dict):
+            host_ups.append(ConversionUtil.transform_ups_dict(ups_dict))
+        return host_ups
 
     def set_ups_notification_type(self, ups:UPS, notification_type:NotificationType, enabled:bool):
         notify_dict = {}

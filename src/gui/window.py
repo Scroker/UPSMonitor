@@ -24,10 +24,8 @@ from pynut3.nut3 import PyNUT3Error
 from gi.repository import Adw, Gtk, GObject
 
 from .data_model import UPS
-from .home_page import HomePage
-from .ups_pages import UpsInfoPage, UpsSettingsPage, UpsNotificationsPage, UpsPreferencesPage
+from .ups_pages import UpsInfoPage, UpsSettingsPage, UpsNotificationsPage, UpsPreferencesPage, HomePage
 from .ups_monitor_daemon import UPSMonitorClient
-from .host_preferences_page import HostPreferencesPage
 from .add_new_server_box import AddNewServerBox
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/window.ui')
@@ -81,13 +79,13 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
     def on_ups_row_selected(self, widget):
         self.split_view.set_show_content(True)
         ups_preferences_page = UpsPreferencesPage(ups_data=widget.ups_data)
-        ups_preferences_page.info_row.connect('activated', self.on_info_selected, widget.ups_data)
+        ups_preferences_page.informations_row.connect('activated', self.on_informations_selected, widget.ups_data)
         ups_preferences_page.settings_row.connect('activated', self.on_settings_selected, widget.ups_data)
         ups_preferences_page.notifications_row.connect('activated', self.on_notifications_selected, widget.ups_data)
         self.navigation_view.replace([ups_preferences_page])
         self.navigation_view.pop_to_tag('ups_page')
 
-    def on_info_selected(self, widget, ups_data):
+    def on_informations_selected(self, widget, ups_data):
         self.navigation_view.push(UpsInfoPage(ups_data=ups_data))
 
     def on_settings_selected(self, widget, ups_data):
