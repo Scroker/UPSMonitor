@@ -88,9 +88,6 @@ class AddNewServerBox(Adw.Window):
                 else:
                     host.profile_name = profile_name
                 ups_monitor_client.save_host(host)
-                print('Saved host: ', vars(host))
-                host = ups_monitor_client.get_host_by_name(profile_name)
-                print('Retrived host: ', vars(host))
                 self.hide()
             except HostNameAlreadyExist :
                 self.banner.set_title(_("Profile name already exist"))

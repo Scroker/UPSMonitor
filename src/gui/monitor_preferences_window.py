@@ -95,7 +95,7 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             self.saved_profiles_list.append(saved_host_row)
 
     def on_saved_row_clicked(self, widget, args):
-        new_page = HostInformationsPage(host_data=args)
+        new_page = HostInformationsPage(host_data=args, real_parent=self)
         new_page.connection_settings_row.connect("activated", self.on_connection_row_clicked, args)
         self.push_subpage(new_page)
 

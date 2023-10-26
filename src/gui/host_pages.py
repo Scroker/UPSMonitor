@@ -53,23 +53,37 @@ class HostInformationsPage(Adw.NavigationPage):
     server_name_row = Gtk.Template.Child()
     connection_settings_row = Gtk.Template.Child()
     devices_group = Gtk.Template.Child()
+    ups_rows = []
 
     def __init__(self, **kwargs):
         self.host_data = kwargs.get("host_data", None)
+        self.real_parent = kwargs.get("real_parent", None)
         if self.host_data != None:
             kwargs.pop("host_data")
+        if self.real_parent != None:
+            kwargs.pop("real_parent")
         super().__init__(**kwargs)
         self.set_title('Host informations')
         self._dbus_client = UPSMonitorClient()
+        self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_updated", self.update_ups_rows)
         self.delete_button.connect("clicked",self.on_delete_host)
         self.save_button.connect("clicked", self.on_save_host)
+        self.connect("destroy", self.on_destroy)
+        self.server_name_row.set_text(self.host_data.profile_name)
+        self.update_ups_rows()
+
+    def update_ups_rows(self, widget=None):
+        for ups_row in self.ups_rows:
+            self.devices_group.remove(ups_row)
+            ups_row.run_dispose()
+        self.ups_rows = []
         for ups in self._dbus_client.get_ups_by_host(self.host_data.host_id):
             ups_row = Adw.ActionRow()
             ups_row.set_title(ups.ups_name)
             ups_row.add_prefix(Gtk.Image.new_from_icon_name('ups-symbolic'))
+            self.ups_rows.append(ups_row)
+        for ups_row in self.ups_rows:
             self.devices_group.add(ups_row)
-        if self.host_data != None:
-            self.server_name_row.set_text(self.host_data.profile_name)
 
     def on_save_host(self, widget):
         self.host_data = self.host_data
@@ -98,3 +112,6 @@ class HostInformationsPage(Adw.NavigationPage):
         elif response == Gtk.ResponseType.CANCEL:
             pass
         widget.destroy()
+
+    def on_destroy(self, widget):
+        self._dbus_signal_handler.remove()
