@@ -350,7 +350,13 @@ class UPSMonitorService(dbus.service.Object):
 
     @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='', out_signature='aa{sv}')
     def get_all_ups(self):
-        return self._ups_data
+        hosts_ups = []
+        for ups_dict in self._ups_data:
+            new_host_dict = copy.deepcopy(ups_dict)
+            new_host_dict.pop('commands')
+            new_host_dict.pop('writable')
+            hosts_ups.append(new_host_dict)
+        return hosts_ups
 
     @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='a{sv}', out_signature='')
     def set_ups_notification_type(self, notify_dict:dict):
@@ -366,15 +372,35 @@ class UPSMonitorService(dbus.service.Object):
         hosts_ups = []
         for ups_dict in self._ups_data:
             if ups_dict['host_id'] == host_id:
-                hosts_ups.append(ups_dict)
+                new_ups_dict = copy.deepcopy(ups_dict)
+                new_ups_dict.pop('commands')
+                new_ups_dict.pop('writable')
+                hosts_ups.append(new_ups_dict)
         return hosts_ups
 
     @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='is', out_signature='a{sv}')
     def get_ups_by_name_and_host(self, host_id:int, ups_name:str):
         for ups_dict in self._ups_data:
             if ups_dict['name'] == ups_name and ups_dict['host_id'] == host_id:
-                return ups_dict
+                new_host_dict = copy.deepcopy(ups_dict)
+                new_host_dict.pop('commands')
+                new_host_dict.pop('writable')
+                return new_host_dict
         return {}
+
+    @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='is', out_signature='a{sv}')
+    def get_ups_command(self, host_id:int, ups_name:str):
+        for ups_dict in self._ups_data:
+            if ups_dict['name'] == ups_name and ups_dict['host_id'] == host_id:
+                return ups_dict['commands']
+        return {}
+
+    @dbus.service.method("org.gdramis.UPSMonitorService.UPS", in_signature='is', out_signature='as')
+    def get_ups_writable_variables(self, host_id:int, ups_name:str):
+        for ups_dict in self._ups_data:
+            if ups_dict['name'] == ups_name and ups_dict['host_id'] == host_id:
+                return ups_dict['writable']
+        return []
 
 class UPSMonitorClient(GObject.Object):
     __gtype_name__ = 'UPSMonitorClient'

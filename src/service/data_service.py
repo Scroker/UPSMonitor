@@ -19,14 +19,20 @@ class UPServices(GObject.Object):
         ups_dict = self.client.get_dict_ups()
         for k1, v1 in ups_dict.items():
             vars_dict = self.client.get_dict_vars(k1)
-            identifier = { "name" : k1 , "name.pretty" : v1 }
+            rw_vars_dict = self.client.get_dict_rw_vars(k1)
+            additional_vars = { "name" : k1 , "name.pretty" : v1 }
             if isinstance(self.host['host_id'], int):
-                identifier['host_id'] = self.host['host_id']
+                additional_vars['host_id'] = self.host['host_id']
             else:
-                identifier['host_id'] = 'None'
-            vars_dict.update(identifier)
+                additional_vars['host_id'] = 'None'
+            additional_vars['commands'] = self.client.get_dict_commands(k1)
+            additional_vars['writable'] = [*rw_vars_dict.keys()]
+            vars_dict.update(additional_vars)
             ups_list.append(vars_dict)
         return ups_list
+
+    def run_command(self, ups_name:str, str_command:str):
+        self.client.run_command(ups_name, str_command)
 
 class HostServices(GObject.Object):
     __gtype_name__ = 'HostServices'
