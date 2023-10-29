@@ -23,14 +23,30 @@
                         </object>
                       </child>
                       <child>
+                        <object class="AdwSwitchRow">
+                          <property name="title" translatable="yes">Hide Devices</property>
+                          <property name="subtitle" translatable="yes">If enabled doesn't show the devices in main view</property>
+                        </object>
+                      </child>
+                      <child>
+                        <object class="AdwComboRow">
+                          <property name="title" translatable="yes">Icon type</property>
+                          <property name="subtitle" translatable="yes">Set the icon that identify this devices</property>
+                          <property name="model">
+                            <object class="GtkStringList">
+                              <items>
+                                <item translatable="yes">Server</item>
+                                <item translatable="yes">Workstation</item>
+                              </items>
+                            </object>
+                          </property>
+                        </object>
+                      </child>
+                      <child>
                         <object class="AdwActionRow" id="connection_settings_row">
                           <property name="title">Connection settings</property>
+                          <property name="subtitle" translatable="yes">Manage settings connection for this device</property>
                           <property name="activatable">true</property>
-                          <child type="prefix">
-                            <object class="GtkImage">
-                              <property name="icon-name">network-receive-symbolic</property>
-                            </object>
-                          </child>
                           <child type="suffix">
                             <object class="GtkImage">
                               <property name="icon-name">go-next-symbolic</property>

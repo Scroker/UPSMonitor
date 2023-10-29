@@ -31,7 +31,7 @@ class HostSettingsPage(Adw.NavigationPage):
     def on_save_host(self, widget):
         self.host_data.ip_address = self.ip_address_row.get_text()
         self.host_data.port = self.port_row.get_text()
-        if self.authentication_switch.get_active() and username != "" and password != "":
+        if self.authentication_switch.get_active() and self.username_row.get_text() != "" and self.password_row.get_text() != "" :
             self.host_data.username = self.username_row.get_text()
             self.host_data.password = self.password_row.get_text()
         else:
@@ -82,8 +82,11 @@ class HostInformationsPage(Adw.NavigationPage):
             ups_row.set_title(ups.ups_name)
             ups_row.add_prefix(Gtk.Image.new_from_icon_name('ups-symbolic'))
             self.ups_rows.append(ups_row)
-        for ups_row in self.ups_rows:
-            self.devices_group.add(ups_row)
+        if len(self.ups_rows) == 0:
+            self.devices_group.set_visible(False)
+        else:
+            for ups_row in self.ups_rows:
+                self.devices_group.add(ups_row)
 
     def on_save_host(self, widget):
         self.host_data = self.host_data

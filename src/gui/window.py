@@ -28,6 +28,9 @@ from .ups_pages import UpsInfoPage, UpsSettingsPage, UpsNotificationsPage, UpsPr
 from .ups_monitor_daemon import UPSMonitorClient
 from .add_new_server_box import AddNewServerBox
 
+APPLICATION_ID = 'org.ponderorg.UPSMonitor'
+LOG_LEVEL = logging.ERROR
+
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/window.ui')
 class UpsmonitorWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'UpsmonitorWindow'
@@ -42,8 +45,16 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
         self.add_server_box = AddNewServerBox()
         self.connect("destroy", self.on_destroy)
         self.navigation_view.push(HomePage())
+        self.initialize_log()
         thread = threading.Thread(target=self.start_dbus_connection, daemon = True)
         thread.start()
+
+    def initialize_log(self):
+        self._logger = logging.getLogger('UpsmonitorWindow')
+        c_handler = logging.FileHandler('.var/app/'+ APPLICATION_ID +'/data/SystemOut_gui.log')
+        c_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        self._logger.setLevel(LOG_LEVEL)
+        self._logger.addHandler(c_handler)
 
     def start_dbus_connection(self):
         dbus_counter = 0
@@ -51,11 +62,13 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             try:
                 self._dbus_client = UPSMonitorClient()
                 self._dbus_signal_handler = self._dbus_client.connect_to_signal("ups_changed", self.refresh_ups_data)
+                self._logger.info("comunication daemon ready")
                 self.refresh_ups_data()
                 break
             except dbus.exceptions.DBusException as e:
-                logging.info("DBus daemo not ready!")
                 dbus_counter += 1
+                if dbus_counter == 10:
+                    self.logger.exception('deamon not ready, max retry reached!', e)
                 time.sleep(1)
 
     def refresh_ups_data(self):

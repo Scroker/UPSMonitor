@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-import sys, gi, time, dbus, os
+import sys, gi, time, dbus, os, logging, subprocess
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -27,7 +27,7 @@ from .ups_monitor_daemon import UPSMonitorServiceStarter, UPSMonitorClient
 from .monitor_preferences_window import MonitorPreferencesWindow
 
 APPLICATION_ID = 'org.ponderorg.UPSMonitor'
-STARTUP_FILE = ".var/app/org.ponderorg.UPSMonitor/.config/autostart/com.ponderorg.UPSMonitor.desktop"
+LOG_LEVEL = logging.ERROR
 
 class UpsmonitorApplication(Adw.Application):
 
@@ -37,6 +37,11 @@ class UpsmonitorApplication(Adw.Application):
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
         self.connect("shutdown", self.destroy_daemon)
+        settings = Gio.Settings.new(APPLICATION_ID)
+        if settings.get_boolean("prefer-dark") :
+            self.get_style_manager().set_color_scheme(Adw.ColorScheme.FORCE_DARK)
+        else:
+            self.get_style_manager().set_color_scheme(Adw.ColorScheme.FORCE_LIGHT)
 
 
     def do_activate(self):
@@ -56,7 +61,7 @@ class UpsmonitorApplication(Adw.Application):
         about.present()
 
     def on_preferences_action(self, widget, _):
-        preference = MonitorPreferencesWindow()
+        preference = MonitorPreferencesWindow(style_manager = self.get_style_manager())
         preference.set_transient_for(self.props.active_window)
         preference.set_modal(True)
         preference.present()
@@ -76,14 +81,25 @@ class UpsmonitorApplication(Adw.Application):
 def help_menu():
     return "UPS Monitor command list:\n\t--background, -b\trun the DBus daemon directly in backgound without starting GUI\n\t--help, -h\tshow the help menu"
 
+def get_logger():
+    c_handler = logging.FileHandler('.var/app/org.ponderorg.UPSMonitor/data/SystemOut_gui.log')
+    c_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger = logging.getLogger('UpsmonitorMain')
+    logger.addHandler(c_handler)
+    logger.setLevel(LOG_LEVEL)
+    return logger
+
 def main(version, args):
     result = 0
+    logger = get_logger()
     if "--help" in args or "-h" in args:
         help_menu()
         return result
+    logger.info('Starting daemon process')
     daemon_process = UPSMonitorServiceStarter()
     daemon_process.start()
     if not "--background" in args and not "-b" in args :
+        logger.info('Starting frontend')
         app = UpsmonitorApplication()
         result = app.run()
     daemon_process.join()

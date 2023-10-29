@@ -1,4 +1,4 @@
-import threading, dbus, time, os
+import threading, dbus, time, os, logging, subprocess
 
 from gi.repository import Adw, Gtk, Gio, GObject, GLib
 
@@ -8,6 +8,7 @@ from .ups_monitor_daemon import UPSMonitorClient
 from .host_pages import HostSettingsPage, HostInformationsPage
 
 APPLICATION_ID = 'org.ponderorg.UPSMonitor'
+LOG_LEVEL = logging.ERROR
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/monitor_preferences_window.ui')
 class MonitorPreferencesWindow(Adw.PreferencesWindow):
@@ -17,6 +18,9 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     saved_profiles_group = Gtk.Template.Child()
     run_in_background = Gtk.Template.Child()
     run_at_boot = Gtk.Template.Child()
+    dark_theme_row = Gtk.Template.Child()
+    refresh_interval_row = Gtk.Template.Child()
+    max_retry_row = Gtk.Template.Child()
     temporary_profiles_list = Gtk.Template.Child()
     temporary_profiles_group = Gtk.Template.Child()
     no_host_connection = Gtk.Template.Child()
@@ -25,20 +29,40 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     dbus_client = None
 
     def __init__(self, **kwargs):
+        self.style_manager = kwargs.get("style_manager", None)
+        if self.style_manager != None:
+            kwargs.pop("style_manager")
         super().__init__(**kwargs)
         self.add_server_box = AddNewServerBox()
         self.add_server_box.set_transient_for(self)
         self.add_server_box.set_modal(True)
-        self.setting = Gio.Settings.new("org.ponderorg.UPSMonitor")
-        self.setting.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
-        self.setting.bind("run-at-boot", self.run_at_boot, "active", Gio.SettingsBindFlags.DEFAULT)
+        self._settings = Gio.Settings.new(APPLICATION_ID)
+        self._settings.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
+        self._settings.bind("run-at-boot", self.run_at_boot, "active", Gio.SettingsBindFlags.DEFAULT)
+        self._settings.bind("prefer-dark", self.dark_theme_row, "active", Gio.SettingsBindFlags.DEFAULT)
+        self._settings.bind("retry-max", self.max_retry_row, "value", Gio.SettingsBindFlags.DEFAULT)
+        self._settings.bind("polling-interval", self.refresh_interval_row, "value", Gio.SettingsBindFlags.DEFAULT)
+        self.initialize_logs()
         thread = threading.Thread(target=self.update_profiles, daemon = True)
         thread.start()
+        nut_check_install = subprocess.run(["flatpak-spawn", "--host", "dnf", "list", "installed", "nut"], stdout=subprocess.PIPE, text=True)
+        if not nut_check_install.returncode:
+            for out_str in nut_check_install.stdout.split("\n") :
+                if "nut" in out_str :
+                    arr = out_str.split()
+                    print ('name: ', arr[0])
+                    print ('version: ', arr[1])
+                    print ('distribution: ', arr[2])
+        else:
+            list_filess = subprocess.run(["flatpak-spawn", "--host", "pkexec", "dnf", "install", "nut", "-y"], stdout=subprocess.PIPE, text=True)
 
-    @Gtk.Template.Callback()
-    def on_add_server_button_clicked(self, widget):
-        allocation = self.get_allocation()
-        self.add_server_box.present()
+
+    def initialize_logs(self):
+        self._logger = logging.getLogger('MonitorPreferencesWindow')
+        c_handler = logging.FileHandler('.var/app/' + APPLICATION_ID + '/data/SystemOut_gui.log')
+        c_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        self._logger.setLevel(LOG_LEVEL)
+        self._logger.addHandler(c_handler)
 
     def update_profiles(self, widget = None, host_var = None):
         if self.start_dbus_connection():
@@ -50,17 +74,20 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
 
     def start_dbus_connection(self):
         dbus_ready = False
-        dbus_counter = 0
         if self.dbus_client == None :
-            while not dbus_ready and dbus_counter < 10:
+            dbus_counter = 0
+            while dbus_counter < 10:
                 try:
                     self.dbus_client = UPSMonitorClient()
                     self.dbus_client.connect_to_signal('host_updated', self.update_profiles)
                     self.dbus_client.connect_to_signal('host_deleated', self.delete_profile)
+                    self._logger.info("comunication daemon ready")
                     dbus_ready = True
+                    break
                 except dbus.exceptions.DBusException as e:
-                    print('DBus daemo not ready: ', e)
                     dbus_counter += 1
+                    if dbus_counter == 10:
+                        self.logger.exception('deamon not ready, max retry reached!', e)
                     time.sleep(1)
             return dbus_ready
         else:
@@ -108,14 +135,26 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.update_profiles()
 
     @Gtk.Template.Callback()
+    def on_add_server_button_clicked(self, widget):
+        allocation = self.get_allocation()
+        self.add_server_box.present()
+
+    @Gtk.Template.Callback()
     def run_background_switch_selected(self, widget, args):
-        if self.setting.get_value("run-in-background") :
+        if self._settings.get_value("run-in-background") :
             self.run_at_boot.set_active(False)
 
     @Gtk.Template.Callback()
     def autostart_switch_selected(self, widget, args):
-        if not self.setting.get_value("run-at-boot") :
+        if not self._settings.get_value("run-at-boot") :
             self.run_in_background.set_active(True)
+
+    @Gtk.Template.Callback()
+    def dark_theme_selected(self, widget, args):
+        if self.dark_theme_row.get_active() :
+            self.style_manager.set_color_scheme(Adw.ColorScheme.FORCE_DARK)
+        elif not self.dark_theme_row.get_active() :
+            self.style_manager.set_color_scheme(Adw.ColorScheme.FORCE_LIGHT)
 
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/saved_host_action_row.ui')

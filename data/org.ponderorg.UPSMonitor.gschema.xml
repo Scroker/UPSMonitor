@@ -7,5 +7,14 @@
 	  <key name="run-at-boot" type="b">
       <default>false</default>
     </key>
+	  <key name="prefer-dark" type="b">
+      <default>false</default>
+    </key>
+	  <key name="retry-max" type="i">
+      <default>0</default>
+    </key>
+	  <key name="polling-interval" type="i">
+      <default>1</default>
+    </key>
   </schema>
 </schemalist>

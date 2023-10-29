@@ -16,7 +16,7 @@
         </child>
         <child>
           <object class="AdwStatusPage">
-            <property name="title" translatable="true">Welcome to UPSMonitor</property>
+            <property name="title" translatable="true">Welcome!</property>
             <child>
               <object class="GtkBox">
                 <property name="orientation">1</property>
@@ -35,7 +35,15 @@
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="label" translatable="true">A simple interface to manage your UPS</property>
+                    <property name="label" translatable="true">A simple interface</property>
+                    <style>
+                      <class name="title-3"/>
+                    </style>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="label" translatable="true">to manage your UPS</property>
                     <style>
                       <class name="title-3"/>
                     </style>

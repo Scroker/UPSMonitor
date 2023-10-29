@@ -11,7 +11,8 @@
         <property name="icon-name">settings-symbolic</property>
         <child>
           <object class="AdwPreferencesGroup">
-            <property name="title" translatable="yes">Startup configurations</property>
+            <property name="title" translatable="yes">Background</property>
+            <property name="description" translatable="yes">Manage application background settings</property>
             <child>
               <object class="AdwSwitchRow" id="run_at_boot">
                 <property name="title">Start on boot</property>
@@ -24,6 +25,70 @@
                 <property name="title">Run in background</property>
                 <property name="subtitle">Enable to start at boot in background</property>
                 <signal name="notify::active" handler="run_background_switch_selected"/>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Network</property>
+            <property name="description" translatable="yes">Manage general connection parameters</property>
+            <child>
+              <object class="AdwSpinRow" id="refresh_interval_row">
+                <property name="title" translatable="yes">Polling interval</property>
+                <property name="subtitle">Set the refresh UPS data interval</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">3</property>
+                    <property name="upper">10</property>
+                    <property name="value">5</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSpinRow" id="max_retry_row">
+                <property name="title" translatable="yes">Max faliure retry</property>
+                <property name="subtitle">Set the number of max retry for each polling interval</property>
+                <property name="adjustment">
+                  <object class="GtkAdjustment">
+                    <property name="lower">0</property>
+                    <property name="upper">4</property>
+                    <property name="value">3</property>
+                    <property name="step-increment">1</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Network UPS Tools</property>
+            <property name="description" translatable="yes">Install and condfigure Network UPS Tools</property>
+            <child>
+              <object class="AdwActionRow">
+                <property name="title" translatable="yes">Install NUT</property>
+                <property name="subtitle" translatable="yes">Authentication required</property>
+                <property name="activatable">false</property>
+                <child>
+                  <object class="GtkButton">
+                    <property name="margin-top">10</property>
+                    <property name="margin-bottom">10</property>
+                    <property name="label">Install</property>
+                    <property name="child">
+                      <object class="AdwButtonContent">
+                        <property name="icon-name">folder-download-symbolic</property>
+                        <property name="label" translatable="yes">Install</property>
+                        <property name="use-underline">True</property>
+                      </object>
+                    </property>
+                    <style>
+                      <class name="suggested-action"/>
+                    </style>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
@@ -103,8 +168,8 @@
                 <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                 <property name="child">
                   <object class="AdwButtonContent">
-                    <property name="icon-name">plus-symbolic</property>
-                    <property name="label" translatable="yes">_Add new</property>
+                    <property name="icon-name">network-receive-symbolic</property>
+                    <property name="label" translatable="yes">_Connect</property>
                     <property name="use-underline">True</property>
                   </object>
                 </property>
@@ -134,8 +199,8 @@
                 <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                 <property name="child">
                   <object class="AdwButtonContent">
-                    <property name="icon-name">plus-symbolic</property>
-                    <property name="label" translatable="yes">_Add new</property>
+                    <property name="icon-name">network-receive-symbolic</property>
+                    <property name="label" translatable="yes">_Connect</property>
                     <property name="use-underline">True</property>
                   </object>
                 </property>
@@ -149,6 +214,51 @@
                 <style>
                   <class name="boxed-list"/>
                 </style>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="title">Appearence</property>
+        <property name="icon-name">preferences-desktop-appearance-symbolic</property>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <child>
+              <object class="AdwSwitchRow" id="dark_theme_row">
+                <property name="title">Dark Theme</property>
+                <property name="subtitle">Enable dark theme</property>
+                <signal name="notify::active" handler="dark_theme_selected"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="AdwPreferencesPage">
+        <property name="title" translatable="yes">Developer</property>
+        <property name="icon-name">code-symbolic</property>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <child>
+              <object class="AdwComboRow">
+                <property name="title" translatable="yes">Log level</property>
+                <property name="subtitle" translatable="yes">Set log level </property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">NOTSET</item>
+                      <item translatable="yes">DEBUG</item>
+                      <item translatable="yes">INFO</item>
+                      <item translatable="yes">WARNING</item>
+                      <item translatable="yes">ERROR</item>
+                      <item translatable="yes">CRITICAL</item>
+                    </items>
+                  </object>
+                </property>
               </object>
             </child>
           </object>
