@@ -27,9 +27,10 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     no_host_connection = Gtk.Template.Child()
     no_dbus_connection = Gtk.Template.Child()
     add_temp_button = Gtk.Template.Child()
-    installed_nut_row = Gtk.Template.Child()
     install_nut_row = Gtk.Template.Child()
-    installed_nut_label = Gtk.Template.Child()
+    install_nut_label = Gtk.Template.Child()
+    install_nut_spinner = Gtk.Template.Child()
+    install_nut_button = Gtk.Template.Child()
     dbus_client = None
 
     def __init__(self, **kwargs):
@@ -53,14 +54,22 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         thread.start()
 
     def nut_check_install(self):
+        self.install_nut_row.set_title('Checking')
+        self.install_nut_row.set_subtitle('Checking NUT local installation')
+        self.install_nut_button.set_visible(False)
+        self.install_nut_label.set_visible(False)
+        self.install_nut_spinner.start()
         installed = NutController.nut_check_install()
         if installed != None :
-            self.installed_nut_row.set_visible(True)
-            self.install_nut_row.set_visible(False)
-            self.installed_nut_label.set_label(installed['version'])
+            self.install_nut_label.set_visible(True)
+            self.install_nut_row.set_title('Installed!')
+            self.install_nut_row.set_subtitle('The NUT server already installed locally')
+            self.install_nut_label.set_label(installed['version'])
+            self.install_nut_spinner.stop()
         else:
-            self.installed_nut_row.set_visible(False)
-            self.install_nut_row.set_visible(True)
+            self.install_nut_row.set_title('Install NUT Server')
+            self.install_nut_row.set_subtitle('This install NUT on local machine, authentication required')
+            self.install_nut_button.set_visible(True)
 
     def install_nut(self):
         NutController.install_nut()

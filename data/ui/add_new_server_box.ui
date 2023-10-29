@@ -8,149 +8,260 @@
     <property name="default-width">600</property>
     <property name="default-height">600</property>
     <child>
-      <object class="AdwToolbarView">
-        <child type="top">
-          <object class="AdwHeaderBar">
-            <property name="show-end-title-buttons">False</property>
-            <property name="title-widget">
-              <object class="AdwWindowTitle">
-                <property name="title" translatable="yes">Add new server</property>
+      <object class="AdwNavigationView">
+        <child>
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Add new UPS</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"/>
+                </child>
+                <property name="content">
+                  <object class="GtkCenterBox">
+                    <property name="orientation">vertical</property>
+                    <property name="center-widget">
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="width-request">300</property>
+                            <property name="margin-bottom">20</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <property name="action-name">navigation.push</property>
+                            <property name="action-target">'connection-local-page'</property>
+                            <property name="child">
+                              <object class="AdwButtonContent">
+                                <property name="icon-name">drive-harddisk-usb-symbolic</property>
+                                <property name="label" translatable="yes">USB Connection</property>
+                                <property name="use-underline">True</property>
+                              </object>
+                            </property>
+                            <style>
+                              <class name="pill"/>
+                              <class name="suggested-action"/>
+                             </style>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="width-request">300</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <property name="action-name">navigation.push</property>
+                            <property name="action-target">'connection-remote-page'</property>
+                            <property name="child">
+                              <object class="AdwButtonContent">
+                                <property name="icon-name">network-receive-symbolic</property>
+                                <property name="label" translatable="yes">Netwotk Connection</property>
+                                <property name="use-underline">True</property>
+                              </object>
+                            </property>
+                            <style>
+                              <class name="pill"/>
+                              <class name="suggested-action"/>
+                             </style>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                  </object>
+                </property>
               </object>
             </property>
-            <child type="start">
-              <object class="GtkButton" id="connect_button">
-                <property name="child">
-                  <object class="AdwButtonContent">
-                    <property name="icon-name">network-transmit-receive-symbolic</property>
-                    <property name="label" translatable="yes">_Connect</property>
-                    <property name="use-underline">True</property>
-                  </object>
-                </property>
-                <style>
-                  <class name="suggested-action"/>
-                </style>
-              </object>
-            </child>
-            <child type="end">
-              <object class="GtkButton" id="cancel_button">
-                <property name="child">
-                  <object class="AdwButtonContent">
-                    <property name="icon-name">network-offline-symbolic</property>
-                    <property name="label" translatable="yes">_Cancel</property>
-                    <property name="use-underline">True</property>
-                  </object>
-                </property>
-                <style>
-                  <class name="destructive-action"/>
-                </style>
-              </object>
-            </child>
           </object>
         </child>
-        <property name="content">
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkProgressBar" id="progress">
-                <property name="visible">False</property>
-                <style>
-                  <class name="osd"/>
-                </style>
-              </object>
-            </child>
-            <child>
-              <object class="AdwBanner" id="banner">
-              </object>
-            </child>
-            <child>
-              <object class="AdwPreferencesPage">
-                <!--
-                <child>
-                  <object class="AdwPreferencesGroup">
-                    <child>
-                    <object class="AdwComboRow">
-                      <property name="title" translatable="yes">Connection Type</property>
-                      <property name="model">
-                        <object class="GtkStringList">
-                          <items>
-                            <item translatable="yes">Remote</item>
-                            <item translatable="yes">Local</item>
-                          </items>
-                        </object>
-                      </property>
-                    </object>
-                      </child>
+        <child>
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Add remote UPS server</property>
+            <property name="tag" translatable="yes">connection-remote-page</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="show-end-title-buttons">False</property>
                   </object>
                 </child>
-                -->
-                <child>
-                  <object class="AdwPreferencesGroup">
-                    <property name="title">Connection</property>
-                    <property name="description">Set the host connection parameters</property>
+                <property name="content">
+                  <object class="GtkBox">
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="AdwEntryRow" id="ip_address">
-                        <property name="title" translatable="yes">Host address</property>
+                      <object class="GtkProgressBar" id="progress">
+                        <property name="visible">False</property>
+                        <style>
+                          <class name="osd"/>
+                        </style>
                       </object>
                     </child>
                     <child>
-                      <object class="AdwSpinRow" id="port">
-                        <property name="title" translatable="yes">Port</property>
-                        <property name="adjustment">
-                          <object class="GtkAdjustment">
-                            <property name="lower">0</property>
-                            <property name="upper">65535</property>
-                            <property name="value">3493</property>
-                            <property name="page-increment">10</property>
-                            <property name="step-increment">1</property>
+                      <object class="AdwBanner" id="banner">
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwPreferencesPage">
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <property name="title">Connection parameters</property>
+                            <property name="description">Set the host connection parameters</property>
+                            <child>
+                              <object class="AdwEntryRow" id="ip_address">
+                                <property name="title" translatable="yes">Host address</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="AdwSpinRow" id="port">
+                                <property name="title" translatable="yes">Port</property>
+                                <property name="adjustment">
+                                  <object class="GtkAdjustment">
+                                    <property name="lower">0</property>
+                                    <property name="upper">65535</property>
+                                    <property name="value">3493</property>
+                                    <property name="page-increment">10</property>
+                                    <property name="step-increment">1</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <property name="title">Save profile</property>
+                            <property name="description">Save host profile</property>
+                            <property name="header-suffix">
+                              <object class="GtkSwitch" id="save_profile_switch">
+                                <property name="margin-top">10</property>
+                                <property name="margin-bottom">10</property>
+                              </object>
+                            </property>
+                            <child>
+                              <object class="AdwEntryRow" id="profile_name">
+                                <property name="title" translatable="yes">Profile name</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwPreferencesGroup">
+                            <property name="title">Use authentication</property>
+                            <property name="description">Authentication parameters</property>
+                            <property name="header-suffix">
+                              <object class="GtkSwitch" id="authentication_switch">
+                                <property name="margin-top">10</property>
+                                <property name="margin-bottom">10</property>
+                              </object>
+                            </property>
+                            <child>
+                              <object class="AdwEntryRow" id="username">
+                                <property name="title" translatable="yes">Username</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="AdwPasswordEntryRow" id="password">
+                                <property name="title" translatable="yes">Password</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+                <child type="bottom">
+                  <object class="GtkActionBar">
+                    <child type="start">
+                      <object class="GtkButton" id="connect_button">
+                        <property name="child">
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">network-transmit-receive-symbolic</property>
+                            <property name="label" translatable="yes">_Connect</property>
+                            <property name="use-underline">True</property>
                           </object>
                         </property>
+                        <style>
+                          <class name="suggested-action"/>
+                        </style>
                       </object>
                     </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwPreferencesGroup">
-                    <property name="title">Save profile</property>
-                    <property name="description">Save host profile</property>
-                    <property name="header-suffix">
-                      <object class="GtkSwitch" id="save_profile_switch">
-                        <property name="margin-top">10</property>
-                        <property name="margin-bottom">10</property>
-                      </object>
-                    </property>
-                    <child>
-                      <object class="AdwEntryRow" id="profile_name">
-                        <property name="title" translatable="yes">Profile name</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwPreferencesGroup">
-                    <property name="title">Use authentication</property>
-                    <property name="description">Authentication parameters</property>
-                    <property name="header-suffix">
-                      <object class="GtkSwitch" id="authentication_switch">
-                        <property name="margin-top">10</property>
-                        <property name="margin-bottom">10</property>
-                      </object>
-                    </property>
-                    <child>
-                      <object class="AdwEntryRow" id="username">
-                        <property name="title" translatable="yes">Username</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="AdwPasswordEntryRow" id="password">
-                        <property name="title" translatable="yes">Password</property>
+                    <child type="end">
+                      <object class="GtkButton" id="cancel_button">
+                        <property name="child">
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">network-offline-symbolic</property>
+                            <property name="label" translatable="yes">_Cancel</property>
+                            <property name="use-underline">True</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="destructive-action"/>
+                        </style>
                       </object>
                     </child>
                   </object>
                 </child>
               </object>
-            </child>
+            </property>
           </object>
-        </property>
+        </child>
+        <child>
+          <object class="AdwNavigationPage">
+            <property name="title" translatable="yes">Add local UPS</property>
+            <property name="tag" translatable="yes">connection-local-page</property>
+            <property name="child">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar"/>
+                </child>
+                <child>
+                  <object class="AdwPreferencesPage">
+                    <child>
+                      <object class="AdwPreferencesGroup">
+                        <property name="title" translatable="yes">Network UPS Tools</property>
+                        <property name="description" translatable="yes">Install and condfigure Network UPS Tools</property>
+                        <child>
+                          <object class="AdwActionRow" id="installed_nut_row">
+                            <property name="visible">false</property>
+                            <property name="title">Installed NUT</property>
+                            <property name="subtitle">Show installed NUT version</property>
+                            <child type="suffix">
+                              <object class="GtkLabel" id="installed_nut_label"/>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="AdwActionRow" id="install_nut_row">
+                            <property name="title" translatable="yes">Install NUT</property>
+                            <property name="subtitle" translatable="yes">Authentication required</property>
+                            <property name="activatable">false</property>
+                            <child>
+                              <object class="GtkButton">
+                                <property name="margin-top">10</property>
+                                <property name="margin-bottom">10</property>
+                                <property name="label">Install</property>
+                                <!-- <signal name="clicked" handler="install_nut_selected" swapped="no"/> -->
+                                <property name="child">
+                                  <object class="AdwButtonContent">
+                                    <property name="icon-name">folder-download-symbolic</property>
+                                    <property name="label" translatable="yes">Install</property>
+                                    <property name="use-underline">True</property>
+                                  </object>
+                                </property>
+                                <style>
+                                  <class name="suggested-action"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </property>
+          </object>
+        </child>
       </object>
     </child>
   </template>

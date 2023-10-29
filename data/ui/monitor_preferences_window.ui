@@ -68,36 +68,36 @@
             <property name="title" translatable="yes">Network UPS Tools</property>
             <property name="description" translatable="yes">Install and condfigure Network UPS Tools</property>
             <child>
-              <object class="AdwActionRow" id="installed_nut_row">
-                <property name="visible">false</property>
-                <property name="title">Installed NUT</property>
-                <property name="subtitle">Show installed NUT version</property>
-                <child type="suffix">
-                  <object class="GtkLabel" id="installed_nut_label"/>
-                </child>
-              </object>
-            </child>
-            <child>
               <object class="AdwActionRow" id="install_nut_row">
-                <property name="title" translatable="yes">Install NUT</property>
-                <property name="subtitle" translatable="yes">Authentication required</property>
-                <property name="activatable">false</property>
-                <child>
-                  <object class="GtkButton">
-                    <property name="margin-top">10</property>
-                    <property name="margin-bottom">10</property>
-                    <property name="label">Install</property>
-                    <signal name="clicked" handler="install_nut_selected" swapped="no"/>
-                    <property name="child">
-                      <object class="AdwButtonContent">
-                        <property name="icon-name">folder-download-symbolic</property>
-                        <property name="label" translatable="yes">Install</property>
-                        <property name="use-underline">True</property>
+                <child type="suffix">
+                  <object class="GtkBox">
+                    <child>
+                      <object class="GtkSpinner" id="install_nut_spinner"/>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="install_nut_label">
+                        <property name="visible">false</property>
                       </object>
-                    </property>
-                    <style>
-                      <class name="suggested-action"/>
-                    </style>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="install_nut_button">
+                        <property name="visible">false</property>
+                        <property name="margin-top">10</property>
+                        <property name="margin-bottom">10</property>
+                        <property name="label">Install</property>
+                        <signal name="clicked" handler="install_nut_selected" swapped="no"/>
+                        <property name="child">
+                          <object class="AdwButtonContent">
+                            <property name="icon-name">folder-download-symbolic</property>
+                            <property name="label" translatable="yes">Install</property>
+                            <property name="use-underline">True</property>
+                          </object>
+                        </property>
+                        <style>
+                          <class name="suggested-action"/>
+                        </style>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
