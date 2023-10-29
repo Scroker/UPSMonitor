@@ -5,6 +5,7 @@ from gi.repository import Adw, Gtk, Gio, GObject, GLib
 from .data_model import Host
 from .add_new_server_box import AddNewServerBox
 from .ups_monitor_daemon import UPSMonitorClient
+from .nut_controller import NutController
 from .host_pages import HostSettingsPage, HostInformationsPage
 
 APPLICATION_ID = 'org.ponderorg.UPSMonitor'
@@ -26,6 +27,9 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     no_host_connection = Gtk.Template.Child()
     no_dbus_connection = Gtk.Template.Child()
     add_temp_button = Gtk.Template.Child()
+    installed_nut_row = Gtk.Template.Child()
+    install_nut_row = Gtk.Template.Child()
+    installed_nut_label = Gtk.Template.Child()
     dbus_client = None
 
     def __init__(self, **kwargs):
@@ -45,17 +49,27 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.initialize_logs()
         thread = threading.Thread(target=self.update_profiles, daemon = True)
         thread.start()
-        nut_check_install = subprocess.run(["flatpak-spawn", "--host", "dnf", "list", "installed", "nut"], stdout=subprocess.PIPE, text=True)
-        if not nut_check_install.returncode:
-            for out_str in nut_check_install.stdout.split("\n") :
-                if "nut" in out_str :
-                    arr = out_str.split()
-                    print ('name: ', arr[0])
-                    print ('version: ', arr[1])
-                    print ('distribution: ', arr[2])
-        else:
-            list_filess = subprocess.run(["flatpak-spawn", "--host", "pkexec", "dnf", "install", "nut", "-y"], stdout=subprocess.PIPE, text=True)
+        thread = threading.Thread(target=self.nut_check_install, daemon = True)
+        thread.start()
 
+    def nut_check_install(self):
+        installed = NutController.nut_check_install()
+        if installed != None :
+            self.installed_nut_row.set_visible(True)
+            self.install_nut_row.set_visible(False)
+            self.installed_nut_label.set_label(installed['version'])
+        else:
+            self.installed_nut_row.set_visible(False)
+            self.install_nut_row.set_visible(True)
+
+    def install_nut(self):
+        NutController.install_nut()
+        self.nut_check_install()
+
+    @Gtk.Template.Callback()
+    def install_nut_selected(self, widget):
+        thread = threading.Thread(target=self.install_nut, daemon = True)
+        thread.start()
 
     def initialize_logs(self):
         self._logger = logging.getLogger('MonitorPreferencesWindow')

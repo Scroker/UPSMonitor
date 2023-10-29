@@ -27,6 +27,7 @@ upsmonitor_sources = [
   'gui/add_new_server_box.py',
   'gui/monitor_preferences_window.py',
   'service/ups_monitor_daemon.py',
+  'service/nut_controller.py',
   'service/data_service.py',
   'model/data_model.py',
   'model/exception_model.py',
