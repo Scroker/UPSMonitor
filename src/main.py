@@ -21,8 +21,10 @@ import sys, gi, time, dbus, os, logging, subprocess
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 
-from .window import UpsmonitorWindow
 from gi.repository import Gtk, Gio, Adw
+
+from .window import UpsmonitorWindow
+from .add_new_server_box import AddNewServerBox
 from .ups_monitor_daemon import UPSMonitorServiceStarter, UPSMonitorClient
 from .monitor_preferences_window import MonitorPreferencesWindow
 
@@ -35,6 +37,7 @@ class UpsmonitorApplication(Adw.Application):
         super().__init__(application_id=APPLICATION_ID, flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
+        self.create_action('add_ups', self.on_add_ups_action, ["<Ctrl>n"])
         self.create_action('preferences', self.on_preferences_action)
         self.connect("shutdown", self.destroy_daemon)
         settings = Gio.Settings.new(APPLICATION_ID)
@@ -62,9 +65,18 @@ class UpsmonitorApplication(Adw.Application):
 
     def on_preferences_action(self, widget, _):
         preference = MonitorPreferencesWindow(style_manager = self.get_style_manager())
+        preference.new_ups_button.connect("clicked", self.on_add_ups_action)
+        preference.add_saved_button.connect("clicked", self.on_add_ups_action)
+        preference.add_temp_button.connect("clicked", self.on_add_ups_action)
         preference.set_transient_for(self.props.active_window)
         preference.set_modal(True)
         preference.present()
+
+    def on_add_ups_action(self, widget, _ = None):
+        add_ups = AddNewServerBox()
+        add_ups.set_transient_for(self.props.active_window)
+        add_ups.set_modal(True)
+        add_ups.present()
 
     def create_action(self, name, callback, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)

@@ -26,6 +26,8 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     temporary_profiles_group = Gtk.Template.Child()
     no_host_connection = Gtk.Template.Child()
     no_dbus_connection = Gtk.Template.Child()
+    new_ups_button = Gtk.Template.Child()
+    add_saved_button = Gtk.Template.Child()
     add_temp_button = Gtk.Template.Child()
     install_nut_row = Gtk.Template.Child()
     install_nut_label = Gtk.Template.Child()
@@ -38,9 +40,6 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         if self.style_manager != None:
             kwargs.pop("style_manager")
         super().__init__(**kwargs)
-        self.add_server_box = AddNewServerBox()
-        self.add_server_box.set_transient_for(self)
-        self.add_server_box.set_modal(True)
         self._settings = Gio.Settings.new(APPLICATION_ID)
         self._settings.bind("run-in-background", self.run_in_background, "active", Gio.SettingsBindFlags.DEFAULT)
         self._settings.bind("run-at-boot", self.run_at_boot, "active", Gio.SettingsBindFlags.DEFAULT)
@@ -74,11 +73,6 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
     def install_nut(self):
         NutController.install_nut()
         self.nut_check_install()
-
-    @Gtk.Template.Callback()
-    def install_nut_selected(self, widget):
-        thread = threading.Thread(target=self.install_nut, daemon = True)
-        thread.start()
 
     def initialize_logs(self):
         self._logger = logging.getLogger('MonitorPreferencesWindow')
@@ -158,9 +152,9 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
         self.update_profiles()
 
     @Gtk.Template.Callback()
-    def on_add_server_button_clicked(self, widget):
-        allocation = self.get_allocation()
-        self.add_server_box.present()
+    def install_nut_selected(self, widget):
+        thread = threading.Thread(target=self.install_nut, daemon = True)
+        thread.start()
 
     @Gtk.Template.Callback()
     def run_background_switch_selected(self, widget, args):
@@ -178,7 +172,6 @@ class MonitorPreferencesWindow(Adw.PreferencesWindow):
             self.style_manager.set_color_scheme(Adw.ColorScheme.FORCE_DARK)
         elif not self.dark_theme_row.get_active() :
             self.style_manager.set_color_scheme(Adw.ColorScheme.FORCE_LIGHT)
-
 
 @Gtk.Template(resource_path='/org/ponderorg/UPSMonitor/ui/saved_host_action_row.ui')
 class SavedHostActionRow(Adw.ActionRow):
@@ -230,3 +223,4 @@ class TemporaryHostActionRow(Adw.ActionRow):
             pass
         widget.destroy()
         
+

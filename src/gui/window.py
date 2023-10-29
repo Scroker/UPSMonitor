@@ -42,7 +42,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.add_server_box = AddNewServerBox()
         self.connect("destroy", self.on_destroy)
         self.navigation_view.push(HomePage())
         self.initialize_log()
@@ -82,12 +81,6 @@ class UpsmonitorWindow(Adw.ApplicationWindow):
             ups_action_row = UpsActionRow(ups_data = ups)
             ups_action_row.connect("activated", self.on_ups_row_selected)
             self.ups_list_box.insert(ups_action_row, -1)
-
-    @Gtk.Template.Callback()
-    def on_add_server_button_clicked(self, widget):
-        self.add_server_box.set_transient_for(self)
-        self.add_server_box.set_modal(True)
-        self.add_server_box.present()
 
     def on_ups_row_selected(self, widget):
         self.split_view.set_show_content(True)

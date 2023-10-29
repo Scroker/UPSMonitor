@@ -104,6 +104,30 @@
             </child>
           </object>
         </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Developer</property>
+            <property name="description" translatable="yes">Enable Developer features</property>
+            <child>
+              <object class="AdwComboRow">
+                <property name="title" translatable="yes">Log level</property>
+                <property name="subtitle" translatable="yes">Set log level </property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">NOTSET</item>
+                      <item translatable="yes">DEBUG</item>
+                      <item translatable="yes">INFO</item>
+                      <item translatable="yes">WARNING</item>
+                      <item translatable="yes">ERROR</item>
+                      <item translatable="yes">CRITICAL</item>
+                    </items>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
     <child>
@@ -154,9 +178,9 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="new_ups_button">
                     <property name="label">New NUT-Server connection</property>
-                    <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
+                    <property name="sensitive">true</property>
                     <style>
                       <class name="pill"/>
                       <class name="suggested-action"/>
@@ -173,10 +197,9 @@
             <property name="visible">false</property>
             <property name="description" translatable="yes">In this section you can manage saved profiles</property>
             <property name="header-suffix">
-              <object class="GtkButton">
+              <object class="GtkButton" id="add_saved_button">
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
-                <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                 <property name="child">
                   <object class="AdwButtonContent">
                     <property name="icon-name">network-receive-symbolic</property>
@@ -207,7 +230,6 @@
               <object class="GtkButton" id="add_temp_button">
                 <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
-                <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
                 <property name="child">
                   <object class="AdwButtonContent">
                     <property name="icon-name">network-receive-symbolic</property>
@@ -248,34 +270,5 @@
         </child>
       </object>
     </child>
-    <child>
-      <object class="AdwPreferencesPage">
-        <property name="title" translatable="yes">Developer</property>
-        <property name="icon-name">code-symbolic</property>
-        <child>
-          <object class="AdwPreferencesGroup">
-            <child>
-              <object class="AdwComboRow">
-                <property name="title" translatable="yes">Log level</property>
-                <property name="subtitle" translatable="yes">Set log level </property>
-                <property name="model">
-                  <object class="GtkStringList">
-                    <items>
-                      <item translatable="yes">NOTSET</item>
-                      <item translatable="yes">DEBUG</item>
-                      <item translatable="yes">INFO</item>
-                      <item translatable="yes">WARNING</item>
-                      <item translatable="yes">ERROR</item>
-                      <item translatable="yes">CRITICAL</item>
-                    </items>
-                  </object>
-                </property>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
   </template>
 </interface>
-

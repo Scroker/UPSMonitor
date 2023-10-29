@@ -33,7 +33,7 @@
                     <child type="start">
                       <object class="GtkButton" id="add_server_button">
                         <property name="icon-name">plus-symbolic</property>
-                        <signal name="clicked" handler="on_add_server_button_clicked" swapped="no"/>
+                        <property name="action-name">app.add_ups</property>
                       </object>
                     </child>
                     <child type="end">
@@ -81,12 +81,10 @@
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
-      <!--
       <item>
         <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
         <attribute name="action">win.show-help-overlay</attribute>
       </item>
-      -->
       <item>
         <attribute name="label" translatable="yes">_About UPSMonitor</attribute>
         <attribute name="action">app.about</attribute>

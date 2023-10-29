@@ -8,7 +8,6 @@ class NutController(GObject.Object):
     @staticmethod
     def nut_check_install():
         command_result = subprocess.run(["flatpak-spawn", "--host", "dnf", "list", "installed", "nut"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        NutController.nut_scanner()
         if not command_result.returncode:
             for out_str in command_result.stdout.split("\n") :
                 if "nut" in out_str :

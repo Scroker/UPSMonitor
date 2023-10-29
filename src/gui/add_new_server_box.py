@@ -5,6 +5,7 @@ from pynut3 import nut3
 from gi.repository import Adw, Gtk, GLib, GObject
 
 from .data_model import Host
+from .nut_controller import NutController
 from .exception_model import HostNameAlreadyExist, HostAddressAlreadyExist
 from .ups_monitor_daemon import UPSMonitorClient
 
@@ -19,25 +20,40 @@ class AddNewServerBox(Adw.Window):
     password = Gtk.Template.Child()
     ip_address = Gtk.Template.Child()
     profile_name = Gtk.Template.Child()
-    cancel_button = Gtk.Template.Child()
-    connect_button = Gtk.Template.Child()
     save_profile_switch = Gtk.Template.Child()
     authentication_switch = Gtk.Template.Child()
+    install_nut_row = Gtk.Template.Child()
+    install_nut_spinner = Gtk.Template.Child()
+    install_nut_label = Gtk.Template.Child()
+    install_nut_button = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.connect_button.connect("clicked", self.do_connect)
-        self.cancel_button.connect("clicked",self.cancel)
+        self.ups_monitor_client = UPSMonitorClient()
+        thread = threading.Thread(target=self.nut_check_install, daemon = True)
+        thread.start()
 
-    def cancel(self, widget):
-        self.hide()
+    def nut_check_install(self):
+        self.install_nut_row.set_title('Checking')
+        self.install_nut_row.set_subtitle('Checking NUT local installation')
+        self.install_nut_button.set_visible(False)
+        self.install_nut_label.set_visible(False)
+        self.install_nut_spinner.start()
+        installed = NutController.nut_check_install()
+        if installed != None :
+            self.install_nut_label.set_visible(True)
+            self.install_nut_row.set_title('Installed!')
+            self.install_nut_row.set_subtitle('The NUT server already installed locally')
+            self.install_nut_label.set_label(installed['version'])
+            self.install_nut_spinner.stop()
+        else:
+            self.install_nut_row.set_title('Install NUT Server')
+            self.install_nut_row.set_subtitle('This install NUT on local machine, authentication required')
+            self.install_nut_button.set_visible(True)
 
-    def do_connect(self, widget):
-        self.progress.set_visible(True)
-        connect_thread = threading.Thread(target=self._do_connect, daemon = True)
-        connect_thread.start()
-        load_thread = threading.Thread(target=self.load_function, daemon = True)
-        load_thread.start()
+    def install_nut(self):
+        NutController.install_nut()
+        self.nut_check_install()
 
     def close_banner(self):
         time.sleep(5)
@@ -54,13 +70,20 @@ class AddNewServerBox(Adw.Window):
         self.progress.set_text(str(i))
         return False
 
-    def _do_connect(self):
+    @Gtk.Template.Callback()
+    def cancel(self, widget):
+        self.destroy()
+
+    @Gtk.Template.Callback()
+    def do_connect(self, widget):
+        self.progress.set_visible(True)
+        load_thread = threading.Thread(target=self.load_function, daemon = True)
+        load_thread.start()
         self.banner.set_revealed(False)
         ip_address = self.ip_address.get_text()
         username = self.username.get_text()
         password = self.password.get_text()
         profile_name = self.profile_name.get_text()
-        ups_monitor_client = UPSMonitorClient()
         if ip_address == "":
             self.banner.set_title("Host address should not be null")
             self.banner.set_revealed(True)
@@ -87,8 +110,10 @@ class AddNewServerBox(Adw.Window):
                     host.profile_name = host.ip_address
                 else:
                     host.profile_name = profile_name
-                ups_monitor_client.save_host(host)
-                self.hide()
+                save_thread = threading.Thread(target=self.ups_monitor_client.save_host, args=(host,), daemon = True)
+                save_thread.start()
+                self.destroy()
+                return
             except HostNameAlreadyExist :
                 self.banner.set_title(_("Profile name already exist"))
                 self.banner.set_revealed(True)
@@ -119,5 +144,10 @@ class AddNewServerBox(Adw.Window):
             thread.start()
             return
         self.progress.set_visible(False)
-        self.hide()
+        self.destroy()
+
+    @Gtk.Template.Callback()
+    def install_nut_selected(self, widget):
+        thread = threading.Thread(target=self.install_nut, daemon = True)
+        thread.start()
 
